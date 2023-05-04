@@ -1,0 +1,6 @@
+Application Version: ${lacus.version}
+Spring Boot Version: ${spring-boot.version}
+ __     __    ___  _  _  ____
+(  )   / _\  / __)/ )( \/ ___)
+/ (_/\/    \( (__ ) \/ (\___ \
+\____/\_/\_/ \___)\____/(____/

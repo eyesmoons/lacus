@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.metadata.mapper.MetaTableMapper">
+    <resultMap id="dbTableMap" type="com.lacus.dao.metadata.entity.MetaDbTableEntity">
+        <result column="datasource_id" property="datasourceId"/>
+        <result column="datasource_name" property="datasourceName"/>
+        <result column="datasource_type" property="datasourceType"/>
+        <result column="db_id" property="dbId"/>
+        <result column="db_name" property="dbName"/>
+        <result column="table_id" property="tableId"/>
+        <result column="table_name" property="tableName"/>
+        <result column="comment" property="comment"/>
+        <result column="table_type" property="type"/>
+        <result column="numeric_scale" property="numericScale"/>
+        <result column="column_comment" property="columnComment"/>
+    </resultMap>
+
+    <select id="listMetaDbTable" resultMap="dbTableMap">
+        select
+            ds.datasource_id,
+            ds.datasource_name,
+            ds.`type` as datasource_type,
+            db.db_id,
+            db.db_name,
+            tbl.table_id,
+            tbl.table_name,
+            tbl.comment,
+            tbl.`type` as table_type
+        from meta_table tbl
+        left join meta_db db on tbl.db_id = db.db_id
+        left join meta_datasource ds on ds.datasource_id = db.datasource_id
+        <where>
+            <if test="datasourceId != null and datasourceId != ''">
+                and ds.datasource_id = #{datasourceId}
+            </if>
+            <if test="dbName != null and dbName != ''">
+                and db.db_name = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                and tbl.table_name = #{tableName}
+            </if>
+        </where>
+    </select>
+</mapper>

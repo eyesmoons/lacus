@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.metadata.mapper.SchemaMapper">
+    <resultMap id="schemaDbMap" type="com.lacus.dao.metadata.entity.SchemaDbEntity">
+        <result column="schema_name" property="schemaName"/>
+    </resultMap>
+
+    <resultMap id="schemaTableMap" type="com.lacus.dao.metadata.entity.SchemaTableEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="table_type" property="tableType"/>
+        <result column="engine" property="engine"/>
+        <result column="table_rows" property="tableRows"/>
+        <result column="data_length" property="dataLength"/>
+        <result column="create_time" property="createTime"/>
+        <result column="table_comment" property="tableComment"/>
+    </resultMap>
+
+    <resultMap id="schemaColumnMap" type="com.lacus.dao.metadata.entity.SchemaColumnEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="column_name" property="columnName"/>
+        <result column="column_default" property="columnDefault"/>
+        <result column="is_nullable" property="isNullable"/>
+        <result column="data_type" property="dataType"/>
+        <result column="column_type" property="columnType"/>
+        <result column="character_octet_length" property="characterOctetLength"/>
+        <result column="numeric_precision" property="numericPrecision"/>
+        <result column="numeric_scale" property="numericScale"/>
+        <result column="column_comment" property="columnComment"/>
+    </resultMap>
+
+    <select id="listAllSchemaDb" resultMap="schemaDbMap">
+        SELECT
+            schema_name
+        from
+            information_schema.schemata
+        WHERE
+            SCHEMA_NAME != 'information_schema'
+            AND SCHEMA_NAME != 'mysql'
+            AND SCHEMA_NAME != 'performance_schema'
+            AND SCHEMA_NAME != 'sys'
+    </select>
+
+    <select id="listSchemaTable" resultMap="schemaTableMap">
+        SELECT
+            table_schema,
+            table_name,
+            table_type,
+            engine,
+            table_rows,
+            data_length,
+            create_time,
+            table_comment
+        FROM
+            information_schema.tables
+        <where>
+            table_type != 'VIEW'
+            <if test="dbName != null and dbName != ''">
+                AND table_schema = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                AND table_name = #{tableName}
+            </if>
+        </where>
+    </select>
+
+    <select id="listSchemaColumn" resultMap="schemaColumnMap">
+        select
+            table_schema,
+            table_name,
+            column_name,
+            column_default,
+            is_nullable,
+            data_type,
+            column_type,
+            character_octet_length,
+            numeric_precision,
+            numeric_scale,
+            column_comment
+        from
+            information_schema.columns
+        <where>
+            <if test="dbName != null and dbName != ''">
+                AND table_schema = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                AND table_name = #{tableName}
+            </if>
+        </where>
+    </select>
+</mapper>
