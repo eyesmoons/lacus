@@ -75,8 +75,9 @@ public class DynamicDataSourceContextHolder {
         }
 
         DynamicDataSource dynamicDataSource = SpringUtils.getBean(DynamicDataSource.class);
-        Map<Object, Object> targetDataSources = new HashMap<>(8);
+        Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put(metaDatasource.getDatasourceName(), druidDataSource);
+        dynamicDataSource.setTargetDataSources(targetDataSources);
         dynamicDataSource.afterPropertiesSet();
 
         log.info("切换到{}数据源", metaDatasource.getDatasourceName());
