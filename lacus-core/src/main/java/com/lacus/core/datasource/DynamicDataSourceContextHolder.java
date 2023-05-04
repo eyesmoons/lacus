@@ -35,7 +35,25 @@ public class DynamicDataSourceContextHolder {
         CONTEXT_HOLDER.set(dsType);
     }
 
-    public static void setDatasourceId(Long datasourceId) {
+    private static String convertUrl(MetaDatasourceEntity metaDatasource, String protocol) {
+        return String.format("jdbc:%s://%s:%s/", protocol, metaDatasource.getIp(), metaDatasource.getPort());
+    }
+
+    /**
+     * 获得数据源的变量
+     */
+    public static String getDataSourceType() {
+        return CONTEXT_HOLDER.get();
+    }
+
+    /**
+     * 清空数据源变量
+     */
+    public static void clearDataSourceType() {
+        CONTEXT_HOLDER.remove();
+    }
+
+    public static void setDataSourceId(Long datasourceId) {
         MetaDatasourceMapper metaDatasourceMapper = SpringUtils.getBean(MetaDatasourceMapper.class);
         MetaDatasourceEntity metaDatasource = metaDatasourceMapper.selectById(datasourceId);
         if (Objects.isNull(metaDatasource)) {
@@ -63,23 +81,5 @@ public class DynamicDataSourceContextHolder {
 
         log.info("切换到{}数据源", metaDatasource.getDatasourceName());
         CONTEXT_HOLDER.set(metaDatasource.getDatasourceName());
-    }
-
-    private static String convertUrl(MetaDatasourceEntity metaDatasource, String protocol) {
-        return String.format("jdbc:%s://%s:%s/", protocol, metaDatasource.getIp(), metaDatasource.getPort());
-    }
-
-    /**
-     * 获得数据源的变量
-     */
-    public static String getDataSourceType() {
-        return CONTEXT_HOLDER.get();
-    }
-
-    /**
-     * 清空数据源变量
-     */
-    public static void clearDataSourceType() {
-        CONTEXT_HOLDER.remove();
     }
 }
