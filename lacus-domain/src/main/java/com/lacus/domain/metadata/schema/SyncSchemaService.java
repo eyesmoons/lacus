@@ -113,31 +113,29 @@ public class SyncSchemaService {
         for (TableDTO tableDTO : tableList) {
             // remove old columns
             boolean remove = metaColumnService.removeColumnsByTableId(tableDTO.getTableId());
-            if (remove) {
-                List<SchemaColumnEntity> columnList;
-                try {
-                    DynamicDataSourceContextHolder.setDataSourceType(datasourceId.toString());
-                    columnList = schemaMapper.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
-                } finally {
-                    DynamicDataSourceContextHolder.clearDataSourceType();
-                }
-                List<MetaColumnEntity> list = columnList.stream().map(entity -> {
-                    MetaColumnEntity column = new MetaColumnEntity();
-                    column.setTableId(tableDTO.getTableId());
-                    column.setColumnName(entity.getColumnName());
-                    column.setDataType(entity.getDataType());
-                    column.setColumnType(entity.getColumnType());
-                    column.setNumericPrecision(entity.getNumericPrecision());
-                    column.setNumericScale(entity.getNumericScale());
-                    column.setColumnLength(entity.getCharacterOctetLength());
-                    column.setComment(entity.getColumnComment());
-                    column.setIsNullable(entity.getIsNullable());
-                    column.setColumnDefault(entity.getColumnDefault());
-                    return column;
-                }).collect(Collectors.toList());
-                // add new columns
-                metaColumnService.saveBatch(list);
+            List<SchemaColumnEntity> columnList;
+            try {
+                DynamicDataSourceContextHolder.setDataSourceType(datasourceId.toString());
+                columnList = schemaMapper.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
+            } finally {
+                DynamicDataSourceContextHolder.clearDataSourceType();
             }
+            List<MetaColumnEntity> list = columnList.stream().map(entity -> {
+                MetaColumnEntity column = new MetaColumnEntity();
+                column.setTableId(tableDTO.getTableId());
+                column.setColumnName(entity.getColumnName());
+                column.setDataType(entity.getDataType());
+                column.setColumnType(entity.getColumnType());
+                column.setNumericPrecision(entity.getNumericPrecision());
+                column.setNumericScale(entity.getNumericScale());
+                column.setColumnLength(entity.getCharacterOctetLength());
+                column.setComment(entity.getColumnComment());
+                column.setIsNullable(entity.getIsNullable());
+                column.setColumnDefault(entity.getColumnDefault());
+                return column;
+            }).collect(Collectors.toList());
+            // add new columns
+            metaColumnService.saveBatch(list);
         }
     }
 

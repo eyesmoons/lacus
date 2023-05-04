@@ -91,7 +91,7 @@ public class DatasourceService {
             return datasourceList.stream().map((Function<MetaDatasourceEntity, MetaDatasourceModel>) entity -> {
                 MetaDatasourceModel model = new MetaDatasourceModel(entity);
                 model.setPassword("******");
-                return null;
+                return model;
             }).collect(Collectors.toList());
         }
         return new ArrayList<>();
