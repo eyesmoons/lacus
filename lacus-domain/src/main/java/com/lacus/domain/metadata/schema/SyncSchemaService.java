@@ -82,7 +82,6 @@ public class SyncSchemaService {
      * @param datasourceId datasourceId
      * @param dbTables dbTables
      */
-    @Transactional
     public boolean syncDbTables(Long datasourceId, List<String> dbTables) {
         try {
             // remove empty items
