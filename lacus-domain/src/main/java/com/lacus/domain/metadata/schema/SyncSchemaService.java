@@ -115,7 +115,7 @@ public class SyncSchemaService {
             boolean remove = metaColumnService.removeColumnsByTableId(tableDTO.getTableId());
             List<SchemaColumnEntity> columnList;
             try {
-                DynamicDataSourceContextHolder.setDataSourceType(datasourceId.toString());
+                DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
                 columnList = schemaMapper.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
             } finally {
                 DynamicDataSourceContextHolder.clearDataSourceType();
