@@ -34,8 +34,9 @@ public class TableService {
 
     public PageDTO pageList(TableQuery query) {
         Long metaDatasourceId = query.getDatasourceId();
-        if (metaDatasourceId == null) {
-            query.setDbIds(Collections.singletonList(query.getDbId()));
+        Long dbId = query.getDbId();
+        if (metaDatasourceId == null && dbId != null) {
+            query.setDbIds(Collections.singletonList(dbId));
         } else {
             List<MetaDbEntity> dbList = metaDbService.listByDatasourceId(metaDatasourceId);
             if (ObjectUtils.isEmpty(dbList)) {
