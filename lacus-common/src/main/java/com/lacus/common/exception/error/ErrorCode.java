@@ -174,6 +174,17 @@ public enum ErrorCode implements ErrorCodeInterface {
         // ----------------------------- metadata -----------------------------------
         DATASOURCE_NAME_IS_NOT_UNIQUE(Module.METADATA, 16, "数据源名称：{}, 已存在"),
 
+
+        //------------------------------dataServer------------------------------------
+
+        DYNAMIC_SQL_PARSE_ERROR(Module.DATASERVER, 17, "动态sql解析异常"),
+
+        API_URL_IS_NOT_UNIQUE(Module.DATASERVER, 18, "数据服务接口：{},已存在"),
+
+        FULL_COLUMN_QUERY_ERROR(Module.DATASERVER, 19, "不允许使用*做全量查询"),
+
+        RETURN_COLUMN_PARSE_ERROR(Module.DATASERVER, 20, "SQL返回参数解析异常"),
+
         ;
         private final int code;
         private final String msg;

@@ -40,6 +40,7 @@
         <knife4j.version>2.0.7</knife4j.version>
         <fastjson.version>1.2.54</fastjson.version>
         <dbutils.version>1.7</dbutils.version>
+        <mybatis.version>3.5.10</mybatis.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -74,6 +75,13 @@
                 <groupId>org.mybatis.spring.boot</groupId>
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis-spring-boot.version}</version>
+            </dependency>
+
+            <!-- mybatis 依赖 -->
+            <dependency>
+                <groupId>org.mybatis</groupId>
+                <artifactId>mybatis</artifactId>
+                <version>${mybatis.version}</version>
             </dependency>
 
             <!-- mybatis plus 主依赖 -->
