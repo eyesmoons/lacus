@@ -11,8 +11,7 @@
     <artifactId>lacus-domain</artifactId>
 
     <description>
-        领域核心代码 放在这个包
-        generator代码生成
+        领域核心代码
     </description>
 
     <dependencies>
