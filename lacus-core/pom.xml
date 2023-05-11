@@ -12,7 +12,7 @@
     <artifactId>lacus-core</artifactId>
 
     <description>
-        infrastructure框架核心
+        框架核心
     </description>
 
     <dependencies>

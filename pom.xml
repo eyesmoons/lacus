@@ -38,8 +38,9 @@
         <mockito.version>1.10.19</mockito.version>
         <common-validator.version>1.7</common-validator.version>
         <knife4j.version>2.0.7</knife4j.version>
-        <fastjson.version>1.2.54</fastjson.version>
+        <fastjson2.version>2.0.26</fastjson2.version>
         <dbutils.version>1.7</dbutils.version>
+        <logback.version>1.4.6</logback.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -241,15 +242,15 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
-            </dependency>
-
-            <dependency>
                 <groupId>commons-dbutils</groupId>
                 <artifactId>commons-dbutils</artifactId>
                 <version>${dbutils.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -261,6 +262,7 @@
         <module>lacus-core</module>
         <module>lacus-dao</module>
         <module>lacus-service</module>
+        <module>lacus-job</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -270,23 +272,39 @@
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
         </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
         </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <scope>test</scope>
         </dependency>
+
         <dependency>
             <groupId>com.baomidou</groupId>
             <artifactId>mybatis-plus-boot-starter</artifactId>
         </dependency>
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
         </dependency>
     </dependencies>
 
