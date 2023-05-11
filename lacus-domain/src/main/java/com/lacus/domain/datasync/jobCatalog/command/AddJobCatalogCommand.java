@@ -1,13 +1,13 @@
-package com.lacus.domain.datasync.jobCatelog.command;
+package com.lacus.domain.datasync.jobCatalog.command;
 
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
-public class AddJobCatelogCommand {
+public class AddJobCatalogCommand {
     @NotBlank(message = "分组名称不能为空")
-    private String catelogName;
+    private String catalogName;
 
     private String remark;
 }

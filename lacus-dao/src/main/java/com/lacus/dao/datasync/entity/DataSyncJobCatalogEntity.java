@@ -9,16 +9,16 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 @Data
-@TableName("data_sync_job_catelog")
-public class DataSyncJobCatelogEntity extends BaseEntity<DataSyncJobCatelogEntity> {
+@TableName("data_sync_job_catalog")
+public class DataSyncJobCatalogEntity extends BaseEntity<DataSyncJobCatalogEntity> {
 
     @ApiModelProperty("主键")
-    @TableId(value = "catelog_id", type = IdType.AUTO)
-    private Long catelogId;
+    @TableId(value = "catalog_id", type = IdType.AUTO)
+    private Long catalogId;
 
     @ApiModelProperty("分组名称")
-    @TableField("catelog_name")
-    private String catelogName;
+    @TableField("catalog_name")
+    private String catalogName;
 
     @ApiModelProperty("分组描述")
     @TableField("remark")
