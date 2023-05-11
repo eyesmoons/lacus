@@ -21,8 +21,8 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     private String jobName;
 
     @ApiModelProperty("分组ID")
-    @TableField("catelog_id")
-    private Long catelogId;
+    @TableField("catalog_id")
+    private Long catalogId;
 
     @ApiModelProperty("输入源配置ID")
     @TableField("source_conf_id")
