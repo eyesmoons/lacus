@@ -13,7 +13,7 @@
 
 ## 平台简介
 
-Lacus是一套开源的全栈精简快速开发平台。
+Lacus是一个开源大数据中台项目，致力于让数据接入变得更简单、好用。
 
 * 前端采用Vue3、Element UI。对应前端仓库 [lacus-ui](https://github.com/eyesmoons/lacus-ui)
 * 后端采用Spring Boot、Spring Security、Redis & Jwt、Mybatis Plus、MySql。
