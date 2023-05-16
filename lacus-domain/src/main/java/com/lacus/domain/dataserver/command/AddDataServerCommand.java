@@ -1,18 +1,13 @@
 package com.lacus.domain.dataserver.command;
 
+import com.lacus.domain.dataserver.dto.ScriptDTO;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/27/9:53
- * @Description:
- */
+
 @Data
 public class AddDataServerCommand {
 
@@ -39,14 +34,12 @@ public class AddDataServerCommand {
     @ApiModelProperty("接口所属项目组")
     private String projectTeam;
 
-    @NotNull(message = "数据服务接口超时时间不能为空")
     @ApiModelProperty("接口超时时间")
     private Integer queryTimeout;
 
     @ApiModelProperty("是否开启限流，默认不开启0，开启1")
-    private Integer currentLimit = 0 ;
+    private Integer currentLimit;
 
-    @NotNull(message = "数据服务接口最大返回行数不能为空")
     @ApiModelProperty("接口最大返回行数")
     private Long maxReturnRows;
 
@@ -54,10 +47,12 @@ public class AddDataServerCommand {
     @ApiModelProperty("数据源id")
     private Long datasourceId;
 
-    @NotBlank(message = "数据服务接口内容不能为空")
+    @NotNull(message = "数据服务接口内容不能为空")
     @ApiModelProperty("apiScript")
-    private String apiScript;
+    private ScriptDTO apiScript;
 
+    @ApiModelProperty("api状态")
+    private Integer apiStatus;
 
 
 }

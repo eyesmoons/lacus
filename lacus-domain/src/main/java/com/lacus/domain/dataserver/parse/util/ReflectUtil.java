@@ -5,13 +5,7 @@ import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/14:21
- * @Description:
- */
+
 public class ReflectUtil {
 
     protected static Logger Logger = LoggerFactory.getLogger(ReflectUtil.class);

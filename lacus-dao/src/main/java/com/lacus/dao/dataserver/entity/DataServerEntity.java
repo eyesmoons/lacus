@@ -8,13 +8,6 @@ import com.lacus.common.core.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/27/10:07
- * @Description:
- */
 @Data
 @TableName("dataserver_api_info")
 public class DataServerEntity extends BaseEntity<DataServerEntity> {
@@ -68,14 +61,9 @@ public class DataServerEntity extends BaseEntity<DataServerEntity> {
     @TableField("max_return_rows")
     private Long maxReturnRows;
 
-
     @ApiModelProperty("接口脚本")
     @TableField("api_script")
     private String apiScript;
-
-    @ApiModelProperty("接口参数")
-    @TableField("api_params")
-    private String apiParams;
 
 
 }

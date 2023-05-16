@@ -3,13 +3,6 @@ package com.lacus.dao.dataserver.enums;
 import com.lacus.dao.system.enums.dictionary.CssTag;
 import com.lacus.dao.system.enums.interfaces.DictionaryEnum;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/27/10:20
- * @Description:
- */
 public enum DataServerStatusEnum implements DictionaryEnum<Integer> {
 
     ENABLE(1, "启用", CssTag.PRIMARY),

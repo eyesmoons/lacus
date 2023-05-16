@@ -5,13 +5,6 @@ import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/17:07
- * @Description:
- */
 @Data
 public class ParseParamCommand {
 

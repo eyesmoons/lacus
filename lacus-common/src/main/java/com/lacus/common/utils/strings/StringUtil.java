@@ -19,4 +19,9 @@ public class StringUtil {
         return null == str || "".equals(str);
     }
 
+
+    public static boolean checkValNotNull(String str) {
+        return !checkValNull(str);
+    }
+
 }

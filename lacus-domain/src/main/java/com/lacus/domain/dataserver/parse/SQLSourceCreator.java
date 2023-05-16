@@ -16,13 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/13:46
- * @Description:
- */
+
 public class SQLSourceCreator {
 
     protected Logger Logger = LoggerFactory.getLogger(this.getClass());

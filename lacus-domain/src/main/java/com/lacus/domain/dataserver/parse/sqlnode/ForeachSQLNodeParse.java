@@ -6,13 +6,7 @@ import org.apache.ibatis.scripting.xmltags.SqlNode;
 
 import java.util.Set;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/14:32
- * @Description:
- */
+
 public class ForeachSQLNodeParse extends SQLNodeParse<Set<String>> {
 
     private static final String COLLECTION_EXPRESSION = "collectionExpression";

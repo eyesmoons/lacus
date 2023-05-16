@@ -6,13 +6,7 @@ import org.apache.ibatis.scripting.xmltags.StaticTextSqlNode;
 
 import java.util.Set;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/05/06/14:48
- * @Description:
- */
+
 public class StaticSQLNodeParse extends SQLNodeParse<String> {
 
     private static final String TEXT = "text";

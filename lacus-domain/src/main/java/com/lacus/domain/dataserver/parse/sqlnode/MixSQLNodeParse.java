@@ -7,13 +7,7 @@ import org.apache.ibatis.scripting.xmltags.SqlNode;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/14:34
- * @Description:
- */
+
 public class MixSQLNodeParse extends SQLNodeParse<Set<String>> {
 
 

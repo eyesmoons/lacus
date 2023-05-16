@@ -10,13 +10,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/13:30
- * @Description:
- */
+
 public abstract class AbstractSQLParser {
 
 

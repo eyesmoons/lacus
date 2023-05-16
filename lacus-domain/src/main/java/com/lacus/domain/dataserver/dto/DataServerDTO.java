@@ -11,13 +11,6 @@ import lombok.Data;
 
 import java.util.Date;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/27/9:38
- * @Description:
- */
 @Data
 public class DataServerDTO {
 

@@ -8,13 +8,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/14:36
- * @Description:
- */
+
 public class TextSQLNodeParse extends SQLNodeParse<Set<String>> {
 
     private static final String TEXT = "text";

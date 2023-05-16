@@ -13,13 +13,7 @@ import org.springframework.util.Base64Utils;
 import java.util.List;
 import java.util.Set;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/17:37
- * @Description:
- */
+
 @Component
 public class MysqlDriverAdapter extends AbstractDriverAdapter<ParseParamsDTO> {
 

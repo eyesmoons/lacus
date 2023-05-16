@@ -1,27 +1,27 @@
 package com.lacus.domain.dataserver.query;
 
+import com.alibaba.fastjson2.JSON;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.dao.dataserver.entity.DataServerEntity;
+import com.lacus.dao.dataserver.enums.DriverTypeEnum;
+import com.lacus.domain.common.constant.Constants;
 import com.lacus.domain.dataserver.adapter.LoadDriverAdapter;
 import com.lacus.domain.dataserver.command.AddDataServerCommand;
 import com.lacus.domain.dataserver.command.ParseParamCommand;
 import com.lacus.domain.dataserver.dto.ParseParamsDTO;
+import com.lacus.domain.dataserver.dto.ScriptDTO;
 import com.lacus.service.dataserver.IDataServerService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import java.util.Objects;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/27/10:56
- * @Description:
- */
+
 @Service
 @Slf4j
 public class DataServerService {
@@ -38,20 +38,65 @@ public class DataServerService {
      * @param apiUrl
      * @return
      */
-    private boolean checkUrlUnique(String apiUrl) {
-        return dataServerService.checkUrlUnique(apiUrl);
-    }
-
-
-    public void add(AddDataServerCommand dataServiceCommand) {
-        String apiUrl = dataServiceCommand.getApiUrl();
-        boolean flag = checkUrlUnique(apiUrl);
+    private void checkUrlUnique(String apiUrl) {
+        boolean flag = dataServerService.checkUrlUnique(apiUrl);
         if (flag) {
             throw new ApiException(ErrorCode.Business.API_URL_IS_NOT_UNIQUE, apiUrl);
         }
-        DataServerEntity dataServerEntity = new DataServerEntity();
-        BeanUtils.copyProperties(dataServiceCommand, dataServerEntity);
-        dataServerService.add(dataServerEntity);
+    }
+
+    private Integer checkTimeout(Integer timeout) {
+        return timeout == null ? Constants.TIMEOUT_MAX : timeout;
+    }
+
+    private Integer checkCurrentLimit(Integer currentLimit) {
+        return currentLimit == null ? Constants.DEFAULT_VALUE : currentLimit;
+    }
+
+    private Long checkMaxReturnRow(Long maxReturnRows) {
+        return maxReturnRows == null ? Constants.DEFAULT_MAX_RETURN_ROW : maxReturnRows;
+    }
+
+    private void checkQueryScript(String apiSQL) {
+        if (null == apiSQL || "".equals(apiSQL)) {
+            throw new ApiException(ErrorCode.Business.API_SQL_SCRIPT_IS_EMPTY);
+        }
+        String trimSQL = apiSQL.trim();
+        if (!(trimSQL.startsWith("SELECT") || trimSQL.startsWith("select"))) {
+            throw new ApiException(ErrorCode.Business.API_SQL_SCRIPT_ONLY_SUPPORT_SELECT);
+        }
+    }
+
+
+    public void add(AddDataServerCommand command) {
+        //check url unique
+        String apiUrl = command.getApiUrl();
+        checkUrlUnique(apiUrl);
+
+        //check timeout
+        Integer timeout = command.getQueryTimeout();
+        command.setQueryTimeout(checkTimeout(timeout));
+        //check currentLimit
+        Integer currentLimit = command.getCurrentLimit();
+        command.setCurrentLimit(checkCurrentLimit(currentLimit));
+
+        command.setApiStatus(Constants.DEFAULT_VALUE);
+        //check max return rows
+        Long maxReturnRows = command.getMaxReturnRows();
+        command.setMaxReturnRows(checkMaxReturnRow(maxReturnRows));
+
+        //check API script type by driverType
+        String driverType = command.getDriverType();
+        ScriptDTO scriptDTO = command.getApiScript();
+        if (Objects.equals(driverType, DriverTypeEnum.MYSQL.getDescription()) || Objects.equals(driverType, DriverTypeEnum.DORIS.getDescription())) {
+            checkQueryScript(scriptDTO.getApiSQL());
+        } else {
+            //TODO
+        }
+        DataServerEntity entity = new DataServerEntity();
+        BeanUtils.copyProperties(command, entity);
+        entity.setApiScript(JSON.toJSONString(command.getApiScript()));
+        dataServerService.add(entity);
     }
 
     /**
@@ -65,5 +110,9 @@ public class DataServerService {
     }
 
 
+    public PageDTO pageList(DataServerQuery query) {
+        Page page = dataServerService.page(query.toPage(), query.toQueryWrapper());
+        return new PageDTO(page);
 
+    }
 }

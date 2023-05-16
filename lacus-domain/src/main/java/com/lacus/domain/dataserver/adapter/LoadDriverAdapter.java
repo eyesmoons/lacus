@@ -7,13 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/28/17:48
- * @Description:
- */
+
 @Component
 public class LoadDriverAdapter {
 

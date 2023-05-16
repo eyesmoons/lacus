@@ -38,7 +38,7 @@
         <mockito.version>1.10.19</mockito.version>
         <common-validator.version>1.7</common-validator.version>
         <knife4j.version>2.0.7</knife4j.version>
-        <fastjson.version>1.2.54</fastjson.version>
+        <fastjson2.version>2.0.26</fastjson2.version>
         <dbutils.version>1.7</dbutils.version>
         <mybatis.version>3.5.10</mybatis.version>
     </properties>
@@ -249,10 +249,11 @@
             </dependency>
 
             <dependency>
-                <groupId>com.alibaba</groupId>
-                <artifactId>fastjson</artifactId>
-                <version>${fastjson.version}</version>
+                <groupId>com.alibaba.fastjson2</groupId>
+                <artifactId>fastjson2</artifactId>
+                <version>${fastjson2.version}</version>
             </dependency>
+
 
             <dependency>
                 <groupId>commons-dbutils</groupId>

@@ -5,13 +5,7 @@ import lombok.Data;
 
 import java.util.List;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/05/06/13:26
- * @Description:
- */
+
 @Data
 public class ParseParamsDTO {
 

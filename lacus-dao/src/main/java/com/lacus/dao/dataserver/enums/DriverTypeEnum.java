@@ -2,13 +2,6 @@ package com.lacus.dao.dataserver.enums;
 
 import com.lacus.dao.system.enums.interfaces.DictionaryEnum;
 
-/**
- * Created by:
- *
- * @Author: lit
- * @Date: 2023/04/27/10:31
- * @Description:
- */
 public enum DriverTypeEnum implements DictionaryEnum<Integer> {
 
     MYSQL(0, "MYSQL"),
@@ -32,6 +25,10 @@ public enum DriverTypeEnum implements DictionaryEnum<Integer> {
     @Override
     public Object getValue() {
         return value;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     @Override
