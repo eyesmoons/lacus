@@ -88,7 +88,7 @@ public class DatasourceService {
     public List<MetaDatasourceModel> getDatasourceList(String datasourceName) {
         List<MetaDatasourceEntity> datasourceList = metadataSourceService.getDatasourceList(datasourceName);
         if (ObjectUtils.isNotEmpty(datasourceList)) {
-            return datasourceList.stream().map((Function<MetaDatasourceEntity, MetaDatasourceModel>) entity -> {
+            return datasourceList.stream().map(entity -> {
                 MetaDatasourceModel model = new MetaDatasourceModel(entity);
                 model.setPassword("******");
                 return model;

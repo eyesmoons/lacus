@@ -1,0 +1,80 @@
+package com.lacus.admin.controller.datasync;
+
+import com.lacus.common.core.dto.ResponseDTO;
+import com.lacus.common.core.page.PageDTO;
+import com.lacus.core.annotations.AccessLog;
+import com.lacus.dao.datasync.entity.DataSyncJobCatalogEntity;
+import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.domain.datasync.jobCatalog.JobCatalogService;
+import com.lacus.domain.datasync.jobCatalog.command.AddJobCatalogCommand;
+import com.lacus.domain.datasync.jobCatalog.command.UpdateJobCatalogCommand;
+import com.lacus.domain.datasync.jobCatalog.query.JobCataLogQuery;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
+
+import javax.validation.constraints.NotNull;
+import java.util.List;
+
+@Api(value = "数据同步分组相关接口", tags = {"数据同步分组相关接口"})
+@RestController
+@RequestMapping("/datasync/job/catalog")
+public class JobCatalogController {
+
+    @Autowired
+    private JobCatalogService jobCatalogService;
+
+    @ApiOperation("任务分组列表")
+    @PreAuthorize("@permission.has('datasync:catalog:list')")
+    @GetMapping("/list")
+    public ResponseDTO<List<DataSyncJobCatalogEntity>> list(@RequestParam("catalogName") String catalogName) {
+        List<DataSyncJobCatalogEntity> list = jobCatalogService.list(catalogName);
+        return ResponseDTO.ok(list);
+    }
+
+    @ApiOperation("任务分组列表")
+    @PreAuthorize("@permission.has('datasync:catalog:list')")
+    @GetMapping("/pageList")
+    public ResponseDTO<PageDTO> pageList(JobCataLogQuery query) {
+        PageDTO page = jobCatalogService.pageList(query);
+        return ResponseDTO.ok(page);
+    }
+
+    @ApiOperation("任务分组详情")
+    @PreAuthorize("@permission.has('datasync:catalog:list')")
+    @GetMapping("/{catalogId}")
+    public ResponseDTO<DataSyncJobCatalogEntity> detail(@PathVariable("catalogId") Long catalogId) {
+        DataSyncJobCatalogEntity entity = jobCatalogService.detail(catalogId);
+        return ResponseDTO.ok(entity);
+    }
+
+    @ApiOperation("新建分组")
+    @PreAuthorize("@permission.has('datasync:catalog:add')")
+    @AccessLog(title = "分组管理", businessType = BusinessTypeEnum.ADD)
+    @PostMapping
+    public ResponseDTO<?> add(@RequestBody @Validated AddJobCatalogCommand addCommand) {
+        jobCatalogService.addJobCatalog(addCommand);
+        return ResponseDTO.ok();
+    }
+
+    @ApiOperation("修改分组")
+    @PreAuthorize("@permission.has('datasync:catalog:edit')")
+    @AccessLog(title = "分组管理", businessType = BusinessTypeEnum.MODIFY)
+    @PutMapping
+    public ResponseDTO<?> edit(@Validated @RequestBody UpdateJobCatalogCommand updateCommand) {
+        jobCatalogService.updateJobCatalog(updateCommand);
+        return ResponseDTO.ok();
+    }
+
+    @ApiOperation("删除分组")
+    @PreAuthorize("@permission.has('datasync:catalog:remove')")
+    @AccessLog(title = "分组管理", businessType = BusinessTypeEnum.DELETE)
+    @DeleteMapping("/{catalogIds}")
+    public ResponseDTO<?> remove(@PathVariable @NotNull List<Long> catalogIds) {
+        jobCatalogService.removeJobCatalog(catalogIds);
+        return ResponseDTO.ok();
+    }
+}
