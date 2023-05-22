@@ -9,4 +9,5 @@ public interface IMetaDbService extends IService<MetaDbEntity> {
     boolean isMetaDbExists(Long datasourceId, String dbName);
     MetaDbEntity getMetaDb(Long datasourceId, String dbName);
     List<MetaDbEntity> listByDatasourceId(Long datasourceId);
+    List<MetaDbEntity> getMetaDbs(Long datasourceId, List<String> dbNames);
 }

@@ -14,6 +14,7 @@ public class MetaDatasourceDTO {
     private Long datasourceId;
     private String datasourceName;
     private String type;
+    private Integer sourceType;
     private String remark;
     private String ip;
     private Integer port;
@@ -30,6 +31,7 @@ public class MetaDatasourceDTO {
         this.datasourceId = entity.getDatasourceId();
         this.datasourceName = entity.getDatasourceName();
         this.type = entity.getType();
+        this.sourceType = entity.getSourceType();
         this.remark = entity.getRemark();
         this.ip = entity.getIp();
         this.port = entity.getPort();

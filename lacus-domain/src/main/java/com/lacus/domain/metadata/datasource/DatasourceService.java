@@ -85,8 +85,8 @@ public class DatasourceService {
         return model.updateById();
     }
 
-    public List<MetaDatasourceModel> getDatasourceList(String datasourceName) {
-        List<MetaDatasourceEntity> datasourceList = metadataSourceService.getDatasourceList(datasourceName);
+    public List<MetaDatasourceModel> getDatasourceList(String datasourceName, String sourceType) {
+        List<MetaDatasourceEntity> datasourceList = metadataSourceService.getDatasourceList(datasourceName, sourceType);
         if (ObjectUtils.isNotEmpty(datasourceList)) {
             return datasourceList.stream().map(entity -> {
                 MetaDatasourceModel model = new MetaDatasourceModel(entity);

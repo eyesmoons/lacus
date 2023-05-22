@@ -21,9 +21,10 @@ public class MetaDataSourceServiceImpl extends ServiceImpl<MetaDatasourceMapper,
     }
 
     @Override
-    public List<MetaDatasourceEntity> getDatasourceList(String datasourceName) {
+    public List<MetaDatasourceEntity> getDatasourceList(String datasourceName, String sourceType) {
         LambdaQueryWrapper<MetaDatasourceEntity> queryWrapper = new LambdaQueryWrapper<>();
         queryWrapper.eq(ObjectUtils.isNotEmpty(datasourceName), MetaDatasourceEntity::getDatasourceName, datasourceName);
+        queryWrapper.eq(ObjectUtils.isNotEmpty(sourceType), MetaDatasourceEntity::getSourceType, sourceType);
         return baseMapper.selectList(queryWrapper);
     }
 }

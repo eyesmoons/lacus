@@ -2,6 +2,8 @@ package com.lacus.domain.metadata.table;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lacus.common.core.page.PageDTO;
+import com.lacus.common.exception.ApiException;
+import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDbEntity;
 import com.lacus.dao.metadata.entity.MetaTableEntity;
@@ -15,8 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import java.util.Collections;
-import java.util.List;
+
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -93,5 +95,26 @@ public class TableService {
         tableDTO.setDatasourceId(datasourceId);
         tableDTO.setDatasourceName(datasourceEntity.getDatasourceName());
         return tableDTO;
+    }
+
+    public List<MetaTableEntity> listTable(TableQuery query) {
+        Long metaDatasourceId = query.getDatasourceId();
+        List<String> dbNames = new ArrayList<>();
+        if (ObjectUtils.isNotEmpty(query.getDbName())) {
+            dbNames = Collections.singletonList(query.getDbName());
+        } else if (ObjectUtils.isNotEmpty(query.getDbName())){
+            dbNames = query.getDbNames();
+        } else {
+            throw new ApiException(ErrorCode.Internal.INVALID_PARAMETER, "dbName或dbNames参数为空");
+        }
+        List<MetaDbEntity> dbList = metaDbService.getMetaDbs(metaDatasourceId, dbNames);
+        Map<Long, String> dbMap = dbList.stream().collect(Collectors.toMap(MetaDbEntity::getDbId, MetaDbEntity::getDbName));
+        List<Long> dbIds = dbList.stream().map(MetaDbEntity::getDbId).collect(Collectors.toList());
+        List<MetaTableEntity> metaTables = metaTableService.getMetaTables(dbIds);
+        for (MetaTableEntity table : metaTables) {
+            String dbName = dbMap.get(table.getDbId());
+            table.setDbName(dbName);
+        }
+        return metaTables;
     }
 }
