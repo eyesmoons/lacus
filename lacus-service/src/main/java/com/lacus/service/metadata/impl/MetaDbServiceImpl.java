@@ -35,4 +35,12 @@ public class MetaDbServiceImpl extends ServiceImpl<MetaDbMapper, MetaDbEntity> i
         wrapper.eq(ObjectUtils.isNotEmpty(datasourceId), MetaDbEntity::getDatasourceId, datasourceId);
         return baseMapper.selectList(wrapper);
     }
+
+    @Override
+    public List<MetaDbEntity> getMetaDbs(Long datasourceId, List<String> dbNames) {
+        LambdaQueryWrapper<MetaDbEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(ObjectUtils.isNotEmpty(datasourceId), MetaDbEntity::getDatasourceId, datasourceId);
+        wrapper.in(ObjectUtils.isNotEmpty(dbNames), MetaDbEntity::getDbName, dbNames);
+        return baseMapper.selectList(wrapper);
+    }
 }

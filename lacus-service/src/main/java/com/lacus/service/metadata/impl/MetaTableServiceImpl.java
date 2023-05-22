@@ -8,6 +8,8 @@ import com.lacus.service.metadata.IMetaTableService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class MetaTableServiceImpl extends ServiceImpl<MetaTableMapper, MetaTableEntity> implements IMetaTableService {
     @Override
@@ -24,5 +26,12 @@ public class MetaTableServiceImpl extends ServiceImpl<MetaTableMapper, MetaTable
         wrapper.eq(ObjectUtils.isNotEmpty(dbId), MetaTableEntity::getDbId, dbId);
         wrapper.eq(ObjectUtils.isNotEmpty(tableName), MetaTableEntity::getTableName, tableName);
         return baseMapper.selectOne(wrapper);
+    }
+
+    @Override
+    public List<MetaTableEntity> getMetaTables(List<Long> dbIds) {
+        LambdaQueryWrapper<MetaTableEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(ObjectUtils.isNotEmpty(dbIds), MetaTableEntity::getDbId, dbIds);
+        return baseMapper.selectList(wrapper);
     }
 }

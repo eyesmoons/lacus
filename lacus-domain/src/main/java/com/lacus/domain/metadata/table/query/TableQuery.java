@@ -20,6 +20,8 @@ public class TableQuery extends AbstractPageQuery {
     private List<Long> dbIds;
     private String tableName;
     private Long dbId;
+    private String dbName;
+    private List<String> dbNames;
 
     @Override
     public QueryWrapper<MetaTableEntity> toQueryWrapper() {

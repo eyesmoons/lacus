@@ -34,8 +34,10 @@ public class DatasourceController {
     @ApiOperation("数据源列表")
     @PreAuthorize("@permission.has('metadata:datasource:list')")
     @GetMapping("/list")
-    public ResponseDTO<List<MetaDatasourceModel>> list(@RequestParam(value = "datasourceName", required = false) String datasourceName) {
-        List<MetaDatasourceModel> list = datasourceService.getDatasourceList(datasourceName);
+    public ResponseDTO<List<MetaDatasourceModel>> list(
+            @RequestParam(value = "datasourceName", required = false) String datasourceName,
+            @RequestParam(value = "sourceType", required = false) String sourceType) {
+        List<MetaDatasourceModel> list = datasourceService.getDatasourceList(datasourceName, sourceType);
         return ResponseDTO.ok(list);
     }
 

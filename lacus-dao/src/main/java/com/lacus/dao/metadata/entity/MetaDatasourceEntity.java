@@ -26,6 +26,10 @@ public class MetaDatasourceEntity extends BaseEntity<MetaDatasourceEntity> {
     @TableField("type")
     private String type;
 
+    @ApiModelProperty("同步类型：1输入源，2输出源")
+    @TableField("source_type")
+    private Integer sourceType;
+
     @ApiModelProperty("数据源描述")
     @TableField("remark")
     private String remark;
