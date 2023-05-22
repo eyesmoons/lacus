@@ -61,6 +61,8 @@ public enum Module {
     ROLE(10),
 
     METADATA(11),
+
+    DATASERVER(12),
     ;
 
 
