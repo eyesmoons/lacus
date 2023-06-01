@@ -46,7 +46,7 @@ public class MetaColumnEntity extends BaseEntity<MetaColumnEntity> {
 
     @ApiModelProperty("字段长度")
     @TableField("column_length")
-    private Integer columnLength;
+    private Long columnLength;
 
     @ApiModelProperty("备注")
     @TableField("comment")

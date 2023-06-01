@@ -7,7 +7,7 @@ import com.lacus.domain.datasync.jobCatalog.command.AddJobCatalogCommand;
 import com.lacus.domain.datasync.jobCatalog.command.UpdateJobCatalogCommand;
 import com.lacus.domain.datasync.jobCatalog.model.DataSyncJobCatalogModel;
 import com.lacus.domain.datasync.jobCatalog.model.DataSyncJobCatalogModelFactory;
-import com.lacus.domain.datasync.jobCatalog.query.JobCataLogQuery;
+import com.lacus.domain.datasync.jobCatalog.query.JobCatalogQuery;
 import com.lacus.service.datasync.IDataSyncJobCatalogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -19,7 +19,7 @@ public class JobCatalogService {
     @Autowired
     private IDataSyncJobCatalogService dataSyncJobCatalogService;
 
-    public PageDTO pageList(JobCataLogQuery query) {
+    public PageDTO pageList(JobCatalogQuery query) {
         Page page = dataSyncJobCatalogService.page(query.toPage(), query.toQueryWrapper());
         return new PageDTO(page.getRecords(), page.getTotal());
     }

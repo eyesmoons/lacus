@@ -2,16 +2,22 @@ package com.lacus.service.metadata.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lacus.dao.metadata.entity.MetaDbTableEntity;
 import com.lacus.dao.metadata.entity.MetaTableEntity;
 import com.lacus.dao.metadata.mapper.MetaTableMapper;
 import com.lacus.service.metadata.IMetaTableService;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 public class MetaTableServiceImpl extends ServiceImpl<MetaTableMapper, MetaTableEntity> implements IMetaTableService {
+
+    @Autowired
+    private MetaTableMapper tableMapper;
+
     @Override
     public boolean isMetaTableExists(Long dbId, String tableName) {
         LambdaQueryWrapper<MetaTableEntity> wrapper = new LambdaQueryWrapper<>();
@@ -33,5 +39,15 @@ public class MetaTableServiceImpl extends ServiceImpl<MetaTableMapper, MetaTable
         LambdaQueryWrapper<MetaTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(ObjectUtils.isNotEmpty(dbIds), MetaTableEntity::getDbId, dbIds);
         return baseMapper.selectList(wrapper);
+    }
+
+    @Override
+    public List<MetaDbTableEntity> getMetaTables(Long datasourceId, String dbName) {
+        return tableMapper.listMetaDbTable(datasourceId, dbName, null);
+    }
+
+    @Override
+    public List<MetaDbTableEntity> listMetaTable(List<MetaDbTableEntity> params) {
+        return tableMapper.listMetaTable(params);
     }
 }

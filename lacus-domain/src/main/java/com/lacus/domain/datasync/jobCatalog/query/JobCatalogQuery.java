@@ -7,7 +7,7 @@ import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 
 @Data
-public class JobCataLogQuery extends AbstractPageQuery {
+public class JobCatalogQuery extends AbstractPageQuery {
 
     private String catalogName;
 

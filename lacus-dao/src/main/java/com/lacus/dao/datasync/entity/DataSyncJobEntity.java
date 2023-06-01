@@ -24,19 +24,35 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     @TableField("catalog_id")
     private Long catalogId;
 
-    @ApiModelProperty("输入源配置ID")
-    @TableField("source_conf_id")
-    private Long sourceConfId;
+    @ApiModelProperty("输入源ID")
+    @TableField("source_datasource_id")
+    private Long sourceDatasourceId;
 
-    @ApiModelProperty("输出源配置ID")
-    @TableField("sink_conf_id")
-    private Long sinkConfId;
+    @ApiModelProperty("输出源ID")
+    @TableField("sink_datasource_id")
+    private Long sinkDatasourceId;
 
     @ApiModelProperty("数据缓存位置")
     @TableField("topic")
     private String topic;
 
-    @ApiModelProperty("任务名称")
+    @ApiModelProperty("同步方式：1 初始快照，2 最早，3 最近，4 指定时间戳")
     @TableField("sync_type")
     private Integer syncType;
+
+    @ApiModelProperty("任务描述")
+    @TableField("remark")
+    private String remark;
+
+    @ApiModelProperty("窗口大小(秒)")
+    @TableField("window_size")
+    private Integer windowSize;
+
+    @ApiModelProperty("最大数据量(MB)")
+    @TableField("max_size")
+    private Integer maxSize;
+
+    @ApiModelProperty("最大数据条数(万条)")
+    @TableField("max_count")
+    private Integer maxCount;
 }
