@@ -16,9 +16,9 @@ public class DataSyncSinkTableEntity extends BaseEntity<DataSyncSinkTableEntity>
     @TableId(value = "sink_table_id", type = IdType.AUTO)
     private Long sinkTableId;
 
-    @ApiModelProperty("输出源配置ID")
-    @TableField("sink_conf_id")
-    private Long sinkConfId;
+    @ApiModelProperty("任务ID")
+    @TableField("job_id")
+    private Long jobId;
 
     @ApiModelProperty("输出源库名称")
     @TableField("sink_db_name")

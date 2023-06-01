@@ -20,6 +20,14 @@ public class DataSyncJobCatalogEntity extends BaseEntity<DataSyncJobCatalogEntit
     @TableField("catalog_name")
     private String catalogName;
 
+    @ApiModelProperty("jobManager内存，单位为GB")
+    @TableField("job_manager")
+    private Long jobManager;
+
+    @ApiModelProperty("taskManager内存，单位为GB")
+    @TableField("task_manager")
+    private Long taskManager;
+
     @ApiModelProperty("分组描述")
     @TableField("remark")
     private String remark;

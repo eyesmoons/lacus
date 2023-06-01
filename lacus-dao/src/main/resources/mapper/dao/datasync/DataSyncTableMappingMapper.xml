@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.datasync.mapper.DataSyncTableMappingMapper">
+
+    <resultMap id="dataSyncSavedTableMap" type="com.lacus.dao.datasync.entity.DataSyncSavedTable">
+        <result column="source_datasource_id" property="sourceDatasourceId"/>
+        <result column="sink_datasource_id" property="sinkDatasourceId"/>
+        <result column="source_db_name" property="sourceDbName"/>
+        <result column="source_table_name" property="sourceTableName"/>
+        <result column="sink_db_name" property="sinkDbName"/>
+        <result column="sink_table_name" property="sinkTableName"/>
+    </resultMap>
+
+    <!-- 查询保存的表 -->
+    <select id="querySavedTables" resultMap="dataSyncSavedTableMap">
+        select
+            job.source_datasource_id,
+            job.sink_datasource_id,
+            st.source_db_name,
+            st.source_table_name,
+            tt.sink_db_name,
+            tt.sink_table_name
+        from (select job_id, source_table_id, sink_table_id from data_sync_table_mapping where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tm
+        left join (select source_table_id, source_db_name, source_table_name from data_sync_source_table where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) st on tm.source_table_id = st.source_table_id
+        left join (select sink_table_id, sink_db_name, sink_table_name from data_sync_sink_table where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tt on tm.sink_table_id = tt.sink_table_id
+        left join (select job_id, source_datasource_id, sink_datasource_id from data_sync_job where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) job on tm.job_id = job.job_id
+        <where>
+            <if test="sourceDatasourceId != null and sourceDatasourceId != ''"> and job.source_datasource_id = #{sourceDatasourceId} </if>
+            <if test="sourceDbName != null and sourceDbName != ''"> and st.source_db_name = #{sourceDbName} </if>
+            <if test="sourceTableName != null and sourceTableName != ''"> and st.source_table_name = #{sourceTableName} </if>
+            <if test="sinkDatasourceId != null and sinkDatasourceId != ''"> and job.sink_datasource_id = #{sinkDatasourceId} </if>
+            <if test="sinkDbName != null and sinkDbName != ''"> and tt.sink_db_name = #{sinkDbName} </if>
+            <if test="sinkTableName != null and sinkTableName != ''"> and tt.sink_table_name = #{sinkTableName} </if>
+        </where>
+    </select>
+
+    <!-- 批量查询保存的表 -->
+    <select id="batchQuerySavedTables" resultMap="dataSyncSavedTableMap">
+        <foreach collection="list" index="index" item="item" open="" separator=" union all " close="">
+            select
+                job.source_datasource_id,
+                job.sink_datasource_id,
+                st.source_db_name,
+                st.source_table_name,
+                tt.sink_db_name,
+                tt.sink_table_name
+            from (select job_id, source_table_id, sink_table_id from data_sync_table_mapping <if test="jobId != null and jobId != ''"> where job_id = #{jobId} </if>) tm
+            left join (select source_table_id, source_db_name, source_table_name from data_sync_source_table <if test="jobId != null and jobId != ''"> where job_id = #{jobId} </if>) st on tm.source_table_id = st.source_table_id
+            left join (select sink_table_id, sink_db_name, sink_table_name from data_sync_sink_table <if test="jobId != null and jobId != ''"> where job_id = #{jobId} </if>) tt on tm.sink_table_id = tt.sink_table_id
+            left join (select job_id, source_datasource_id, sink_datasource_id from data_sync_job <if test="jobId != null and jobId != ''"> where job_id = #{jobId} </if>) job on tm.job_id = job.job_id
+            <where>
+                <if test="sourceDatasourceId != null and sourceDatasourceId != ''"> and job.source_datasource_id = #{sourceDatasourceId} </if>
+                <if test="sourceDbName != null and sourceDbName != ''"> and st.source_db_name = #{sourceDbName} </if>
+                <if test="sourceTableName != null and sourceTableName != ''"> and st.source_table_name = #{sourceTableName} </if>
+                <if test="sinkDatasourceId != null and sinkDatasourceId != ''"> and job.sink_datasource_id = #{sinkDatasourceId} </if>
+                <if test="sinkDbName != null and sinkDbName != ''"> and tt.sink_db_name = #{sinkDbName} </if>
+                <if test="sinkTableName != null and sinkTableName != ''"> and tt.sink_table_name = #{sinkTableName} </if>
+            </where>
+        </foreach>
+    </select>
+</mapper>

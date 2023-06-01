@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.datasync.mapper.DataSyncColumnMappingMapper">
+
+    <resultMap id="dataSyncSavedColumnMap" type="com.lacus.dao.datasync.entity.DataSyncSavedColumn">
+        <result column="job_id" property="jobId"/>
+        <result column="source_datasource_id" property="sourceDatasourceId"/>
+        <result column="sink_datasource_id" property="sinkDatasourceId"/>
+        <result column="source_db_name" property="sourceDbName"/>
+        <result column="source_table_name" property="sourceTableName"/>
+        <result column="source_column_name" property="sourceColumnName"/>
+        <result column="sink_db_name" property="sinkDbName"/>
+        <result column="sink_table_name" property="sinkTableName"/>
+        <result column="sink_column_name" property="sinkColumnName"/>
+    </resultMap>
+
+    <!-- 查询保存的表 -->
+    <select id="querySavedColumns" resultMap="dataSyncSavedColumnMap">
+        select
+            job.job_id,
+            job.source_datasource_id,
+            job.sink_datasource_id,
+            st.source_db_name,
+            st.source_table_name,
+            sc.source_column_name,
+            tt.sink_db_name,
+            tt.sink_table_name,
+            tc.sink_column_name,
+            1 as flag
+        from (select * from data_sync_column_mapping where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) cm
+        left join (select * from data_sync_source_column where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) sc on cm.source_column_id = sc.source_column_id
+        left join (select * from data_sync_sink_column where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tc on cm.sink_column_id = tc.sink_column_id
+        left join (select * from data_sync_source_table where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) st on st.source_table_id = sc.source_table_id
+        left join (select * from data_sync_sink_table where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tt on tt.sink_table_id = tc.sink_table_id
+        left join (select * from data_sync_table_mapping where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) sm on st.source_table_id = sm.source_table_id
+        left join (select * from data_sync_table_mapping where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tm on tt.sink_table_id = tm.sink_table_id
+        left join (select * from data_sync_job where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) job on cm.job_id = cm.job_id
+        <where>
+            <if test="sourceDatasourceId != null and sourceDatasourceId != ''"> and job.source_datasource_id = #{sourceDatasourceId} </if>
+            <if test="sourceDbName != null and sourceDbName != ''"> and st.source_db_name = #{sourceDbName} </if>
+            <if test="sourceTableName != null and sourceTableName != ''"> and st.source_table_name = #{sourceTableName} </if>
+            <if test="sourceColumnName != null and sourceColumnName != ''"> and sc.source_column_name = #{sourceColumnName} </if>
+            <if test="sinkDatasourceId != null and sinkDatasourceId != ''"> and job.sink_datasource_id = #{sinkDatasourceId} </if>
+            <if test="sinkDbName != null and sinkDbName != ''"> and tt.sink_db_name = #{sinkDbName} </if>
+            <if test="sinkTableName != null and sinkTableName != ''"> and tt.sink_table_name = #{sinkTableName} </if>
+            <if test="sinkColumnName != null and sinkColumnName != ''"> and tc.sink_column_name = #{sinkColumnName} </if>
+        </where>
+    </select>
+</mapper>

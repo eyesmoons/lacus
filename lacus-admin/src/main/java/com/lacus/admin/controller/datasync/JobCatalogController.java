@@ -8,7 +8,7 @@ import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.datasync.jobCatalog.JobCatalogService;
 import com.lacus.domain.datasync.jobCatalog.command.AddJobCatalogCommand;
 import com.lacus.domain.datasync.jobCatalog.command.UpdateJobCatalogCommand;
-import com.lacus.domain.datasync.jobCatalog.query.JobCataLogQuery;
+import com.lacus.domain.datasync.jobCatalog.query.JobCatalogQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +30,7 @@ public class JobCatalogController {
     @ApiOperation("任务分组列表")
     @PreAuthorize("@permission.has('datasync:catalog:list')")
     @GetMapping("/list")
-    public ResponseDTO<List<DataSyncJobCatalogEntity>> list(@RequestParam("catalogName") String catalogName) {
+    public ResponseDTO<List<DataSyncJobCatalogEntity>> list(@RequestParam(value = "catalogName", required = false) String catalogName) {
         List<DataSyncJobCatalogEntity> list = jobCatalogService.list(catalogName);
         return ResponseDTO.ok(list);
     }
@@ -38,7 +38,7 @@ public class JobCatalogController {
     @ApiOperation("任务分组列表")
     @PreAuthorize("@permission.has('datasync:catalog:list')")
     @GetMapping("/pageList")
-    public ResponseDTO<PageDTO> pageList(JobCataLogQuery query) {
+    public ResponseDTO<PageDTO> pageList(JobCatalogQuery query) {
         PageDTO page = jobCatalogService.pageList(query);
         return ResponseDTO.ok(page);
     }
