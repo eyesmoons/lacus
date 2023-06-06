@@ -6,10 +6,7 @@ import com.lacus.domain.metadata.column.ColumnService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,8 +19,14 @@ public class ColumnController {
     private ColumnService columnService;
 
     @ApiOperation("根据tableId查询字段列表")
-    @GetMapping("/getColumnsBytTableId/{tableId}")
+    @GetMapping("/getColumnsByTableId/{tableId}")
     public ResponseDTO<List<MetaColumnEntity>> getColumnsBytTableId(@PathVariable("tableId") Long tableId) {
         return ResponseDTO.ok(columnService.getColumnsBytTableId(tableId));
+    }
+
+    @ApiOperation("根据tableName查询字段列表")
+    @GetMapping("/getColumnsByTableName")
+    public ResponseDTO<List<MetaColumnEntity>> getColumnsBytTableName(@RequestParam("datasourceId") Long datasourceId, @RequestParam("dbName") String dbName, @RequestParam("tableName") String tableName) {
+        return ResponseDTO.ok(columnService.getColumnsBytTableName(datasourceId, dbName, tableName));
     }
 }

@@ -16,9 +16,9 @@ public class DataSyncSourceColumnEntity extends BaseEntity<DataSyncSourceColumnE
     @TableId(value = "source_column_id", type = IdType.AUTO)
     private Long sourceColumnId;
 
-    @ApiModelProperty("输出源配置ID")
-    @TableField("source_conf_id")
-    private Long sourceConfId;
+    @ApiModelProperty("任务ID")
+    @TableField("job_id")
+    private Long jobId;
 
     @ApiModelProperty("输出源表ID")
     @TableField("source_table_id")

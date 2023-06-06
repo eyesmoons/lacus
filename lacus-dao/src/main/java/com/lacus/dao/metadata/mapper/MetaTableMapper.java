@@ -9,4 +9,6 @@ import java.util.List;
 
 public interface MetaTableMapper extends BaseMapper<MetaTableEntity> {
     List<MetaDbTableEntity> listMetaDbTable(@Param("datasourceId") Long datasourceId, @Param("dbName") String dbName, @Param("tableName") String tableName);
+
+    List<MetaDbTableEntity> listMetaTable(@Param("list") List<MetaDbTableEntity> list);
 }

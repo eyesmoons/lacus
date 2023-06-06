@@ -11,7 +11,7 @@ public class SchemaColumnEntity {
     private String isNullable;
     private String dataType;
     private String columnType;
-    private Integer characterOctetLength;
+    private Long characterOctetLength;
     private Long numericPrecision;
     private Long numericScale;
     private String columnComment;

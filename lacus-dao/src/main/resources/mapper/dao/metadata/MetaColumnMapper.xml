@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.metadata.mapper.MetaColumnMapper">
+    <resultMap id="metaColumnMap" type="com.lacus.dao.metadata.entity.MetaColumnEntity">
+        <result column="column_id" property="columnId"/>
+        <result column="table_id" property="tableId"/>
+        <result column="column_name" property="columnName"/>
+        <result column="data_type" property="dataType"/>
+        <result column="column_type" property="columnType"/>
+        <result column="column_length" property="columnLength"/>
+        <result column="comment" property="comment"/>
+        <result column="is_nullable" property="isNullable"/>
+        <result column="column_default" property="columnDefault"/>
+    </resultMap>
+
+    <select id="selectColumnsByTableName" resultMap="metaColumnMap">
+        select
+            a.column_name,
+            a.data_type,
+            a.column_length,
+            a.comment
+        from (select table_id, column_name, data_type, column_length, comment from meta_column where deleted = 0) a
+        left join (select table_id, table_name, db_id from meta_table where deleted = 0) b on a.table_id = b.table_id
+        left join (select db_id, db_name, datasource_id from meta_db where deleted = 0) c on b.db_id = c.db_id
+        left join (select datasource_id from meta_datasource where deleted = 0) d on c.datasource_id = d.datasource_id
+        <where>
+            <if test="datasourceId != null"> and d.datasource_id = #{datasourceId}</if>
+            <if test="dbName != null"> and c.db_name = #{dbName}</if>
+            <if test="tableName != null"> and b.table_name = #{tableName}</if>
+        </where>
+    </select>
+</mapper>
