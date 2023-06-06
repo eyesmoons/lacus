@@ -1,12 +1,15 @@
 package com.lacus.job.flink;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.lacus.common.utils.PropertiesUtil;
 import com.lacus.job.AbstractJob;
+import com.lacus.job.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
+import org.apache.flink.util.OutputTag;
 
 @Slf4j
 public abstract class BaseFlinkJob extends AbstractJob {
@@ -15,13 +18,26 @@ public abstract class BaseFlinkJob extends AbstractJob {
 
     protected static transient StreamExecutionEnvironment env;
 
+    protected Integer maxBatchInterval;
+    protected Integer maxBatchSize;
+    protected Integer maxBatchCount;
+
     public BaseFlinkJob(String[] args) {
         super(args);
     }
 
+    public OutputTag<JSONObject> sideOutput = new OutputTag<JSONObject>("side-output-source") {
+    };
+
     @Override
     public void afterInit() {
         log.info("初始化flink参数");
+        JSONObject flinkConf = baseConf.getJSONObject("flinkConf");
+        if (StringUtils.checkValNotNull(flinkConf)) {
+            this.maxBatchInterval = flinkConf.getInteger("maxBatchInterval");
+            this.maxBatchCount = flinkConf.getInteger("maxBatchRows");
+            this.maxBatchSize = flinkConf.getInteger("maxBatchSize");
+        }
 
         env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(1);
 
@@ -42,6 +58,6 @@ public abstract class BaseFlinkJob extends AbstractJob {
 
         // 设置checkpoint状态后端
         env.setStateBackend(new HashMapStateBackend());
-        env.getCheckpointConfig().setCheckpointStorage("hdfs://"+ PropertiesUtil.getPropValue("hdfs.name.node")+"/flink/flink-checkpoints/");
+        env.getCheckpointConfig().setCheckpointStorage("hdfs://" + PropertiesUtil.getPropValue("hdfs.name.node") + "/flink/flink-checkpoints/");
     }
 }
