@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface IDataSyncColumnMappingService extends IService<DataSyncColumnMappingEntity> {
     List<DataSyncSavedColumn> querySavedColumns(DataSyncSavedColumn tpl);
+    void removeByJobId(Long jobId);
 }

@@ -40,7 +40,12 @@ public class ColumnService {
             if (ObjectUtils.isNotEmpty(metaTable)) {
                 LambdaQueryWrapper<MetaColumnEntity> wrapper = new LambdaQueryWrapper<>();
                 wrapper.eq(MetaColumnEntity::getTableId, metaTable.getTableId());
-                return metaColumnService.list(wrapper);
+                List<MetaColumnEntity> list = metaColumnService.list(wrapper);
+                for (MetaColumnEntity column : list) {
+                    column.setDbName(dbName);
+                    column.setTableName(tableName);
+                }
+                return list;
             }
         }
         return null;

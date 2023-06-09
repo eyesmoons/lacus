@@ -59,4 +59,13 @@ public class MetaColumnEntity extends BaseEntity<MetaColumnEntity> {
     @ApiModelProperty("字段默认值")
     @TableField("column_default")
     private String columnDefault;
+
+    @TableField(exist = false)
+    private Long datasourceId;
+
+    @TableField(exist = false)
+    private String dbName;
+
+    @TableField(exist = false)
+    private String tableName;
 }
