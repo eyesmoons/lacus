@@ -16,6 +16,9 @@ public class AddJobCommand {
     @NotNull(message = "任务分组不能为空")
     private Long catalogId;
 
+    @NotBlank(message = "调度容器不能为空")
+    private String appContainer;
+
     private String remark;
 
     @NotNull(message = "窗口大小不能为空")

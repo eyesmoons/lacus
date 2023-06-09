@@ -32,6 +32,9 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     @TableField("sink_datasource_id")
     private Long sinkDatasourceId;
 
+    @ApiModelProperty("app_container")
+    private String appContainer;
+
     @ApiModelProperty("数据缓存位置")
     @TableField("topic")
     private String topic;
