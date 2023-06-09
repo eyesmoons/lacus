@@ -13,7 +13,7 @@ public class AddJobCommand {
     @NotBlank(message = "任务名称不能为空")
     private String jobName;
 
-    @NotBlank(message = "任务分组不能为空")
+    @NotNull(message = "任务分组不能为空")
     private Long catalogId;
 
     private String remark;

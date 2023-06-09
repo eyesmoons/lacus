@@ -6,6 +6,7 @@ import com.lacus.core.annotations.AccessLog;
 import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.datasync.job.JobService;
 import com.lacus.domain.datasync.job.command.AddJobCommand;
+import com.lacus.domain.datasync.job.dto.TableDTO;
 import com.lacus.domain.datasync.job.query.JobQuery;
 import com.lacus.domain.datasync.job.query.MappedColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableQuery;
@@ -54,5 +55,23 @@ public class JobController {
     @PostMapping("/listMappedColumn")
     public ResponseDTO<?> listMappedColumn(@RequestBody MappedColumnQuery query) {
         return ResponseDTO.ok(jobService.listMappedColumn(query));
+    }
+
+    @ApiOperation("根据dbName查询已接入的表")
+    @GetMapping("/listSavedDbTableByDbName")
+    public ResponseDTO<?> listSavedDbTable(TableDTO query) {
+        return ResponseDTO.ok(jobService.listSavedDbTable(query.getDatasourceId(), query.getDbName()));
+    }
+
+    @ApiOperation("根据jobId查询已接入的表")
+    @GetMapping("/listSavedTableByJobId/{jobId}")
+    public ResponseDTO<?> listSavedTableByJobId(@PathVariable("jobId") Long jobId) {
+        return ResponseDTO.ok(jobService.listSavedTableByJobId(jobId));
+    }
+
+    @ApiOperation("任务详情")
+    @GetMapping("/detail/{jobId}")
+    public ResponseDTO<?> detail(@PathVariable("jobId") Long jobId) {
+        return ResponseDTO.ok(jobService.detail(jobId));
     }
 }

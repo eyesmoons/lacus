@@ -10,12 +10,12 @@ import lombok.Data;
 import java.util.Date;
 
 @Data
-@TableName("data_sync_log")
-public class DataSyncLogEntity extends BaseEntity<DataSyncLogEntity> {
+@TableName("data_sync_job_instance")
+public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEntity> {
 
     @ApiModelProperty("主键")
-    @TableId(value = "log_id", type = IdType.AUTO)
-    private Long logId;
+    @TableId(value = "instance_id", type = IdType.AUTO)
+    private Long instanceId;
 
     @ApiModelProperty("任务ID")
     @TableField("job_id")
@@ -25,9 +25,9 @@ public class DataSyncLogEntity extends BaseEntity<DataSyncLogEntity> {
     @TableField("application_id")
     private String applicationId;
 
-    @ApiModelProperty("日志类型 1 source 2 sink")
-    @TableField("log_type")
-    private Integer logType;
+    @ApiModelProperty("类型 1 source 2 sink")
+    @TableField("type")
+    private Integer type;
 
     @ApiModelProperty("任务提交时间")
     @TableField("submit_time")

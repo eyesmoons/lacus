@@ -1,5 +1,6 @@
 package com.lacus.service.datasync.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lacus.dao.datasync.entity.DataSyncSavedTable;
 import com.lacus.dao.datasync.entity.DataSyncTableMappingEntity;
@@ -25,5 +26,12 @@ public class DataSyncTableMappingServiceImpl extends ServiceImpl<DataSyncTableMa
     @Override
     public LinkedList<DataSyncSavedTable> listSavedTables(List<DataSyncSavedTable> list) {
         return tableMappingMapper.batchQuerySavedTables(list);
+    }
+
+    @Override
+    public void removeByJobId(Long jobId) {
+        LambdaQueryWrapper<DataSyncTableMappingEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(DataSyncTableMappingEntity::getJobId, jobId);
+        this.remove(wrapper);
     }
 }
