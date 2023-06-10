@@ -6,10 +6,11 @@ import java.util.List;
 
 @Data
 public class MappedTableQuery {
-    private Long jobId;
+    private String jobId;
     private Long sourceDatasourceId;
     private String sourceDbName;
     private List<String> sourceTableNames;
     private Long sinkDatasourceId;
     private String sinkDbName;
+    private List<String> sinkTableNames;
 }

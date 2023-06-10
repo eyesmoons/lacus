@@ -58,13 +58,13 @@
             left join (select db_id, db_name, datasource_id from meta_db where deleted = 0) db on tbl.db_id = db.db_id
             left join (select datasource_id, datasource_name, type from meta_datasource where deleted = 0) ds on ds.datasource_id = db.datasource_id
             <where>
-                <if test="datasourceId != null and datasourceId != ''">
+                <if test="item.datasourceId != null and item.datasourceId != ''">
                     and ds.datasource_id = #{item.datasourceId}
                 </if>
-                <if test="dbName != null and dbName != ''">
+                <if test="item.dbName != null and item.dbName != ''">
                     and db.db_name = #{item.dbName}
                 </if>
-                <if test="tableName != null and tableName != ''">
+                <if test="item.tableName != null and item.tableName != ''">
                     and tbl.table_name = #{item.tableName}
                 </if>
             </where>

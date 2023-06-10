@@ -15,6 +15,7 @@ public class DataSyncJobCatalogServiceImpl extends ServiceImpl<DataSyncJobCatalo
     public List<DataSyncJobCatalogEntity> listByName(String catalogName) {
         LambdaQueryWrapper<DataSyncJobCatalogEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.like(ObjectUtils.isNotEmpty(catalogName), DataSyncJobCatalogEntity::getCatalogName, catalogName);
+        wrapper.orderByDesc(DataSyncJobCatalogEntity::getUpdateTime);
         return this.list(wrapper);
     }
 }

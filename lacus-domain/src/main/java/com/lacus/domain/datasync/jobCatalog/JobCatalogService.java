@@ -43,7 +43,7 @@ public class JobCatalogService {
         return dataSyncJobCatalogService.listByName(catalogName);
     }
 
-    public DataSyncJobCatalogEntity detail(Long catalogId) {
+    public DataSyncJobCatalogEntity detail(String catalogId) {
         return dataSyncJobCatalogService.getById(catalogId);
     }
 }

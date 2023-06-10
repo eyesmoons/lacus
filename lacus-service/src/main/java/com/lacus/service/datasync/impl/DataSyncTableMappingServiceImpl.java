@@ -19,8 +19,8 @@ public class DataSyncTableMappingServiceImpl extends ServiceImpl<DataSyncTableMa
     private DataSyncTableMappingMapper tableMappingMapper;
 
     @Override
-    public LinkedList<DataSyncSavedTable> listSavedTables(Long jobId) {
-        return tableMappingMapper.querySavedTables(jobId);
+    public LinkedList<DataSyncSavedTable> listSavedTables(DataSyncSavedTable query) {
+        return tableMappingMapper.querySavedTables(query);
     }
 
     @Override
@@ -29,7 +29,7 @@ public class DataSyncTableMappingServiceImpl extends ServiceImpl<DataSyncTableMa
     }
 
     @Override
-    public void removeByJobId(Long jobId) {
+    public void removeByJobId(String jobId) {
         LambdaQueryWrapper<DataSyncTableMappingEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncTableMappingEntity::getJobId, jobId);
         this.remove(wrapper);

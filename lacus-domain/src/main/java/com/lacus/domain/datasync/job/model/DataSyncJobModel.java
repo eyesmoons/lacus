@@ -14,8 +14,8 @@ public class DataSyncJobModel extends DataSyncJobEntity {
     private String sourceDatasourceName;
     private String sinkDatasourceName;
     private String syncTypeName;
-    private Integer sourceStatus;
-    private Integer sinkStatus;
+    private String sourceStatus;
+    private String sinkStatus;
 
     public DataSyncJobModel(DataSyncJobEntity entity) {
         BeanUtil.copyProperties(entity, this);

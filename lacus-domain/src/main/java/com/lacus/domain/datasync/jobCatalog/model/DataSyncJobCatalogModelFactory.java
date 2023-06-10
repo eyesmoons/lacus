@@ -9,7 +9,7 @@ import com.lacus.service.datasync.IDataSyncJobCatalogService;
 
 public class DataSyncJobCatalogModelFactory {
 
-    public static DataSyncJobCatalogModel loadFromDb(Long catalogId, IDataSyncJobCatalogService dataSyncJobCatalogService) {
+    public static DataSyncJobCatalogModel loadFromDb(String catalogId, IDataSyncJobCatalogService dataSyncJobCatalogService) {
         DataSyncJobCatalogEntity byId = dataSyncJobCatalogService.getById(catalogId);
         if (byId == null) {
             throw new ApiException(ErrorCode.Business.OBJECT_NOT_FOUND, catalogId, "任务分组");

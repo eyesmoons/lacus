@@ -13,8 +13,8 @@ import lombok.Data;
 public class DataSyncJobCatalogEntity extends BaseEntity<DataSyncJobCatalogEntity> {
 
     @ApiModelProperty("主键")
-    @TableId(value = "catalog_id", type = IdType.AUTO)
-    private Long catalogId;
+    @TableId(value = "catalog_id", type = IdType.ASSIGN_UUID)
+    private String catalogId;
 
     @ApiModelProperty("分组名称")
     @TableField("catalog_name")
@@ -22,11 +22,11 @@ public class DataSyncJobCatalogEntity extends BaseEntity<DataSyncJobCatalogEntit
 
     @ApiModelProperty("jobManager内存，单位为GB")
     @TableField("job_manager")
-    private Long jobManager;
+    private Integer jobManager;
 
     @ApiModelProperty("taskManager内存，单位为GB")
     @TableField("task_manager")
-    private Long taskManager;
+    private Integer taskManager;
 
     @ApiModelProperty("分组描述")
     @TableField("remark")

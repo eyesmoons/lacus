@@ -4,9 +4,11 @@ import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
-import com.lacus.domain.datasync.job.JobService;
+import com.lacus.domain.datasync.job.JobManagerService;
 import com.lacus.domain.datasync.job.command.AddJobCommand;
+import com.lacus.domain.datasync.job.command.UpdateJobCommand;
 import com.lacus.domain.datasync.job.dto.TableDTO;
+import com.lacus.domain.datasync.job.query.JobPageQuery;
 import com.lacus.domain.datasync.job.query.JobQuery;
 import com.lacus.domain.datasync.job.query.MappedColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableQuery;
@@ -18,19 +20,25 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 
-@Api(value = "数据同步相关接口", tags = {"数据同步相关接口"})
+@Api(value = "数据同步任务管理相关接口", tags = {"数据同步任务管理相关接口"})
 @RestController
-@RequestMapping("/datasync/job")
-public class JobController {
+@RequestMapping("/datasync/job/manager")
+public class JobManagerController {
 
     @Autowired
-    private JobService jobService;
+    private JobManagerService jobManagerService;
+
+    @ApiOperation("任务列表树")
+    @GetMapping("/jobListTree")
+    public ResponseDTO<?> jobListTree(JobQuery query) {
+        return ResponseDTO.ok(jobManagerService.jobListTree(query));
+    }
 
     @ApiOperation("任务列表")
     @PreAuthorize("@permission.has('datasync:job:list')")
     @GetMapping("/pageList")
-    public ResponseDTO<PageDTO> pageList(JobQuery query) {
-        PageDTO page = jobService.pageList(query);
+    public ResponseDTO<PageDTO> pageList(JobPageQuery query) {
+        PageDTO page = jobManagerService.pageList(query);
         return ResponseDTO.ok(page);
     }
 
@@ -39,7 +47,16 @@ public class JobController {
     @AccessLog(title = "任务管理", businessType = BusinessTypeEnum.ADD)
     @PostMapping("/add")
     public ResponseDTO<?> add(@Valid @RequestBody AddJobCommand command) {
-        jobService.addJob(command);
+        jobManagerService.addJob(command);
+        return ResponseDTO.ok();
+    }
+
+    @ApiOperation("更新任务")
+    @PreAuthorize("@permission.has('datasync:job:add')")
+    @AccessLog(title = "任务管理", businessType = BusinessTypeEnum.ADD)
+    @PostMapping("/modify")
+    public ResponseDTO<?> modify(@Valid @RequestBody UpdateJobCommand command) {
+        jobManagerService.updateJob(command);
         return ResponseDTO.ok();
     }
 
@@ -47,31 +64,37 @@ public class JobController {
     @PreAuthorize("@permission.has('datasync:job:list')")
     @PostMapping("/listMappedTable")
     public ResponseDTO<?> listMappedTable(@RequestBody MappedTableQuery query) {
-        return ResponseDTO.ok(jobService.listMappedTable(query));
+        return ResponseDTO.ok(jobManagerService.listMappedTable(query));
     }
 
     @ApiOperation("查询映射字段列表")
     @PreAuthorize("@permission.has('datasync:job:list')")
     @PostMapping("/listMappedColumn")
     public ResponseDTO<?> listMappedColumn(@RequestBody MappedColumnQuery query) {
-        return ResponseDTO.ok(jobService.listMappedColumn(query));
+        return ResponseDTO.ok(jobManagerService.listMappedColumn(query));
     }
 
     @ApiOperation("根据dbName查询已接入的表")
     @GetMapping("/listSavedDbTableByDbName")
     public ResponseDTO<?> listSavedDbTable(TableDTO query) {
-        return ResponseDTO.ok(jobService.listSavedDbTable(query.getDatasourceId(), query.getDbName()));
+        return ResponseDTO.ok(jobManagerService.listSavedSourceDbTable(query.getDatasourceId(), query.getDbName()));
     }
 
     @ApiOperation("根据jobId查询已接入的表")
     @GetMapping("/listSavedTableByJobId/{jobId}")
-    public ResponseDTO<?> listSavedTableByJobId(@PathVariable("jobId") Long jobId) {
-        return ResponseDTO.ok(jobService.listSavedTableByJobId(jobId));
+    public ResponseDTO<?> listSavedTableByJobId(@PathVariable("jobId") String jobId) {
+        return ResponseDTO.ok(jobManagerService.listSavedSourceTableByJobId(jobId));
     }
 
     @ApiOperation("任务详情")
     @GetMapping("/detail/{jobId}")
-    public ResponseDTO<?> detail(@PathVariable("jobId") Long jobId) {
-        return ResponseDTO.ok(jobService.detail(jobId));
+    public ResponseDTO<?> detail(@PathVariable("jobId") String jobId) {
+        return ResponseDTO.ok(jobManagerService.detail(jobId));
+    }
+
+    @ApiOperation("检查表映射")
+    @PostMapping("/checkMapping")
+    public ResponseDTO<?> checkMapping(@RequestBody MappedTableQuery query) {
+        return ResponseDTO.ok(jobManagerService.checkMapping(query));
     }
 }

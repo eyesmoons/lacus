@@ -4,8 +4,9 @@
 
     <resultMap id="jobInstanceMap" type="com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity">
         <result column="instance_id" property="instanceId"/>
-        <result column="job_id" property="jobId"/>
+        <result column="catalog_id" property="catalogId"/>
         <result column="application_id" property="applicationId"/>
+        <result column="flink_job_id" property="flinkJobId"/>
         <result column="type" property="type"/>
         <result column="submit_time" property="submitTime"/>
         <result column="finished_time" property="finishedTime"/>
@@ -17,7 +18,7 @@
     <select id="getLastInstanceByJobId" resultMap="jobInstanceMap">
         select *
         from data_sync_job_instance
-        where job_id = #{jobId} and type = #{type} and deleted = 0
-        and create_time = (select max(create_time) from data_sync_job_instance where job_id = #{jobId} and type = #{type} and deleted = 0)
+        where catalog_id = #{catalogId} and type = #{type} and deleted = 0
+        and create_time = (select max(create_time) from data_sync_job_instance where catalog_id = #{catalogId} and type = #{type} and deleted = 0)
     </select>
 </mapper>

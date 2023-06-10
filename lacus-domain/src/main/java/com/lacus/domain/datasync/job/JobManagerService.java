@@ -1,6 +1,5 @@
 package com.lacus.domain.datasync.job;
 
-import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
@@ -10,9 +9,11 @@ import com.lacus.dao.metadata.entity.MetaColumnEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDbTableEntity;
 import com.lacus.domain.datasync.job.command.AddJobCommand;
+import com.lacus.domain.datasync.job.command.UpdateJobCommand;
 import com.lacus.domain.datasync.job.dto.*;
 import com.lacus.domain.datasync.job.model.DataSyncJobModel;
 import com.lacus.domain.datasync.job.model.DataSyncJobModelFactory;
+import com.lacus.domain.datasync.job.query.JobPageQuery;
 import com.lacus.domain.datasync.job.query.JobQuery;
 import com.lacus.domain.datasync.job.query.MappedColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableQuery;
@@ -22,16 +23,16 @@ import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.metadata.IMetaTableService;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
-public class JobService {
+public class JobManagerService {
 
     @Autowired
     private IDataSyncJobService dataSyncJobService;
@@ -73,10 +74,10 @@ public class JobService {
     private IDataSyncJobInstanceService instanceService;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public PageDTO pageList(JobQuery query) {
+    public PageDTO pageList(JobPageQuery query) {
         Page page = dataSyncJobService.page(query.toPage(), query.toQueryWrapper());
         List<DataSyncJobEntity> records = page.getRecords();
-        List<Long> catalogIds = new ArrayList<>();
+        List<String> catalogIds = new ArrayList<>();
         List<Long> datasourceIds = new ArrayList<>();
         for (DataSyncJobEntity job : records) {
             catalogIds.add(job.getCatalogId());
@@ -84,7 +85,7 @@ public class JobService {
             datasourceIds.add(job.getSinkDatasourceId());
         }
 
-        Map<Long, String> catalogEntityMap = new HashMap<>();
+        Map<String, String> catalogEntityMap = new HashMap<>();
         Map<Long, String> metaDatasourceEntityMap = new HashMap<>();
         if (ObjectUtils.isNotEmpty(catalogIds)) {
             List<DataSyncJobCatalogEntity> catalogEntityList = catalogService.listByIds(catalogIds);
@@ -96,7 +97,7 @@ public class JobService {
             List<MetaDatasourceEntity> metaDatasourceEntityList = metaDataSourceService.listByIds(datasourceIds);
             metaDatasourceEntityMap = metaDatasourceEntityList.stream().collect(Collectors.toMap(MetaDatasourceEntity::getDatasourceId, MetaDatasourceEntity::getDatasourceName));
         }
-        Map<Long, String> finalCatalogEntityMap = catalogEntityMap;
+        Map<String, String> finalCatalogEntityMap = catalogEntityMap;
         Map<Long, String> finalMetaDatasourceEntityMap = metaDatasourceEntityMap;
         List<DataSyncJobModel> resultRecord = records.stream().map(entity -> {
             DataSyncJobModel model = new DataSyncJobModel(entity);
@@ -104,8 +105,8 @@ public class JobService {
             model.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             model.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
             model.setSyncTypeName(SyncTypeEnum.getByCode(entity.getSyncType()));
-            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getJobId(), 1);
-            DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(entity.getJobId(), 1);
+            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
+            DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 2);
             if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
                 model.setSourceStatus(lastSourceInstance.getStatus());
             }
@@ -125,7 +126,10 @@ public class JobService {
         saveTableMappings(jobModel.getJobId(), addJobCommand);
     }
 
-    private void saveTableMappings(Long jobId, AddJobCommand addJobCommand) {
+    /**
+     * save table and column mappings
+     */
+    private void saveTableMappings(String jobId, AddJobCommand addJobCommand) {
         resetTableAndColumnMappings(jobId);
         List<TableMapping> tableMappings = addJobCommand.getTableMappings();
         List<DataSyncTableMappingEntity> tableMappingEntities = new ArrayList<>();
@@ -197,7 +201,7 @@ public class JobService {
      * 重置表及字段映射关系
      * @param jobId 任务ID
      */
-    private void resetTableAndColumnMappings(Long jobId) {
+    private void resetTableAndColumnMappings(String jobId) {
         tableMappingService.removeByJobId(jobId);
         columnMappingService.removeByJobId(jobId);
         sourceTableService.removeByJobId(jobId);
@@ -216,26 +220,18 @@ public class JobService {
         return model;
     }
 
-    private String buildSourceConf(AddJobCommand command) {
-        SourceConf sourceConf = new SourceConf();
-        String sourceDbName = command.getSourceDbName();
-        List<TableMapping> tableMappings = command.getTableMappings();
-        List<String> sourceTables = tableMappings.stream().map(TableMapping::getSourceTableName).collect(Collectors.toList());
-        MetaDatasourceEntity metaDatasource = dataSourceService.getById(command.getSourceDatasourceId());
-        if (ObjectUtils.isNotEmpty(metaDatasource)) {
-            sourceConf.setHostname(metaDatasource.getIp());
-            sourceConf.setPort(metaDatasource.getPort());
-            sourceConf.setUsername(metaDatasource.getUsername());
-            sourceConf.setPassword(metaDatasource.getPassword());
-            sourceConf.setDatabaseList(Collections.singletonList(sourceDbName));
-            sourceConf.setTableList(sourceTables);
-        }
-        return JSON.toJSONString(sourceConf);
+    /**
+     * 更新任务信息
+     * @param updateJobCommand 入参
+     */
+    private void modifyJob(UpdateJobCommand updateJobCommand) {
+        DataSyncJobModel model = DataSyncJobModelFactory.loadFromUpdateCommand(updateJobCommand, new DataSyncJobModel());
+        model.updateById();
     }
 
     @SuppressWarnings("unchecked")
     public MappedTableDTO listMappedTable(MappedTableQuery query) {
-        Long jobId = query.getJobId();
+        String jobId = query.getJobId();
         MappedTableDTO result = new MappedTableDTO();
         LinkedList<TableDTO> sourceTables = new LinkedList<>();
         LinkedList<TableDTO> sinkTables = new LinkedList<>();
@@ -302,7 +298,9 @@ public class JobService {
         } else {
             // 如果只传了jobId，则查询所有的已接入的表(任务详情页面)
             if (ObjectUtils.isEmpty(sourceTableNames)) {
-                LinkedList<DataSyncSavedTable> savedTables = tableMappingService.listSavedTables(jobId);
+                DataSyncSavedTable syncSavedTableQuery = new DataSyncSavedTable();
+                BeanUtils.copyProperties(query, syncSavedTableQuery);
+                LinkedList<DataSyncSavedTable> savedTables = tableMappingService.listSavedTables(syncSavedTableQuery);
                 if (ObjectUtils.isNotEmpty(savedTables)) {
                     Map<String, List<MetaDbTableEntity>> metaTablesMap = convertMetaTables(savedTables);
                     List<MetaDbTableEntity> sourceMetaTables = metaTablesMap.get("sourceTables");
@@ -353,7 +351,7 @@ public class JobService {
         return result;
     }
 
-    private Map<String, Object> convertMappedAndSourceMetaTables(List<String> sourceDbTables, Long jobId, Long sourceDatasourceId) {
+    private Map<String, Object> convertMappedAndSourceMetaTables(List<String> sourceDbTables, String jobId, Long sourceDatasourceId) {
         Map<String, Object> mappedAndSourceMetaTablesMap = new HashMap<>();
         List<DataSyncSavedTable> params = new ArrayList<>();
         List<MetaDbTableEntity> sourceParams = new ArrayList<>();
@@ -443,7 +441,7 @@ public class JobService {
 
     public MappedColumnDTO listMappedColumn(MappedColumnQuery query) {
         String sourceTableNameStr = query.getSourceTableName();
-        Long jobId = query.getJobId();
+        String jobId = query.getJobId();
         String[] sourceTableNameArr = sourceTableNameStr.split("\\.");
         String sourceTableName = sourceTableNameArr[1];
         MappedColumnDTO result = new MappedColumnDTO();
@@ -455,6 +453,12 @@ public class JobService {
         if (ObjectUtils.isNotEmpty(jobId)) {
             DataSyncSavedColumn tpl = new DataSyncSavedColumn();
             tpl.setJobId(jobId);
+            tpl.setSourceDatasourceId(query.getSourceDatasourceId());
+            tpl.setSourceDbName(query.getSourceDbName());
+            tpl.setSourceTableName(query.getSourceTableName());
+            tpl.setSinkDatasourceId(query.getSinkDatasourceId());
+            tpl.setSinkDbName(query.getSinkDbName());
+            tpl.setSinkTableName(query.getSinkTableName());
             List<DataSyncSavedColumn> savedColumnList = columnMappingService.querySavedColumns(tpl);
             if (ObjectUtils.isNotEmpty(savedColumnList)) {
                 List<String> savedColumnNames = savedColumnList.stream().map(DataSyncSavedColumn::getSourceColumnName).collect(Collectors.toList());
@@ -523,16 +527,18 @@ public class JobService {
         columnDTO.setDbName(dbName);
         columnDTO.setTableName(tableName);
         columnDTO.setColumnName(columnName);
-        columnDTO.setDataType(metaColumn.getDataType());
-        columnDTO.setColumnLength(metaColumn.getColumnLength());
-        columnDTO.setComment(metaColumn.getComment());
+        if (ObjectUtils.isNotEmpty(metaColumn)) {
+            columnDTO.setDataType(metaColumn.getDataType());
+            columnDTO.setColumnLength(metaColumn.getColumnLength());
+            columnDTO.setComment(metaColumn.getComment());
+        }
         columnDTOs.add(columnDTO);
     }
 
-    public List<TableDTO> listSavedDbTable(Long datasourceId, String dbName) {
+    public List<TableDTO> listSavedSourceDbTable(Long datasourceId, String dbName) {
         List<DataSyncJobEntity> jobs = dataSyncJobService.listBySourceDatasourceId(datasourceId);
         if (ObjectUtils.isNotEmpty(jobs)) {
-            List<Long> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
+            List<String> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
             List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobIdsAndDbName(jobIds, dbName);
             if (ObjectUtils.isNotEmpty(sourceTables)) {
                 return sourceTables.stream().map(entity -> {
@@ -546,7 +552,7 @@ public class JobService {
         return null;
     }
 
-    public List<TableDTO> listSavedTableByJobId(Long jobId) {
+    public List<TableDTO> listSavedSourceTableByJobId(String jobId) {
         List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobId(jobId);
         if (ObjectUtils.isNotEmpty(sourceTables)) {
             return sourceTables.stream().map(entity -> {
@@ -559,16 +565,91 @@ public class JobService {
         return null;
     }
 
-    public JobDTO detail(Long jobId) {
+    public JobDTO detail(String jobId) {
         DataSyncJobEntity byId = dataSyncJobService.getById(jobId);
         JobDTO jobDTO = new JobDTO(byId);
-        List<TableDTO> mappedSourceDbTable = listSavedTableByJobId(jobId);
-        List<DataSyncSinkTableEntity> sinkTables = sinkTableService.listByJobId(jobId);
-        jobDTO.setMappedSourceDbTable(mappedSourceDbTable);
-        jobDTO.setSourceDbName(mappedSourceDbTable.get(0).getDbName());
-        if (ObjectUtils.isNotEmpty(sinkTables)) {
-            jobDTO.setSinkDbName(sinkTables.get(0).getSinkDbName());
+        MappedTableQuery mappedTableQuery = new MappedTableQuery();
+        mappedTableQuery.setJobId(jobId);
+        MappedTableDTO mappedTable = listMappedTable(mappedTableQuery);
+        if (ObjectUtils.isNotEmpty(mappedTable)) {
+            jobDTO.setMappedTable(mappedTable);
+            if (ObjectUtils.isNotEmpty(mappedTable.getMappedSourceTables())) {
+                jobDTO.setSourceDbName(mappedTable.getMappedSourceTables().get(0).getDbName());
+            }
+            if (ObjectUtils.isNotEmpty(mappedTable.getMappedSinkTables())) {
+                jobDTO.setSinkDbName(mappedTable.getMappedSinkTables().get(0).getDbName());
+            }
         }
         return jobDTO;
+    }
+
+    @Transactional
+    public void updateJob(UpdateJobCommand updateJobCommand) {
+        // update job info
+        modifyJob(updateJobCommand);
+        // save job source table and column
+        saveTableMappings(updateJobCommand.getJobId(), updateJobCommand);
+    }
+
+    public String checkMapping(MappedTableQuery query) {
+        String jobId = query.getJobId();
+        DataSyncJobEntity jobEntity;
+        if (ObjectUtils.isNotEmpty(jobId)) {
+            jobEntity = dataSyncJobService.getById(jobId);
+        }
+        List<String> sourceTableNames = query.getSourceTableNames();
+        List<String> sinkTableNames = query.getSinkTableNames();
+        // TODO 待开发
+        return null;
+    }
+
+    public List<JobTreeDTO> jobListTree(JobQuery query) {
+        List<JobTreeDTO> result = new ArrayList<>();
+        List<String> catalogIds = new ArrayList<>();
+        List<DataSyncJobCatalogEntity> catalogList = catalogService.listByName(query.getCatalogName());
+        if (ObjectUtils.isNotEmpty(catalogList)) {
+            for (DataSyncJobCatalogEntity catalog : catalogList) {
+                catalogIds.add(catalog.getCatalogId());
+                JobTreeDTO catalogDTO = new JobTreeDTO();
+                catalogDTO.setJobId(catalog.getCatalogId());
+                catalogDTO.setCatalogId("0");
+                catalogDTO.setJobName(catalog.getCatalogName());
+                catalogDTO.setRemark(catalog.getRemark());
+                catalogDTO.setCreateTime(catalog.getCreateTime());
+                result.add(catalogDTO);
+            }
+        }
+        DataSyncJobEntity tpl = new DataSyncJobEntity();
+        tpl.setJobName(query.getJobName());
+        tpl.setCatalogIds(catalogIds);
+        List<DataSyncJobEntity> jobList = dataSyncJobService.listByQuery(tpl);
+
+        List<Long> datasourceIds = new ArrayList<>();
+        for (DataSyncJobEntity job : jobList) {
+            datasourceIds.add(job.getSourceDatasourceId());
+            datasourceIds.add(job.getSinkDatasourceId());
+        }
+
+        Map<Long, String> metaDatasourceEntityMap = new HashMap<>();
+        if (ObjectUtils.isNotEmpty(datasourceIds)) {
+            List<MetaDatasourceEntity> metaDatasourceEntityList = metaDataSourceService.listByIds(datasourceIds);
+            metaDatasourceEntityMap = metaDatasourceEntityList.stream().collect(Collectors.toMap(MetaDatasourceEntity::getDatasourceId, MetaDatasourceEntity::getDatasourceName));
+        }
+        Map<Long, String> finalMetaDatasourceEntityMap = metaDatasourceEntityMap;
+        List<JobTreeDTO> jobTreeDTOList = jobList.stream().map(entity -> {
+            entity.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
+            entity.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
+            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
+            DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 2);
+            if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
+                entity.setSourceStatus(lastSourceInstance.getStatus());
+            }
+            if (ObjectUtils.isNotEmpty(lastSinkInstance)) {
+                entity.setSinkStatus(lastSinkInstance.getStatus());
+            }
+            return new JobTreeDTO(entity);
+        }).collect(Collectors.toList());
+        result.addAll(jobTreeDTOList);
+        return result;
     }
 }

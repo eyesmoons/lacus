@@ -2,10 +2,7 @@ package com.lacus.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
 import java.util.Objects;
@@ -33,6 +30,17 @@ public class PropertiesUtil {
             log.error("获取propKey错误:", e);
         }
         return null;
+    }
+
+    public static Properties loadPropertiesByStr(String str) {
+        Properties props = new Properties();
+        try {
+            ByteArrayInputStream inputStream = new ByteArrayInputStream(str.getBytes());
+            props.load(inputStream);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return props;
     }
 
     /**
