@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 @Data
 public class MappedColumnDTO {
-    private Long jobId;
+    private String jobId;
     private LinkedList<ColumnDTO> mappedSourceColumns;
     private LinkedList<ColumnDTO> mappedSinkColumns;
 }

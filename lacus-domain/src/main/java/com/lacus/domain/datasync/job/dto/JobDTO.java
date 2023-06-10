@@ -12,7 +12,7 @@ import java.util.List;
 public class JobDTO extends DataSyncJobEntity {
     private String sourceDbName;
     private String sinkDbName;
-    private List<TableDTO> mappedSourceDbTable;
+    private MappedTableDTO mappedTable;
 
     public JobDTO(DataSyncJobEntity entity) {
         BeanUtil.copyProperties(entity, this);

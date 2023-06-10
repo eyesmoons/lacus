@@ -12,4 +12,5 @@ public class SourceConf {
     private String password;
     private List<String> databaseList;
     private List<String> tableList;
+    private String syncType;
 }

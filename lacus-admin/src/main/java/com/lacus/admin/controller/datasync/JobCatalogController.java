@@ -46,7 +46,7 @@ public class JobCatalogController {
     @ApiOperation("任务分组详情")
     @PreAuthorize("@permission.has('datasync:catalog:list')")
     @GetMapping("/{catalogId}")
-    public ResponseDTO<DataSyncJobCatalogEntity> detail(@PathVariable("catalogId") Long catalogId) {
+    public ResponseDTO<DataSyncJobCatalogEntity> detail(@PathVariable("catalogId") String catalogId) {
         DataSyncJobCatalogEntity entity = jobCatalogService.detail(catalogId);
         return ResponseDTO.ok(entity);
     }

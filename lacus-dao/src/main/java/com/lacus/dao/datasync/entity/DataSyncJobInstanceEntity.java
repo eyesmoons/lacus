@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.lacus.common.core.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+
 import java.util.Date;
 
 @Data
@@ -17,17 +18,25 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
     @TableId(value = "instance_id", type = IdType.AUTO)
     private Long instanceId;
 
-    @ApiModelProperty("任务ID")
-    @TableField("job_id")
-    private Long jobId;
+    @ApiModelProperty("任务分组ID")
+    @TableField("catalog_id")
+    private String catalogId;
 
     @ApiModelProperty("flink任务ID")
     @TableField("application_id")
     private String applicationId;
 
+    @ApiModelProperty("flink任务ID")
+    @TableField("flink_job_id")
+    private String flinkJobId;
+
     @ApiModelProperty("类型 1 source 2 sink")
     @TableField("type")
     private Integer type;
+
+    @ApiModelProperty("同步方式")
+    @TableField("sync_type")
+    private Integer syncType;
 
     @ApiModelProperty("任务提交时间")
     @TableField("submit_time")
@@ -43,5 +52,5 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
 
     @ApiModelProperty("任务状态 1 RUNNING, 2 KILL, 3 FAILED")
     @TableField("status")
-    private Integer status;
+    private String status;
 }

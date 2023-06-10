@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public interface DataSyncTableMappingMapper extends BaseMapper<DataSyncTableMappingEntity> {
-    LinkedList<DataSyncSavedTable> querySavedTables(@Param("jobId") Long jobId);
+    LinkedList<DataSyncSavedTable> querySavedTables(DataSyncSavedTable query);
 
     LinkedList<DataSyncSavedTable> batchQuerySavedTables(@Param("list") List<DataSyncSavedTable> list);
 }

@@ -18,7 +18,7 @@ public class DataSyncColumnMappingEntity extends BaseEntity<DataSyncColumnMappin
 
     @ApiModelProperty("任务ID")
     @TableField("job_id")
-    private Long jobId;
+    private String jobId;
 
     @ApiModelProperty("输入源表字段ID")
     @TableField("source_column_id")

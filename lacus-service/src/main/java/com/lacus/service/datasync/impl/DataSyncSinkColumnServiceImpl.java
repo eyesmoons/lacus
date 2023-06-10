@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class DataSyncSinkColumnServiceImpl extends ServiceImpl<DataSyncSinkColumnMapper, DataSyncSinkColumnEntity> implements IDataSyncSinkColumnService {
 
     @Override
-    public void removeByJobId(Long jobId) {
+    public void removeByJobId(String jobId) {
         LambdaQueryWrapper<DataSyncSinkColumnEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncSinkColumnEntity::getJobId, jobId);
         this.remove(wrapper);

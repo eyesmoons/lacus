@@ -6,7 +6,7 @@ import java.util.List;
 
 @Data
 public class MappedColumnQuery {
-    private Long jobId;
+    private String jobId;
     private Long sourceDatasourceId;
     private String sourceDbName;
     private String sourceTableName;

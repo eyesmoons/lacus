@@ -18,7 +18,7 @@ public class DataSyncSinkColumnEntity extends BaseEntity<DataSyncSinkColumnEntit
 
     @ApiModelProperty("任务ID")
     @TableField("job_id")
-    private Long jobId;
+    private String jobId;
 
     @ApiModelProperty("输出源表ID")
     @TableField("sink_table_id")
