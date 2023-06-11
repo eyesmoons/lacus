@@ -35,7 +35,6 @@ Lacus是一个开源大数据中台项目，致力于让数据接入变得更简
 |----------------|-----------------|-------------------|
 | `springboot`   | Java项目必备框架      | 2.7               |
 | `druid`        | alibaba数据库连接池   | 1.2.8             |
-| `swagger`      | 文档生成            | 3.0.0             |
 | `mybatis-plus` | 数据库框架           | 3.5.2             |
 | `hutool`       | 国产工具包（简单易用）     | 3.5.2             |
 | `mockito`      | 单元测试模拟          | 1.10.19           |
@@ -78,7 +77,7 @@ git clone https://github.com/eyesmoons/lacus-ui
 
 vite v2.6.14 dev server running at:
 
-> Local: http://127.0.0.1:80/
+> Local: http://127.0.0.1:8080/
 
 ready in 4376ms.
 
@@ -153,7 +152,6 @@ lacus
 
 ## 注意事项
 - IDEA会自动将.properties文件的编码设置为ISO-8859-1,请在Settings > Editor > File Encodings > Properties Files > 设置为UTF-8
-- 请导入统一的代码格式化模板（Google）: Settings > Editor > Code Style > Java > 设置按钮 > import schema > 选择项目根目录下的GoogleStyle.xml文件
 - 如需要生成新的表，请使用CodeGenerator类进行生成。
   - 填入数据库地址，账号密码，库名。然后填入所需的表名执行代码即可。
 - 项目基础环境搭建，请参考docker目录下的指南搭建。保姆级启动说明：
