@@ -7,9 +7,11 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.lacus.common.core.base.BaseEntity;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
+@EqualsAndHashCode(callSuper = true)
 @Data
 @TableName("data_sync_job")
 public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
