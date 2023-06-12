@@ -17,7 +17,7 @@ import java.util.List;
 public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
 
     @ApiModelProperty("主键")
-    @TableId(value = "job_id", type = IdType.ASSIGN_UUID)
+    @TableId(value = "job_id", type = IdType.ASSIGN_ID)
     private String jobId;
 
     @ApiModelProperty("任务名称")
