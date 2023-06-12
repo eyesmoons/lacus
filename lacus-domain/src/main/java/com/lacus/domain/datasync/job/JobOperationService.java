@@ -5,6 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.common.utils.hdfs.HdfsUtil;
+import com.lacus.common.utils.yarn.FlinkConf;
 import com.lacus.common.utils.yarn.FlinkJobDetail;
 import com.lacus.common.utils.yarn.FlinkParams;
 import com.lacus.common.utils.yarn.YarnUtil;
@@ -74,9 +75,11 @@ public class JobOperationService {
 
     /**
      * 为了节省服务器资源，所有任务以分组形式启动
-     * @param catalogId 任务分组ID
+     * @param catalogId 分组ID
+     * @param syncType 启动方式
+     * @param timeStamp 指定时间戳
      */
-    public void submitJob(String catalogId, String syncType) {
+    public void submitJob(String catalogId, String syncType, String timeStamp) {
         DataSyncJobCatalogEntity catalogEntity = catalogService.getById(catalogId);
         if (ObjectUtils.isEmpty(catalogEntity)) {
             throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "未查询到任务分组信息");
@@ -90,9 +93,9 @@ public class JobOperationService {
 
         List<DataSyncJobEntity> jobs = jobService.listByCatalogId(catalogId);
         // 构建Source任务json
-        List<SourceConf> sourceJobConf = buildSourceJobConf(catalogName, jobs, syncType);
+        List<SourceConf> sourceJobConf = buildSourceJobConf(jobs, syncType, timeStamp);
         // 构建sink任务json
-        List<FlinkSinkJobConf> sinkJobConf = buildSinkJobConf(catalogName, catalogId, jobs, flinkParams);
+        List<FlinkSinkJobConf> sinkJobConf = buildSinkJobConf(jobs);
 
         String sourceJobPath = getJobJarPath(sourceJobJarName);
         String sinkJobPath = getJobJarPath(sinkJobJarName);
@@ -102,7 +105,7 @@ public class JobOperationService {
             String sourceAppId = YarnUtil.deployOnYarn( new String[]{sourceJobName, JSON.toJSONString(sourceJobConf) }, sourceJobName, flinkParams, sourceJobPath, flinkConfPath, "");
             while (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-                String sinkAppId = YarnUtil.deployOnYarn( new String[]{sinkJobName, JSON.toJSONString(sourceJobConf) }, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
+                String sinkAppId = YarnUtil.deployOnYarn( new String[]{sinkJobName, JSON.toJSONString(sinkJobConf) }, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
                 while (Objects.nonNull(sinkAppId)) {
                     createInstance(catalogId, 2, sinkAppId, syncType);
                 }
@@ -130,20 +133,20 @@ public class JobOperationService {
         return hdfsJarPath;
     }
 
-    private List<FlinkSinkJobConf> buildSinkJobConf(String catalogName, String catalogId, List<DataSyncJobEntity> jobs, FlinkParams flinkParams) {
+    private List<FlinkSinkJobConf> buildSinkJobConf(List<DataSyncJobEntity> jobs) {
         List<FlinkSinkJobConf> sinkJobConfList = new ArrayList<>();
         for (DataSyncJobEntity job : jobs) {
             FlinkJobSource source = new FlinkJobSource();
             source.setBootstrapServers(bootstrapServers);
-            source.setGroupId("data_sync_" + job.getJobId());
-            source.setTopics(Collections.singletonList(job.getTopic()));
+            source.setGroupId("data_sync_group_" + job.getJobId());
+            source.setTopics(Collections.singletonList("data_sync_topic_" + job.getJobId()));
 
             FlinkTaskSink sink = new FlinkTaskSink();
             MetaDatasourceEntity sourceDatasource = dataSourceService.getById(job.getSourceDatasourceId());
             MetaDatasourceEntity sinkDatasource = dataSourceService.getById(job.getSinkDatasourceId());
             List<DataSyncSourceTableEntity> sourceTableEntities = sourceTableService.listByJobId(job.getJobId());
             if (ObjectUtils.isNotEmpty(sourceDatasource)) {
-                sink.setSinkType(sourceDatasource.getType());
+                sink.setSinkType(sinkDatasource.getType());
             }
             FlinkTaskEngine engine = new FlinkTaskEngine();
             if (ObjectUtils.isNotEmpty(sinkDatasource)) {
@@ -191,8 +194,13 @@ public class JobOperationService {
             }
             sink.setEngine(engine);
 
+            FlinkConf flinkConf = new FlinkConf();
+            flinkConf.setJobName(job.getJobName());
+            flinkConf.setMaxBatchInterval(job.getWindowSize());
+            flinkConf.setMaxBatchSize(job.getMaxSize() * 1024 * 1024);
+            flinkConf.setMaxBatchRows(job.getMaxCount() * 10000);
             FlinkSinkJobConf sinkJobConf = new FlinkSinkJobConf();
-            sinkJobConf.setFlinkConf(flinkParams);
+            sinkJobConf.setFlinkConf(flinkConf);
             sinkJobConf.setSource(source);
             sinkJobConf.setSink(sink);
             sinkJobConfList.add(sinkJobConf);
@@ -200,7 +208,7 @@ public class JobOperationService {
         return sinkJobConfList;
     }
 
-    private List<SourceConf> buildSourceJobConf(String jobName, List<DataSyncJobEntity> jobs, String syncType) {
+    private List<SourceConf> buildSourceJobConf(List<DataSyncJobEntity> jobs, String syncType, String timeStamp) {
         List<SourceConf> sourceConfList = new ArrayList<>();
         List<String> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
         List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobIds(jobIds);
@@ -222,6 +230,7 @@ public class JobOperationService {
                 sourceConf.setDatabaseList(Collections.singletonList(sourceDbName));
                 sourceConf.setTableList(sourceTableNames);
                 sourceConf.setSyncType(syncType);
+                sourceConf.setTimeStamp(timeStamp);
                 sourceConfList.add(sourceConf);
             }
         }

@@ -17,8 +17,10 @@ public class JobOperationController {
 
     @ApiOperation("启动任务")
     @GetMapping("/start")
-    public ResponseDTO<?> start(@RequestParam("catalogId") String catalogId, @RequestParam("syncType") String syncType) {
-        operationService.submitJob(catalogId, syncType);
+    public ResponseDTO<?> start(@RequestParam("catalogId") String catalogId,
+                                @RequestParam("syncType") String syncType,
+                                @RequestParam(value = "timeStamp", required = false) String timeStamp) {
+        operationService.submitJob(catalogId, syncType, timeStamp);
         return ResponseDTO.ok();
     }
 }
