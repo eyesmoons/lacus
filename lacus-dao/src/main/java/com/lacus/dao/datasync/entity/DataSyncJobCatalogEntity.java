@@ -15,7 +15,7 @@ import lombok.EqualsAndHashCode;
 public class DataSyncJobCatalogEntity extends BaseEntity<DataSyncJobCatalogEntity> {
 
     @ApiModelProperty("主键")
-    @TableId(value = "catalog_id", type = IdType.ASSIGN_UUID)
+    @TableId(value = "catalog_id", type = IdType.ASSIGN_ID)
     private String catalogId;
 
     @ApiModelProperty("分组名称")
