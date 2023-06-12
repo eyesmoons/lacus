@@ -39,10 +39,6 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     @ApiModelProperty("app_container")
     private String appContainer;
 
-    @ApiModelProperty("数据缓存位置")
-    @TableField("topic")
-    private String topic;
-
     @ApiModelProperty("同步方式：1 初始快照，2 最早，3 最近，4 指定时间戳")
     @TableField("sync_type")
     private Integer syncType;
@@ -57,7 +53,7 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
 
     @ApiModelProperty("最大数据量(MB)")
     @TableField("max_size")
-    private Integer maxSize;
+    private Long maxSize;
 
     @ApiModelProperty("最大数据条数(万条)")
     @TableField("max_count")

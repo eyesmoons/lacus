@@ -1,5 +1,6 @@
 package com.lacus.domain.datasync.job;
 
+import cn.hutool.core.lang.generator.SnowflakeGenerator;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
@@ -38,9 +39,6 @@ public class JobManagerService {
     private IDataSyncJobService dataSyncJobService;
 
     @Autowired
-    private IMetaDataSourceService dataSourceService;
-
-    @Autowired
     private IDataSyncTableMappingService tableMappingService;
 
     @Autowired
@@ -72,6 +70,9 @@ public class JobManagerService {
 
     @Autowired
     private IDataSyncJobInstanceService instanceService;
+
+    @Autowired
+    private SnowflakeGenerator snowflakeGenerator;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public PageDTO pageList(JobPageQuery query) {

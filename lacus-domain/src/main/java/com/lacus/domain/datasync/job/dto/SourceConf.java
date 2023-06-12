@@ -13,4 +13,5 @@ public class SourceConf {
     private List<String> databaseList;
     private List<String> tableList;
     private String syncType;
+    private String timeStamp;
 }
