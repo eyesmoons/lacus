@@ -1,6 +1,7 @@
 package com.lacus.common.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -11,25 +12,33 @@ import java.util.Properties;
 @Slf4j
 public class PropertiesUtil {
 
-    private static final String DEFAULT_PROPERTIES = "/application.properties";
+    private static final String DEFAULT_PROPERTIES = "application-basic.yml";
 
     /**
      * 获取properties属性值
      */
     public static String getPropValue(String propKey) {
         try {
-            Properties props = new Properties();
-            InputStream inputStream = PropertiesUtil.class.getResourceAsStream(DEFAULT_PROPERTIES);
-            if (Objects.isNull(inputStream)) {
-                throw new RuntimeException("输入流获取失败");
-            }
-            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
-            props.load(bf);
-            return props.getProperty(propKey);
-        } catch (IOException e) {
+            Yaml yaml = new Yaml();
+            InputStream inputStream = PropertiesUtil.class.getClassLoader().getResourceAsStream("application-basic.yml");
+            Map<String, Object> obj = yaml.load(inputStream);
+            return getProperty(obj, propKey);
+        } catch (Exception e) {
             log.error("获取propKey错误:", e);
         }
         return null;
+    }
+    private static String getProperty(Map<String, Object> obj, String path) {
+        String[] parts = path.split("\\.");
+        Object value = obj;
+        for (String part : parts) {
+            if (value instanceof Map) {
+                value = ((Map<String, Object>) value).get(part);
+            } else {
+                return null;
+            }
+        }
+        return (String) value;
     }
 
     public static Properties loadPropertiesByStr(String str) {
