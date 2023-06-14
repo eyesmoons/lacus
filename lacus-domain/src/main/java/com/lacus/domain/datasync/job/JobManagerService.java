@@ -3,7 +3,9 @@ package com.lacus.domain.datasync.job;
 import cn.hutool.core.lang.generator.SnowflakeGenerator;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lacus.common.core.page.PageDTO;
+import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.CustomException;
+import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.dao.datasync.entity.*;
 import com.lacus.dao.datasync.enums.SyncTypeEnum;
 import com.lacus.dao.metadata.entity.MetaColumnEntity;
@@ -14,10 +16,7 @@ import com.lacus.domain.datasync.job.command.UpdateJobCommand;
 import com.lacus.domain.datasync.job.dto.*;
 import com.lacus.domain.datasync.job.model.DataSyncJobModel;
 import com.lacus.domain.datasync.job.model.DataSyncJobModelFactory;
-import com.lacus.domain.datasync.job.query.JobPageQuery;
-import com.lacus.domain.datasync.job.query.JobQuery;
-import com.lacus.domain.datasync.job.query.MappedColumnQuery;
-import com.lacus.domain.datasync.job.query.MappedTableQuery;
+import com.lacus.domain.datasync.job.query.*;
 import com.lacus.service.datasync.*;
 import com.lacus.service.metadata.IMetaColumnService;
 import com.lacus.service.metadata.IMetaDataSourceService;
@@ -592,16 +591,94 @@ public class JobManagerService {
         saveTableMappings(updateJobCommand.getJobId(), updateJobCommand);
     }
 
-    public String checkMapping(MappedTableQuery query) {
+    public List<TableMapping> preCheck(MappedTableColumnQuery query) {
+        List<TableMapping> result = new ArrayList<>();
         String jobId = query.getJobId();
-        DataSyncJobEntity jobEntity;
-        if (ObjectUtils.isNotEmpty(jobId)) {
-            jobEntity = dataSyncJobService.getById(jobId);
+        List<TableMapping> tableMappings = query.getTableMappings();
+        if (ObjectUtils.isEmpty(tableMappings)) {
+            throw new ApiException(ErrorCode.Internal.INVALID_PARAMETER, "请传入正确的映射表和字段信息");
         }
-        List<String> sourceTableNames = query.getSourceTableNames();
-        List<String> sinkTableNames = query.getSinkTableNames();
-        // TODO 待开发
-        return null;
+        // 新建任务
+        if (ObjectUtils.isEmpty(jobId)) {
+            return query.getTableMappings();
+        }
+        DataSyncSavedColumn tpl = new DataSyncSavedColumn();
+        tpl.setJobId(jobId);
+        List<DataSyncSavedColumn> savedColumns = columnMappingService.querySavedColumns(tpl);
+        Map<MappedTableQuery, List<DataSyncSavedColumn>> savedColumnsMap = savedColumns.stream().collect(Collectors.groupingBy(savedColumn -> {
+            MappedTableQuery bean = new MappedTableQuery();
+            bean.setSourceDbName(savedColumn.getSourceDbName());
+            bean.setSourceTableName(savedColumn.getSourceTableName());
+            bean.setSinkDbName(savedColumn.getSinkDbName());
+            bean.setSinkTableName(savedColumn.getSinkTableName());
+            return bean;
+        }));
+
+        DataSyncSavedColumn savedColumn0 = savedColumns.get(0);
+        String sourceTableName = savedColumn0.getSourceTableName().split("\\.")[1];
+        List<MetaColumnEntity> sourceMetaColumns = metaColumnService.getColumnsByTableName(savedColumn0.getSourceDatasourceId(), savedColumn0.getSourceDbName(), sourceTableName);
+        List<MetaColumnEntity> sinkMetaColumns = metaColumnService.getColumnsByTableName(savedColumn0.getSinkDatasourceId(), savedColumn0.getSinkDbName(), savedColumn0.getSinkTableName());
+
+        Map<String, MetaColumnEntity> sourceMetaColumnMap = new HashMap<>();
+        Map<String, MetaColumnEntity> sinkMetaColumnMap = new HashMap<>();
+        if (ObjectUtils.isNotEmpty(sourceMetaColumns)) {
+            sourceMetaColumnMap = sourceMetaColumns.stream().collect(Collectors.toMap(MetaColumnEntity::getColumnName, t -> t));
+        }
+        if (ObjectUtils.isNotEmpty(sinkMetaColumns)) {
+            sinkMetaColumnMap = sinkMetaColumns.stream().collect(Collectors.toMap(MetaColumnEntity::getColumnName, t -> t));
+        }
+
+        for (TableMapping tableMapping : tableMappings) {
+            MappedTableQuery mappedTableQuery = new MappedTableQuery();
+            mappedTableQuery.setSourceDbName(query.getSourceDbName());
+            mappedTableQuery.setSourceTableName(tableMapping.getSourceTableName());
+            mappedTableQuery.setSinkDbName(query.getSinkDbName());
+            mappedTableQuery.setSinkTableName(tableMapping.getSinkTableName());
+            List<DataSyncSavedColumn> savedColumnList = savedColumnsMap.get(mappedTableQuery);
+            List<MetaColumnEntity> sourceColumns = tableMapping.getSourceColumns();
+            List<MetaColumnEntity> sinkColumns = tableMapping.getSinkColumns();
+
+            TableMapping resultBean = new TableMapping();
+            resultBean.setSourceTableName(tableMapping.getSourceTableName());
+            resultBean.setSinkTableName(tableMapping.getSinkTableName());
+            if (ObjectUtils.isNotEmpty(sourceColumns) && ObjectUtils.isNotEmpty(sinkColumns)) {
+                resultBean.setSourceColumns(sourceColumns);
+                resultBean.setSinkColumns(sinkColumns);
+            } else {
+                List<MetaColumnEntity> resultSourceColumns = new LinkedList<>();
+                List<MetaColumnEntity> resultSinkColumns = new ArrayList<>();
+                for (DataSyncSavedColumn savedColumn : savedColumnList) {
+                    MetaColumnEntity sourceColumn = new MetaColumnEntity();
+                    sourceColumn.setTableName(savedColumn.getSourceTableName());
+                    sourceColumn.setColumnName(savedColumn.getSourceColumnName());
+
+                    MetaColumnEntity sourceMetaColumn = sourceMetaColumnMap.get(savedColumn.getSourceColumnName());
+                    // 输入源填充元数据信息
+                    if (ObjectUtils.isNotEmpty(sourceMetaColumn)) {
+                        sourceColumn.setDataType(sourceMetaColumn.getDataType());
+                        sourceColumn.setColumnLength(sourceMetaColumn.getColumnLength());
+                        sourceColumn.setComment(sourceMetaColumn.getComment());
+                    }
+                    resultSourceColumns.add(sourceColumn);
+
+                    MetaColumnEntity sinkColumn = new MetaColumnEntity();
+                    sinkColumn.setTableName(savedColumn.getSinkTableName());
+                    sinkColumn.setColumnName(savedColumn.getSinkColumnName());
+                    MetaColumnEntity sinkMetaColumn = sinkMetaColumnMap.get(savedColumn.getSourceColumnName());
+                    // 输出源填充元数据信息
+                    if (ObjectUtils.isNotEmpty(sinkMetaColumn)) {
+                        sinkColumn.setDataType(sinkMetaColumn.getDataType());
+                        sinkColumn.setColumnLength(sinkMetaColumn.getColumnLength());
+                        sinkColumn.setComment(sinkMetaColumn.getComment());
+                    }
+                    resultSinkColumns.add(sinkColumn);
+                }
+                resultBean.setSourceColumns(resultSourceColumns);
+                resultBean.setSinkColumns(resultSinkColumns);
+            }
+            result.add(resultBean);
+        }
+        return result;
     }
 
     public List<JobTreeDTO> jobListTree(JobQuery query) {

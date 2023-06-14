@@ -1,18 +1,16 @@
 package com.lacus.domain.datasync.job.query;
 
+import com.lacus.domain.datasync.job.dto.TableMapping;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class MappedTableQuery {
+public class MappedTableColumnQuery {
     private String jobId;
     private Long sourceDatasourceId;
     private String sourceDbName;
-    private String sourceTableName;
-    private List<String> sourceTableNames;
     private Long sinkDatasourceId;
     private String sinkDbName;
-    private String sinkTableName;
-    private List<String> sinkTableNames;
+    private List<TableMapping> tableMappings;
 }
