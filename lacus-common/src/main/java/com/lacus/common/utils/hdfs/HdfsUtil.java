@@ -1,5 +1,6 @@
 package com.lacus.common.utils.hdfs;
 
+import com.lacus.common.utils.PropertiesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -9,6 +10,7 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.CompressionOutputStream;
 import org.apache.hadoop.util.ReflectionUtils;
+import org.springframework.util.ObjectUtils;
 
 import java.io.*;
 import java.net.URI;
@@ -25,10 +27,10 @@ public class HdfsUtil {
 
     private static void init() {
         envSetting();
+        String hdfsPath = PropertiesUtil.getPropValue("hdfs.defaultFS");
         if (conf == null) {
             conf = new Configuration();
-            String hdfsAddr = DEFAULT_HDFS;
-            conf.set("fs.defaultFS", hdfsAddr);
+            conf.set("fs.defaultFS", ObjectUtils.isEmpty(hdfsPath) ? DEFAULT_HDFS : hdfsPath);
         }
     }
 
@@ -212,16 +214,15 @@ public class HdfsUtil {
      *
      * @param baseDir         文件目录
      * @param zipOutputStream zip文件输出流
-     * @throws IOException
      */
     public static void compressFolder(String baseDir, ZipOutputStream zipOutputStream) throws IOException {
         try {
             init();
             FileSystem fs = FileSystem.get(conf);
-            FileStatus[] fileStatulist = fs.listStatus(new Path(baseDir));
+            FileStatus[] fileStatusList = fs.listStatus(new Path(baseDir));
             log.info("basedir = " + baseDir);
 
-            for (FileStatus fileStatus : fileStatulist) {
+            for (FileStatus fileStatus : fileStatusList) {
                 String name = fileStatus.getPath().toString();
                 name = new File(name).getName();
                 name = name.replace("_0.xlsx", ".xlsx");
@@ -239,7 +240,7 @@ public class HdfsUtil {
                 }
             }
         } catch (IOException e) {
-            log.info("----error:{}----" + e.getMessage());
+            log.info("----error:{}----", e.getMessage());
         }
     }
 
