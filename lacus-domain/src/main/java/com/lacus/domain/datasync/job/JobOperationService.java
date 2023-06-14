@@ -233,7 +233,7 @@ public class JobOperationService {
                 sourceConf.setDatabaseList(Collections.singletonList(sourceDbName));
                 sourceConf.setTableList(sourceTableNames);
                 sourceConf.setSyncType(syncType);
-                sourceConf.setTimeStamp(timeStamp);
+                sourceConf.setTimeStamp(Long.valueOf(timeStamp));
                 sourceConfList.add(sourceConf);
             }
         }
