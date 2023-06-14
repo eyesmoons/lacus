@@ -138,3 +138,6 @@ flink:
   job-jars-path: /flink/jobs/jars/
   source-jar-name: flink-source-job.jar
   sink-jar-name: flink-sink-job.jar
+
+hdfs:
+  defaultFS: hdfs://172.22.224.113:8020

@@ -23,6 +23,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -70,12 +71,17 @@ public class JobOperationService {
     @Value("${flink.conf-path}")
     private String flinkConfPath;
 
+    @Value("${hdfs.defaultFS}")
+    private String defaultFS;
+
     /**
      * 为了节省服务器资源，所有任务以分组形式启动
+     *
      * @param catalogId 分组ID
-     * @param syncType 启动方式
+     * @param syncType  启动方式
      * @param timeStamp 指定时间戳
      */
+    @Transactional
     public void submitJob(String catalogId, String syncType, String timeStamp) {
         DataSyncJobCatalogEntity catalogEntity = catalogService.getById(catalogId);
         if (ObjectUtils.isEmpty(catalogEntity)) {
@@ -99,10 +105,10 @@ public class JobOperationService {
         try {
             String sourceJobName = "source_task_" + catalogName;
             String sinkJobName = "sink_task_" + catalogName;
-            String sourceAppId = YarnUtil.deployOnYarn( new String[]{sourceJobName, JSON.toJSONString(sourceJobConf) }, sourceJobName, flinkParams, sourceJobPath, flinkConfPath, "");
+            String sourceAppId = YarnUtil.deployOnYarn(new String[]{sourceJobName, JSON.toJSONString(sourceJobConf)}, sourceJobName, flinkParams, sourceJobPath, flinkConfPath, "");
             while (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-                String sinkAppId = YarnUtil.deployOnYarn( new String[]{sinkJobName, JSON.toJSONString(sinkJobConf) }, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
+                String sinkAppId = YarnUtil.deployOnYarn(new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
                 while (Objects.nonNull(sinkAppId)) {
                     createInstance(catalogId, 2, sinkAppId, syncType);
                 }
@@ -122,9 +128,9 @@ public class JobOperationService {
     }
 
     private String getJobJarPath(String jarName) {
-        String fsPrefix = HdfsUtil.DEFAULT_HDFS;
+        String fsPrefix = ObjectUtils.isEmpty(defaultFS) ? HdfsUtil.DEFAULT_HDFS : defaultFS;
         String hdfsJarPath = fsPrefix + jarHdfsPath + jarName;
-        if(!HdfsUtil.exists(hdfsJarPath)){
+        if (!HdfsUtil.exists(hdfsJarPath)) {
             throw new RuntimeException("找不到路径:" + hdfsJarPath);
         }
         return hdfsJarPath;
