@@ -44,9 +44,6 @@ public class JobOperationService {
     private IDataSyncSourceTableService sourceTableService;
 
     @Autowired
-    private IDataSyncSinkTableService sinkTableService;
-
-    @Autowired
     private IDataSyncTableMappingService tableMappingService;
 
     @Autowired
@@ -180,7 +177,7 @@ public class JobOperationService {
                         }
 
                         JSONObject columnJson = new JSONObject();
-                        String sinkDbTable = savedTable.getSinkDbName() + "." + savedTable.getSinkTableName();
+                        String sinkDbTable = savedTable.getSourceDbName() + "." + savedTable.getSourceTableName();
                         columnJson.put("sinkTable", savedTable.getSinkTableName());
                         columnJson.put("format", "json");
                         columnJson.put("max_filter_ratio", "1.0");

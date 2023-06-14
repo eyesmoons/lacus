@@ -8,10 +8,7 @@ import com.lacus.domain.datasync.job.JobManagerService;
 import com.lacus.domain.datasync.job.command.AddJobCommand;
 import com.lacus.domain.datasync.job.command.UpdateJobCommand;
 import com.lacus.domain.datasync.job.dto.TableDTO;
-import com.lacus.domain.datasync.job.query.JobPageQuery;
-import com.lacus.domain.datasync.job.query.JobQuery;
-import com.lacus.domain.datasync.job.query.MappedColumnQuery;
-import com.lacus.domain.datasync.job.query.MappedTableQuery;
+import com.lacus.domain.datasync.job.query.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -92,9 +89,9 @@ public class JobManagerController {
         return ResponseDTO.ok(jobManagerService.detail(jobId));
     }
 
-    @ApiOperation("检查表映射")
-    @PostMapping("/checkMapping")
-    public ResponseDTO<?> checkMapping(@RequestBody MappedTableQuery query) {
-        return ResponseDTO.ok(jobManagerService.checkMapping(query));
+    @ApiOperation("预检查")
+    @PostMapping("/preCheck")
+    public ResponseDTO<?> preCheck(@RequestBody MappedTableColumnQuery query) {
+        return ResponseDTO.ok(jobManagerService.preCheck(query));
     }
 }
