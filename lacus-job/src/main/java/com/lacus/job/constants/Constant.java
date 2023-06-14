@@ -10,6 +10,12 @@ public class Constant {
 
     public static final String OP = "op";
 
+    public static final String SOURCE = "source";
+
+    public static final String DB = "db";
+
+    public static final String TABLE = "table";
+
     //----------------------LOAD DATA COMMON FILED ------------------------//
     public static final String IS_DELETE_FILED = "_is_delete";
 

@@ -42,9 +42,10 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
 
     @Override
     public TriggerResult onElement(T ele, long l, TimeWindow window, TriggerContext context) throws Exception {
-        if (window.maxTimestamp() <= context.getCurrentWatermark()) {
-            return TriggerResult.FIRE;
+        if (window.maxTimestamp() <= context.getCurrentProcessingTime()) {
+            return TriggerResult.FIRE_AND_PURGE;
         }
+        context.registerProcessingTimeTimer(window.maxTimestamp());
         //判断counter定时器是否注册
         ReducingState<Long> counterState = context.getPartitionedState(counter);
         counterState.add(1L);
@@ -73,8 +74,14 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
     }
 
     @Override
-    public TriggerResult onEventTime(long l, TimeWindow timeWindow, TriggerContext triggerContext) throws Exception {
-        return null;
+    public TriggerResult onEventTime(long time, TimeWindow window, TriggerContext context) throws Exception {
+        if (time < window.getEnd()) {
+            return TriggerResult.CONTINUE;
+        } else {
+            log.info("fire with event time: " + time);
+            clear(window, context);
+            return TriggerResult.FIRE_AND_PURGE;
+        }
     }
 
     @Override

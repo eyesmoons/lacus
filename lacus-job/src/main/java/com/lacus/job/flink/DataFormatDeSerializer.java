@@ -1,20 +1,25 @@
 package com.lacus.job.flink;
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
-
-import com.lacus.job.enums.OperatorEnums;
-
+import com.google.common.collect.Maps;
 import com.lacus.job.constants.Constant;
+import com.lacus.job.enums.OperatorEnums;
 import com.lacus.job.utils.DateUtils;
 import com.lacus.job.utils.StringUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
+import org.apache.flink.util.CollectionUtil;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 
 public class DataFormatDeSerializer implements KafkaDeserializationSchema<ConsumerRecord<String, String>> {
@@ -36,9 +41,7 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
         }
         String key = new String(record.key(), StandardCharsets.UTF_8);
         String originValue = new String(record.value(), StandardCharsets.UTF_8);
-        JSONObject formatData = loadFormat(originValue);
-
-        if (StringUtils.checkValNull(formatData)) {
+        if (StringUtils.checkValNull(originValue)) {
             return null;
         }
         return new ConsumerRecord(
@@ -50,7 +53,7 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
                 record.serializedKeySize(),
                 record.serializedValueSize(),
                 key,
-                formatData,
+                originValue,
                 record.headers(),
                 record.leaderEpoch());
     }
@@ -62,36 +65,7 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
     }
 
 
-    private JSONObject loadFormat(String originData) {
-        if (StringUtils.checkValNull(originData)) {
-            return null;
-        }
-        JSONObject jData = JSONObject.parseObject(originData);
-        String op = jData.getString(Constant.OP);
-        OperatorEnums opEnums = OperatorEnums.getOpEnums(op);
-        JSONObject formatData = null;
-        if (StringUtils.checkValNull(opEnums)) {
-            return null;
-        }
-        switch (opEnums) {
-            case INSERT_OP:
-            case UPDATE_OP:
-            case ROW_OP:
-                formatData = jData.getJSONObject(Constant.AFTER);
-                formatData.put(Constant.IS_DELETE_FILED, Constant.DELETE_FALSE);
-                break;
-            case DELETE_OP:
-                formatData = jData.getJSONObject(Constant.BEFORE);
-                formatData.put(Constant.IS_DELETE_FILED, Constant.DELETE_TRUE);
-                break;
-            default:
-                break;
-        }
-        if (StringUtils.checkValNotNull(formatData)) {
-            formatData.put(Constant.UPDATE_STAMP_FILED, DateUtils.getCurrentTime());
-        }
-        return formatData;
-    }
+
 
 
 }

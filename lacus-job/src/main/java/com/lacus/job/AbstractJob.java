@@ -20,16 +20,20 @@ public abstract class AbstractJob implements IJob {
     private static final long serialVersionUID = -8435891490675922619L;
 
     protected KafkaSource<ConsumerRecord<String, String>> kafkaSource;
+
+    //base
+    protected JSONObject flinkConf;
+
+    //source
+    protected JSONObject source;
     protected List<String> topics;
     protected String bootStrapServer;
     protected String groupId;
-    protected OffsetsInitializer offsetsInitializer;
-    protected String autoOffset = "earliest";
-    protected String kafkaTimeStamp;
-    protected String dataFormat;
+
+    //sink
+    protected JSONObject sink;
     protected String sinkType;
     protected String engine;
-    protected JSONObject baseConf;
 
 
     protected Properties conf = new Properties();
@@ -45,19 +49,13 @@ public abstract class AbstractJob implements IJob {
 
     @Override
     public void init() {
-        this.baseConf = getParamValue("baseConf", null);
-        JSONObject source = JSONObject.parseObject(JSON.toJSONString(getParamValue("source", null)));
-        this.bootStrapServer = source.getString("bootstrap.server");
+        this.flinkConf = getParamValue("flinkConf", null);
+        this.source = JSONObject.parseObject(JSON.toJSONString(getParamValue("source", null)));
+        this.bootStrapServer = source.getString("bootStrapServer");
         this.topics = JSONArray.parseArray(source.getString("topics"), String.class);
-        this.groupId = source.getString("group.id");
-        String offsetReset = source.getString("auto.offset.reset");
-        this.kafkaTimeStamp = source.getString("kafka.timestamp");
-        if (StringUtils.checkValNotNull(offsetReset)) {
-            this.autoOffset = offsetReset;
-        }
-        JSONObject sink = JSONObject.parseObject(JSON.toJSONString(getParamValue("sink", null)));
-        this.dataFormat = sink.getString("dataFormat");
-        this.sinkType = sink.getString("sink.type");
+        this.groupId = source.getString("groupId");
+        this.sink = JSONObject.parseObject(JSON.toJSONString(getParamValue("sink", null)));
+        this.sinkType = sink.getString("sinkType");
         this.engine = sink.getString("engine");
         log.info("接收到参数:" + param_json);
     }
@@ -91,13 +89,14 @@ public abstract class AbstractJob implements IJob {
     }
 
 
+    //默认从最新时间开始消费
     private void buildKafkaSource() {
         this.kafkaSource = KafkaSourceConfig.builder()
                 .bootstrapServer(bootStrapServer)
                 .groupId(groupId)
                 .topics(topics)
                 .conf(conf)
-                .offsetsInitializer(offsetsInitializer)
+                .offsetsInitializer(null)
                 .valueSerialize(null)
                 .build();
     }

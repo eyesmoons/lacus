@@ -1,8 +1,9 @@
 package com.lacus.job.flink;
 
-import org.apache.flink.api.common.serialization.DeserializationSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
+import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.List;
@@ -13,7 +14,7 @@ public class KafkaSourceConfig {
     private String bootstrapServer;
     private List<String> topics;
     private String groupId;
-    private DeserializationSchema<ConsumerRecord<String, String>> valueSerialize;
+    private KafkaDeserializationSchema<ConsumerRecord<String, String>> valueSerialize;
     private OffsetsInitializer offsetsInitializer;
     private Properties conf;
 
@@ -39,14 +40,14 @@ public class KafkaSourceConfig {
     }
 
 
-    public KafkaSourceConfig valueSerialize(DeserializationSchema<ConsumerRecord<String, String>> valueSerialize) {
-        this.valueSerialize = (valueSerialize == null) ? (DeserializationSchema<ConsumerRecord<String, String>>) new DataFormatDeSerializer() : valueSerialize;
+    public KafkaSourceConfig valueSerialize(KafkaDeserializationSchema<ConsumerRecord<String, String>> valueSerialize) {
+        this.valueSerialize = (valueSerialize == null) ? new DataFormatDeSerializer() : valueSerialize;
         return this;
     }
 
 
     public KafkaSourceConfig offsetsInitializer(OffsetsInitializer offsetsInitializer) {
-        this.offsetsInitializer = (offsetsInitializer == null) ? OffsetsInitializer.earliest() : offsetsInitializer;
+        this.offsetsInitializer = (offsetsInitializer == null) ? OffsetsInitializer.latest() : offsetsInitializer;
         return this;
     }
 
@@ -61,7 +62,7 @@ public class KafkaSourceConfig {
                 .setStartingOffsets(offsetsInitializer)
                 .setGroupId(groupId)
                 .setBootstrapServers(bootstrapServer)
-                .setValueOnlyDeserializer(valueSerialize)
+                .setDeserializer(KafkaRecordDeserializationSchema.of(valueSerialize))
                 .setProperties(conf).build();
 
     }
