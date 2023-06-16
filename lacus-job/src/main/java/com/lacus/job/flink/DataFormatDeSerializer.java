@@ -39,6 +39,7 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
                 record.offset(),
                 record.timestamp(),
                 record.timestampType(),
+                record.checksum(),
                 record.serializedKeySize(),
                 record.serializedValueSize(),
                 key,

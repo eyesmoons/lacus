@@ -56,6 +56,10 @@ public class JobOperationService {
     @Autowired
     private JobMonitorService monitorService;
 
+    private static final String sourceJobMainClass = "com.lacus.job.flink.impl.SourceFlinkJob";
+
+    private static final String sinkJobMainClass = "com.lacus.job.flink.impl.SinkFlinkJob";
+
     @Value("${kafka.bootstrapServers}")
     private String bootstrapServers;
 
@@ -105,10 +109,10 @@ public class JobOperationService {
         try {
             String sourceJobName = "source_task_" + catalogName;
             String sinkJobName = "sink_task_" + catalogName;
-            String sourceAppId = YarnUtil.deployOnYarn(new String[]{sourceJobName, JSON.toJSONString(sourceJobConf)}, sourceJobName, flinkParams, sourceJobPath, flinkConfPath, "");
+            String sourceAppId = YarnUtil.deployOnYarn(sourceJobMainClass, new String[]{sourceJobName, JSON.toJSONString(sourceJobConf)}, sourceJobName, flinkParams, sourceJobPath, flinkConfPath, "");
             while (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-                String sinkAppId = YarnUtil.deployOnYarn(new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
+                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
                 while (Objects.nonNull(sinkAppId)) {
                     createInstance(catalogId, 2, sinkAppId, syncType);
                 }
@@ -226,6 +230,8 @@ public class JobOperationService {
             List<String> sourceTableNames = sourceTableEntities.stream().map(entity -> entity.getSourceDbName() + "." + entity.getSourceTableName()).collect(Collectors.toList());
             MetaDatasourceEntity metaDatasource = dataSourceService.getById(job.getSourceDatasourceId());
             if (ObjectUtils.isNotEmpty(metaDatasource)) {
+                sourceConf.setBootStrapServer(bootstrapServers);
+                sourceConf.setTopic("data_sync_topic_" + job.getJobId());
                 sourceConf.setHostname(metaDatasource.getIp());
                 sourceConf.setPort(metaDatasource.getPort());
                 sourceConf.setUsername(metaDatasource.getUsername());

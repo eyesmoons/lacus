@@ -138,6 +138,9 @@ flink:
   job-jars-path: /flink/jobs/jars/
   source-jar-name: flink-source-job.jar
   sink-jar-name: flink-sink-job.jar
+  lib-path: /tmp/flink/libs
+  dist-jar-path: /tmp/flink/libs/flink-yarn_16.0.jar
 
 hdfs:
   defaultFS: hdfs://172.22.224.113:8020
+  username: hdfs

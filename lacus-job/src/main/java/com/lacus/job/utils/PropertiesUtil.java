@@ -1,4 +1,4 @@
-package com.lacus.common.utils;
+package com.lacus.job.utils;
 
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;

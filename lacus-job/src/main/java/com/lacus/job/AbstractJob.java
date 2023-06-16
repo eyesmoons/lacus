@@ -4,13 +4,16 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lacus.job.flink.KafkaSourceConfig;
-import com.lacus.job.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.connector.kafka.source.KafkaSource;
-import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerConfig;
+import org.apache.kafka.clients.producer.ProducerRecord;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Properties;
 
@@ -39,11 +42,19 @@ public abstract class AbstractJob implements IJob {
     protected Properties conf = new Properties();
 
 
-    protected static transient JSONObject param_json = new JSONObject();
+    // 任务名称
+    protected static String jobName;
+
+    // 任务配置
+    protected static JSONObject job_param = new JSONObject();
+
+    protected static String jobConf;
 
     protected AbstractJob(String[] args) {
         if (ObjectUtils.isNotEmpty(args)) {
-            param_json = JSONObject.parseObject(args[0]);
+            jobName = args[0];
+            jobConf = args[1];
+            job_param = JSONObject.parseObject(args[1]);
         }
     }
 
@@ -57,7 +68,7 @@ public abstract class AbstractJob implements IJob {
         this.sink = JSONObject.parseObject(JSON.toJSONString(getParamValue("sink", null)));
         this.sinkType = sink.getString("sinkType");
         this.engine = sink.getString("engine");
-        log.info("接收到参数:" + param_json);
+        log.info("接收到参数:" + jobConf);
     }
 
     @Override
@@ -81,11 +92,11 @@ public abstract class AbstractJob implements IJob {
 
     @SuppressWarnings("unchecked")
     private <T> T getParamValue(String name, T defaultValue) {
-        return paramContainKey(name) ? (T) param_json.get(name) : defaultValue;
+        return paramContainKey(name) ? (T) job_param.get(name) : defaultValue;
     }
 
     private boolean paramContainKey(String name) {
-        return param_json.containsKey(name);
+        return job_param.containsKey(name);
     }
 
 
@@ -99,5 +110,32 @@ public abstract class AbstractJob implements IJob {
                 .offsetsInitializer(null)
                 .valueSerialize(null)
                 .build();
+    }
+
+    /**
+     * 发送数据到kafka
+     * @param bootStrapServers bootStrapServers
+     * @param topic topic
+     */
+    protected FlinkKafkaProducer<String> kafkaSink(String bootStrapServers, String topic) {
+        // 定义kafka producer
+        return new FlinkKafkaProducer<>(topic, new KafkaSerializationSchema<String>() {
+            @Override
+            public ProducerRecord<byte[], byte[]> serialize(String data, @Nullable Long aLong) {
+                return new ProducerRecord<>(topic, data.getBytes());
+            }
+        }, buildKafkaProducerProps(bootStrapServers), FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
+    }
+
+    /**
+     * 构建kafka生产者参数
+     */
+    private Properties buildKafkaProducerProps(String bootStrapServers) {
+        Properties props = new Properties();
+        props.setProperty(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootStrapServers);
+        props.setProperty(ProducerConfig.RETRIES_CONFIG, "1");
+        props.setProperty(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, "300000");
+        props.setProperty(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, "60485760");
+        return props;
     }
 }
