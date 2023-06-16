@@ -10,10 +10,10 @@ import org.apache.hadoop.io.compress.CompressionCodec;
 import org.apache.hadoop.io.compress.CompressionCodecFactory;
 import org.apache.hadoop.io.compress.CompressionOutputStream;
 import org.apache.hadoop.util.ReflectionUtils;
-import org.springframework.util.ObjectUtils;
 
 import java.io.*;
 import java.net.URI;
+import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -21,16 +21,18 @@ import java.util.zip.ZipOutputStream;
 public class HdfsUtil {
 
     private static Configuration conf;
-    public static final String DEFAULT_HDFS = "hdfs://127.0.0.1:8020";
+    public static final String DEFAULT_HDFS = "hdfs.defaultFS";
 
-    private static final String HADOOP_USER = "hdfs";
+    private static final String HADOOP_USER_KEY = "HADOOP_USER_NAME";
+
+    private static final String HADOOP_USER_VALUE = "hdfs.username";
 
     private static void init() {
         envSetting();
-        String hdfsPath = PropertiesUtil.getPropValue("hdfs.defaultFS");
+        String hdfsPath = PropertiesUtil.getPropValue(DEFAULT_HDFS);
         if (conf == null) {
             conf = new Configuration();
-            conf.set("fs.defaultFS", ObjectUtils.isEmpty(hdfsPath) ? DEFAULT_HDFS : hdfsPath);
+            conf.set(DEFAULT_HDFS, hdfsPath);
         }
     }
 
@@ -38,7 +40,7 @@ public class HdfsUtil {
      * 设置hadoop用户环境变量
      */
     public static void envSetting() {
-        System.setProperty("HADOOP_USER_NAME", HADOOP_USER);
+        System.setProperty(HADOOP_USER_KEY, Objects.requireNonNull(PropertiesUtil.getPropValue(HADOOP_USER_VALUE)));
     }
 
     /**
@@ -143,8 +145,6 @@ public class HdfsUtil {
 
     /**
      * 读取文件内容
-     *
-     * @param filePath
      */
     public static String readFile(String filePath) throws IOException {
         init();
@@ -176,7 +176,7 @@ public class HdfsUtil {
      */
     public static boolean exists(String path) {
         init();
-        FileSystem fs = null;
+        FileSystem fs;
         try {
             fs = FileSystem.get(conf);
             return fs.exists(new Path(path));
@@ -314,7 +314,6 @@ public class HdfsUtil {
         conf = new Configuration();
         System.setProperty("HADOOP_USER_NAME", "hdfs");
         conf.set("fs.defaultFS", "hdfs://127.0.0.1:8020");
-//      HdfsUtil.copyFileFromLocal("E:\\demo.js","/kylin");
         HdfsUtil.copyToLocalFile("/flink/demo/demo.txt", "/Users/casey/demo/");
     }
 }

@@ -1,15 +1,13 @@
 package com.lacus.job.flink;
 
-import com.alibaba.fastjson2.JSONObject;
-import com.lacus.common.utils.PropertiesUtil;
 import com.lacus.job.AbstractJob;
+import com.lacus.job.utils.PropertiesUtil;
 import com.lacus.job.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.util.OutputTag;
 
 import java.util.Objects;
 
@@ -18,7 +16,7 @@ public abstract class BaseFlinkJob extends AbstractJob {
 
     private static final long serialVersionUID = -4382178120041481967L;
 
-    protected static transient StreamExecutionEnvironment env;
+    protected static StreamExecutionEnvironment env;
 
     protected String jobName;
     protected Integer maxBatchInterval;
@@ -30,9 +28,6 @@ public abstract class BaseFlinkJob extends AbstractJob {
     public BaseFlinkJob(String[] args) {
         super(args);
     }
-
-    public OutputTag<JSONObject> sideOutput = new OutputTag<JSONObject>("side-output-source") {
-    };
 
     @Override
     public void afterInit() {

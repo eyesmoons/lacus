@@ -41,7 +41,7 @@
         <fastjson2.version>2.0.26</fastjson2.version>
         <dbutils.version>1.7</dbutils.version>
         <hadoop.version>2.4.1</hadoop.version>
-        <flink.version>1.11.2</flink.version>
+        <flink.version>1.16.0</flink.version>
         <kafka.version>3.1.1</kafka.version>
     </properties>
 
@@ -311,13 +311,13 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients_2.12</artifactId>
+            <artifactId>flink-clients</artifactId>
             <version>${flink.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-yarn_2.12</artifactId>
+            <artifactId>flink-yarn</artifactId>
             <version>${flink.version}</version>
         </dependency>
 

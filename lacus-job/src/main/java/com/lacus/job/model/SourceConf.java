@@ -1,4 +1,4 @@
-package com.lacus.domain.datasync.job.dto;
+package com.lacus.job.model;
 
 import lombok.Data;
 
