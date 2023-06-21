@@ -40,7 +40,7 @@
         <knife4j.version>2.0.7</knife4j.version>
         <fastjson2.version>2.0.26</fastjson2.version>
         <dbutils.version>1.7</dbutils.version>
-        <hadoop.version>2.4.1</hadoop.version>
+        <hadoop.version>3.3.3</hadoop.version>
         <flink.version>1.16.0</flink.version>
         <kafka.version>3.1.1</kafka.version>
     </properties>

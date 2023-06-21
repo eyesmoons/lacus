@@ -239,7 +239,9 @@ public class JobOperationService {
                 sourceConf.setDatabaseList(Collections.singletonList(sourceDbName));
                 sourceConf.setTableList(sourceTableNames);
                 sourceConf.setSyncType(syncType);
-                sourceConf.setTimeStamp(Long.valueOf(timeStamp));
+                if (ObjectUtils.isNotEmpty(timeStamp)) {
+                    sourceConf.setTimeStamp(Long.valueOf(timeStamp));
+                }
                 sourceConfList.add(sourceConf);
             }
         }
