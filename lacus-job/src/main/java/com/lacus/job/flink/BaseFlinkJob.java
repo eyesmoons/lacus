@@ -66,6 +66,6 @@ public abstract class BaseFlinkJob extends AbstractJob {
 
         // 设置checkpoint状态后端
         env.setStateBackend(new HashMapStateBackend());
-        env.getCheckpointConfig().setCheckpointStorage("hdfs://" + PropertiesUtil.getPropValue("hdfs.name.node") + "/flink/flink-checkpoints/");
+        //env.getCheckpointConfig().setCheckpointStorage("hdfs://" + PropertiesUtil.getPropValue("hdfs.name.node") + "/flink/flink-checkpoints/");
     }
 }
