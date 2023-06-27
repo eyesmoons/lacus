@@ -32,7 +32,7 @@
         <jwt.version>0.9.1</jwt.version>
         <hutool.version>5.8.11</hutool.version>
         <junit.version>4.13.1</junit.version>
-        <lombok.version>1.18.24</lombok.version>
+        <lombok.version>1.18.2</lombok.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
         <mockito.version>1.10.19</mockito.version>
@@ -40,9 +40,10 @@
         <knife4j.version>2.0.7</knife4j.version>
         <fastjson2.version>2.0.26</fastjson2.version>
         <dbutils.version>1.7</dbutils.version>
-        <hadoop.version>3.3.3</hadoop.version>
-        <flink.version>1.16.0</flink.version>
+        <hadoop.version>2.4.1</hadoop.version>
+        <flink.version>1.13.5</flink.version>
         <kafka.version>3.1.1</kafka.version>
+        <log4j.version>2.0.7</log4j.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -85,6 +86,7 @@
                 <artifactId>mybatis-plus-boot-starter</artifactId>
                 <version>${mybatis-plus.version}</version>
             </dependency>
+
             <!-- mybatis plus 代码生成器依赖 -->
             <dependency>
                 <groupId>com.baomidou</groupId>
@@ -298,26 +300,8 @@
         </dependency>
 
         <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-common</artifactId>
-            <version>${hadoop.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.hadoop</groupId>
-            <artifactId>hadoop-yarn-api</artifactId>
-            <version>${hadoop.version}</version>
-        </dependency>
-
-        <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients</artifactId>
-            <version>${flink.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-yarn</artifactId>
+            <artifactId>flink-yarn_2.12</artifactId>
             <version>${flink.version}</version>
         </dependency>
 
@@ -325,6 +309,18 @@
             <groupId>org.apache.kafka</groupId>
             <artifactId>kafka-clients</artifactId>
             <version>${kafka.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${log4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${log4j.version}</version>
         </dependency>
     </dependencies>
 
@@ -351,30 +347,4 @@
             </plugin>
         </plugins>
     </build>
-
-    <!--    <repositories>-->
-    <!--        <repository>-->
-    <!--            <id>public</id>-->
-    <!--            <name>aliyun nexus</name>-->
-    <!--            <url>https://maven.aliyun.com/repository/public</url>-->
-    <!--            <releases>-->
-    <!--                <enabled>true</enabled>-->
-    <!--            </releases>-->
-    <!--        </repository>-->
-    <!--    </repositories>-->
-
-    <!--    <pluginRepositories>-->
-    <!--        <pluginRepository>-->
-    <!--            <id>public</id>-->
-    <!--            <name>aliyun nexus</name>-->
-    <!--            <url>https://maven.aliyun.com/repository/public</url>-->
-    <!--            <releases>-->
-    <!--                <enabled>true</enabled>-->
-    <!--            </releases>-->
-    <!--            <snapshots>-->
-    <!--                <enabled>false</enabled>-->
-    <!--            </snapshots>-->
-    <!--        </pluginRepository>-->
-    <!--    </pluginRepositories>-->
-
 </project>

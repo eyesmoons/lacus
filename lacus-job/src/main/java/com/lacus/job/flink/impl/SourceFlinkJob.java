@@ -7,6 +7,7 @@ import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
 import com.lacus.job.flink.BaseFlinkJob;
 import com.lacus.job.flink.deserialization.CustomerDeserializationSchemaMysql;
 import com.lacus.job.model.SourceConf;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
 
 import java.util.List;
@@ -14,13 +15,16 @@ import java.util.List;
 /**
  * flink source端任务
  */
+@Slf4j
 public class SourceFlinkJob extends BaseFlinkJob {
 
     public SourceFlinkJob(String[] args) {super(args);}
 
     @Override
     public void handle() throws Throwable {
+        log.info("jobName：{}", jobName);
         List<SourceConf> sourceConfList = JSON.parseArray(jobConf, SourceConf.class);
+        log.info("sourceConfList：{}", JSON.toJSONString(sourceConfList));
         for (SourceConf sourceConf : sourceConfList) {
             StartupOptions syncType = StartupOptions.initial();
             syncType = getStartupOptions(sourceConf, syncType);

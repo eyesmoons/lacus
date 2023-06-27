@@ -81,7 +81,7 @@ public class JobMonitorService {
 
     public String getFlinkJobId(String applicationId) {
         String sb = flinkRestPrefix + applicationId + "/jobs/overview";
-
+        log.info("获取flinkJobId请求地址：{}", sb);
         JSONObject jsonObject = restUtil.getForJsonObject(sb);
         log.debug("rest返回信息:{}", JSON.toJSONString(jsonObject));
         JSONArray jobs = JSON.parseObject(JSON.toJSONString(jsonObject)).getJSONArray("jobs");

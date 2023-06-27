@@ -1,10 +1,8 @@
 package com.lacus.job.flink;
 
 import com.lacus.job.AbstractJob;
-import com.lacus.job.utils.PropertiesUtil;
 import com.lacus.job.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.flink.runtime.state.hashmap.HashMapStateBackend;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -18,7 +16,6 @@ public abstract class BaseFlinkJob extends AbstractJob {
 
     protected static StreamExecutionEnvironment env;
 
-    protected String jobName;
     protected Integer maxBatchInterval;
     protected Integer maxBatchSize;
     protected Integer maxBatchCount;
@@ -32,20 +29,20 @@ public abstract class BaseFlinkJob extends AbstractJob {
     @Override
     public void afterInit() {
         log.info("初始化flink参数");
-        if (StringUtils.checkValNotNull(flinkConf)) {
-            this.jobName = flinkConf.getString("jobName");
-            this.maxBatchInterval = flinkConf.getInteger("maxBatchInterval");
-            this.maxBatchCount = flinkConf.getInteger("maxBatchRows");
-            this.maxBatchSize = flinkConf.getInteger("maxBatchSize");
-            this.parallelism = flinkConf.getInteger("parallelism");
-            if (Objects.isNull(parallelism)) {
-                this.parallelism = 1;
-            }
-            this.slotsPerTaskManager = flinkConf.getInteger("slotsPerTaskManager");
-            if (Objects.isNull(slotsPerTaskManager)) {
-                this.slotsPerTaskManager = 1;
-            }
-        }
+//        if (StringUtils.checkValNotNull(flinkConf)) {
+//            this.jobName = flinkConf.getString("jobName");
+//            this.maxBatchInterval = flinkConf.getInteger("maxBatchInterval");
+//            this.maxBatchCount = flinkConf.getInteger("maxBatchRows");
+//            this.maxBatchSize = flinkConf.getInteger("maxBatchSize");
+//            this.parallelism = flinkConf.getInteger("parallelism");
+//            if (Objects.isNull(parallelism)) {
+//                this.parallelism = 1;
+//            }
+//            this.slotsPerTaskManager = flinkConf.getInteger("slotsPerTaskManager");
+//            if (Objects.isNull(slotsPerTaskManager)) {
+//                this.slotsPerTaskManager = 1;
+//            }
+//        }
 
         env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(1);
 
@@ -62,10 +59,6 @@ public abstract class BaseFlinkJob extends AbstractJob {
         env.getCheckpointConfig().setMaxConcurrentCheckpoints(1);
 
         // Flink处理程序被cancel后，会保留Checkpoint数据
-        env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
-
-        // 设置checkpoint状态后端
-        env.setStateBackend(new HashMapStateBackend());
-        //env.getCheckpointConfig().setCheckpointStorage("hdfs://" + PropertiesUtil.getPropValue("hdfs.name.node") + "/flink/flink-checkpoints/");
+        env.getCheckpointConfig().enableExternalizedCheckpoints(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
     }
 }

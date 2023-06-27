@@ -130,17 +130,16 @@ kafka:
   bootstrapServers: localhost:9092
 
 yarn:
-  restapi-address: http://172.22.224.113:8088/proxy/
-  node-address: http://172.22.224.113:8088/cluster/nodes
+  restapi-address: http://gaia-dev-bigdata1:8088/proxy/
+  node-address: http://gaia-dev-bigdata1:8088/cluster/nodes
 
 flink:
-  conf-path: /flink/conf/
-  job-jars-path: /flink/jobs/jars/
-  source-jar-name: flink-source-job.jar
-  sink-jar-name: flink-sink-job.jar
-  lib-path: /tmp/flink/libs
-  dist-jar-path: /tmp/flink/libs/flink-yarn_16.0.jar
+  conf-path: /flinkCDC/flink/conf/
+  job-jars-path: /flinkCDC/flink/jobs/
+  jar-name: flink-jobs.jar
+  lib-path: /flinkCDC/flink/libs
+  dist-jar-path: /flinkCDC/flink/libs/flink-dist_2.12-1.13.5.jar
 
 hdfs:
-  defaultFS: hdfs://172.22.224.113:8020
+  defaultFS: hdfs://gaia-dev-bigdata1:8020
   username: hdfs

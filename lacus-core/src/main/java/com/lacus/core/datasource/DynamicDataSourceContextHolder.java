@@ -3,11 +3,9 @@ package com.lacus.core.datasource;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.lacus.common.exception.CustomException;
 import com.lacus.common.utils.spring.SpringUtils;
-import com.lacus.core.enums.DataSourceType;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.enums.DatasourceTypeEnum;
 import com.lacus.dao.metadata.mapper.MetaDatasourceMapper;
-import com.lacus.service.metadata.IMetaDataSourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 

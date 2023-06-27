@@ -15,7 +15,6 @@ import org.apache.flink.client.deployment.application.ApplicationConfiguration;
 import org.apache.flink.client.program.ClusterClient;
 import org.apache.flink.client.program.ClusterClientProvider;
 import org.apache.flink.configuration.*;
-import org.apache.flink.core.execution.SavepointFormatType;
 import org.apache.flink.core.fs.Path;
 import org.apache.flink.runtime.messages.Acknowledge;
 import org.apache.flink.util.FlinkException;
@@ -199,7 +198,7 @@ public class YarnUtil {
         YarnClusterDescriptor clusterDescriptor = initYarnClusterDescriptor(flinkConfig, flinkConf);
         ClusterClient<ApplicationId> clusterClient = clusterDescriptor.retrieve(applicationId).getClusterClient();
         JobID parseJobId = parseJobId(jobId);
-        CompletableFuture<String> completableFuture = clusterClient.stopWithSavepoint(parseJobId, true, savepointDir, SavepointFormatType.DEFAULT);
+        CompletableFuture<String> completableFuture = clusterClient.stopWithSavepoint(parseJobId, true, savepointDir);
         String savepointUrl = completableFuture.get();
         log.info("停止任务:{}", appId);
         log.info("savePoint 地址:{}", savepointUrl);

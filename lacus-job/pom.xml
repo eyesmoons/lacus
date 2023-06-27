@@ -19,23 +19,18 @@
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.16.0</flink.version>
         <flink-shaded.version>2.6.5-10.0</flink-shaded.version>
+        <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
         <flink-doris-connector-version>1.3.0</flink-doris-connector-version>
         <fastjson2.version>2.0.26</fastjson2.version>
         <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
         <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
         <flink-connector-mysql-cdc.version>1.3.0</flink-connector-mysql-cdc.version>
-        <!--<scope.setting>provided</scope.setting>-->
-        <scope.setting>compile</scope.setting>
+        <scope.setting>provided</scope.setting>
+<!--        <scope.setting>compile</scope.setting>-->
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-        </dependency>
-
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
@@ -50,14 +45,14 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients</artifactId>
+            <artifactId>flink-clients_2.12</artifactId>
             <version>${flink.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java</artifactId>
+            <artifactId>flink-streaming-java_2.12</artifactId>
             <version>${flink.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
@@ -71,25 +66,17 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka</artifactId>
-            <version>${flink.version}</version>
+            <artifactId>flink-connector-kafka_2.12</artifactId>
+            <version>${flink-connector-kafka.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime</artifactId>
-            <version>${flink.version}</version>
+            <artifactId>flink-runtime-web_2.12</artifactId>
+            <version>1.11.3</version>
             <scope>${scope.setting}</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime-web</artifactId>
-            <version>${flink.version}</version>
-            <scope>${scope.setting}</scope>
-        </dependency>
-
 
         <!-- flink-doris-connector -->
         <dependency>
@@ -98,25 +85,24 @@
             <version>1.3.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
             <version>${fastjson2.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.2.18</version>
+            <scope>${scope.setting}</scope>
         </dependency>
-
 
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.0.31</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <!-- flink mysql cdc-->
@@ -124,18 +110,21 @@
             <groupId>com.alibaba.ververica</groupId>
             <artifactId>flink-connector-mysql-cdc</artifactId>
             <version>${flink-connector-mysql-cdc.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-jdbc_2.12</artifactId>
             <version>${flink-connector-jdbc_2.12.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
     </dependencies>
 
