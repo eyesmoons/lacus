@@ -98,8 +98,8 @@ public class JobOperationService {
         List<SourceConf> sourceJobConf = buildSourceJobConf(jobs, syncType, timeStamp);
         // 构建sink任务json
         List<FlinkSinkJobConf> sinkJobConf = buildSinkJobConf(jobs);
-        log.info("sourceJobConf：{}", sourceJobConf);
-        log.info("sinkJobConf：{}", sinkJobConf);
+        log.info("sourceJobConf：{}", JSON.toJSONString(sourceJobConf));
+        log.info("sinkJobConf：{}", JSON.toJSONString(sinkJobConf));
         String flinkJobPath = getJobJarPath(flinkJobJarName);
         try {
             String sourceJobName = "source_task_" + catalogName;

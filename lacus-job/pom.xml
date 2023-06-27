@@ -26,6 +26,8 @@
         <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
         <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
         <flink-connector-mysql-cdc.version>1.3.0</flink-connector-mysql-cdc.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
         <scope.setting>provided</scope.setting>
 <!--        <scope.setting>compile</scope.setting>-->
     </properties>
@@ -125,6 +127,32 @@
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
             <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
         </dependency>
     </dependencies>
 
