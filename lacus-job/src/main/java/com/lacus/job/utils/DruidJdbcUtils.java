@@ -1,6 +1,5 @@
 package com.lacus.job.utils;
 
-
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.google.common.collect.Lists;
 import com.lacus.job.exception.SinkException;

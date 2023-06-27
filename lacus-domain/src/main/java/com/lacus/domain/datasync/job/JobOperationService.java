@@ -108,11 +108,11 @@ public class JobOperationService {
             Thread.sleep(1000);
             if (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
-                Thread.sleep(1000);
-                if (Objects.nonNull(sinkAppId)) {
-                    createInstance(catalogId, 2, sinkAppId, syncType);
-                }
+//                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
+//                Thread.sleep(1000);
+//                if (Objects.nonNull(sinkAppId)) {
+//                    createInstance(catalogId, 2, sinkAppId, syncType);
+//                }
             }
         } catch (Exception e) {
             log.error("任务提交失败：{}", e.getMessage());
@@ -222,6 +222,7 @@ public class JobOperationService {
         }
         for (DataSyncJobEntity job : jobs) {
             SourceConf sourceConf = new SourceConf();
+            sourceConf.setJobName(job.getJobName());
             List<DataSyncSourceTableEntity> sourceTableEntities = sourceTablesMap.get(job.getJobId());
             String sourceDbName = sourceTableEntities.get(0).getSourceDbName();
             List<String> sourceTableNames = sourceTableEntities.stream().map(entity -> entity.getSourceDbName() + "." + entity.getSourceTableName()).collect(Collectors.toList());

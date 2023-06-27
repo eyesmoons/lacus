@@ -267,7 +267,6 @@
         <module>lacus-core</module>
         <module>lacus-dao</module>
         <module>lacus-service</module>
-        <module>lacus-job</module>
     </modules>
     <packaging>pom</packaging>
 

@@ -6,6 +6,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.lacus.job.flink.KafkaSourceConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.KafkaSerializationSchema;
@@ -118,13 +119,9 @@ public abstract class AbstractJob implements IJob {
      * @param topic topic
      */
     protected FlinkKafkaProducer<String> kafkaSink(String bootStrapServers, String topic) {
+        System.out.println("开发往kafka，topic：" + topic);
         // 定义kafka producer
-        return new FlinkKafkaProducer<>(topic, new KafkaSerializationSchema<String>() {
-            @Override
-            public ProducerRecord<byte[], byte[]> serialize(String data, @Nullable Long aLong) {
-                return new ProducerRecord<>(topic, data.getBytes());
-            }
-        }, buildKafkaProducerProps(bootStrapServers), FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
+        return new FlinkKafkaProducer<>(topic, (KafkaSerializationSchema<String>) (data, aLong) -> new ProducerRecord<>(topic, data.getBytes()), buildKafkaProducerProps(bootStrapServers), FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
     }
 
     /**

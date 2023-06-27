@@ -27,6 +27,8 @@ public class DataSyncJobInstanceServiceImpl extends ServiceImpl<DataSyncJobInsta
     public void saveInstance(String catalogId, Integer type, String syncType, String applicationId, FlinkJobDetail jobDetail) {
         DataSyncJobInstanceEntity entity = new DataSyncJobInstanceEntity();
         entity.setCatalogId(catalogId);
+        entity.setType(type);
+        entity.setSyncType(syncType);
         entity.setSubmitTime(DateUtils.getDate(jobDetail.getStartTime()));
         entity.setStatus(jobDetail.getState());
         if (jobDetail.getEndTime() > 0) {
@@ -42,6 +44,7 @@ public class DataSyncJobInstanceServiceImpl extends ServiceImpl<DataSyncJobInsta
         DataSyncJobInstanceEntity entity = new DataSyncJobInstanceEntity();
         entity.setCatalogId(catalogId);
         entity.setType(type);
+        entity.setSyncType(syncType);
         entity.setApplicationId(applicationId);
         entity.setSubmitTime(new Date());
         entity.setFinishedTime(new Date());

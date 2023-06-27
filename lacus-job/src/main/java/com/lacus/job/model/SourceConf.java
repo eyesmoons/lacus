@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class SourceConf {
+    private String jobName;
     private String bootStrapServer;
     private String topic;
     private String hostname;
