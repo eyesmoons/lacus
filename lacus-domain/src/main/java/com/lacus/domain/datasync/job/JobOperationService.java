@@ -23,7 +23,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -63,11 +62,8 @@ public class JobOperationService {
     @Value("${kafka.bootstrapServers}")
     private String bootstrapServers;
 
-    @Value("${flink.source-jar-name}")
-    private String sourceJobJarName;
-
-    @Value("${flink.sink-jar-name}")
-    private String sinkJobJarName;
+    @Value("${flink.jar-name}")
+    private String flinkJobJarName;
 
     @Value("${flink.job-jars-path}")
     private String jarHdfsPath;
@@ -85,7 +81,6 @@ public class JobOperationService {
      * @param syncType  启动方式
      * @param timeStamp 指定时间戳
      */
-    @Transactional
     public void submitJob(String catalogId, String syncType, String timeStamp) {
         DataSyncJobCatalogEntity catalogEntity = catalogService.getById(catalogId);
         if (ObjectUtils.isEmpty(catalogEntity)) {
@@ -94,8 +89,8 @@ public class JobOperationService {
 
         String catalogName = catalogEntity.getCatalogName();
         FlinkParams flinkParams = new FlinkParams();
-        flinkParams.setMasterMemoryMB(catalogEntity.getJobManager());
-        flinkParams.setTaskManagerMemoryMB(catalogEntity.getTaskManager());
+        flinkParams.setMasterMemoryMB(catalogEntity.getJobManager() * 1024);
+        flinkParams.setTaskManagerMemoryMB(catalogEntity.getTaskManager() * 1024);
         flinkParams.setJobName(catalogName);
 
         List<DataSyncJobEntity> jobs = jobService.listByCatalogId(catalogId);
@@ -103,22 +98,24 @@ public class JobOperationService {
         List<SourceConf> sourceJobConf = buildSourceJobConf(jobs, syncType, timeStamp);
         // 构建sink任务json
         List<FlinkSinkJobConf> sinkJobConf = buildSinkJobConf(jobs);
-
-        String sourceJobPath = getJobJarPath(sourceJobJarName);
-        String sinkJobPath = getJobJarPath(sinkJobJarName);
+        log.info("sourceJobConf：{}", JSON.toJSONString(sourceJobConf));
+        log.info("sinkJobConf：{}", JSON.toJSONString(sinkJobConf));
+        String flinkJobPath = getJobJarPath(flinkJobJarName);
         try {
             String sourceJobName = "source_task_" + catalogName;
             String sinkJobName = "sink_task_" + catalogName;
-            String sourceAppId = YarnUtil.deployOnYarn(sourceJobMainClass, new String[]{sourceJobName, JSON.toJSONString(sourceJobConf)}, sourceJobName, flinkParams, sourceJobPath, flinkConfPath, "");
-            while (Objects.nonNull(sourceAppId)) {
+            String sourceAppId = YarnUtil.deployOnYarn(sourceJobMainClass, new String[]{sourceJobName, JSON.toJSONString(sourceJobConf)}, sourceJobName, flinkParams, flinkJobPath, flinkConfPath, "");
+            Thread.sleep(1000);
+            if (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, sinkJobPath, flinkConfPath, "");
-                while (Objects.nonNull(sinkAppId)) {
+                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
+                Thread.sleep(1000);
+                if (Objects.nonNull(sinkAppId)) {
                     createInstance(catalogId, 2, sinkAppId, syncType);
                 }
             }
         } catch (Exception e) {
-            log.error("任务提交失败：{}", e.getMessage());
+            log.error("任务提交失败", e);
         }
     }
 
@@ -187,14 +184,14 @@ public class JobOperationService {
                         }
 
                         JSONObject columnJson = new JSONObject();
-                        String sinkDbTable = savedTable.getSourceDbName() + "." + savedTable.getSourceTableName();
+                        String sourceTable = savedTable.getSourceTableName();
                         columnJson.put("sinkTable", savedTable.getSinkTableName());
                         columnJson.put("format", "json");
                         columnJson.put("max_filter_ratio", "1.0");
                         columnJson.put("strip_outer_array", true);
                         columnJson.put("columns", String.join(",", columns));
                         columnJson.put("jsonpaths", "[" + String.join(",", jsonPaths) + "]");
-                        columnMap.put(sinkDbTable, columnJson);
+                        columnMap.put(sourceTable, columnJson);
                     }
                 }
                 engine.setColumnMap(columnMap);
@@ -225,9 +222,10 @@ public class JobOperationService {
         }
         for (DataSyncJobEntity job : jobs) {
             SourceConf sourceConf = new SourceConf();
+            sourceConf.setJobName(job.getJobName());
             List<DataSyncSourceTableEntity> sourceTableEntities = sourceTablesMap.get(job.getJobId());
             String sourceDbName = sourceTableEntities.get(0).getSourceDbName();
-            List<String> sourceTableNames = sourceTableEntities.stream().map(entity -> entity.getSourceDbName() + "." + entity.getSourceTableName()).collect(Collectors.toList());
+            List<String> sourceTableNames = sourceTableEntities.stream().map(DataSyncSourceTableEntity::getSourceTableName).collect(Collectors.toList());
             MetaDatasourceEntity metaDatasource = dataSourceService.getById(job.getSourceDatasourceId());
             if (ObjectUtils.isNotEmpty(metaDatasource)) {
                 sourceConf.setBootStrapServer(bootstrapServers);

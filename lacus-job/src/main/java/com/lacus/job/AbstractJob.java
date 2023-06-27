@@ -43,32 +43,32 @@ public abstract class AbstractJob implements IJob {
 
 
     // 任务名称
-    protected static String jobName;
+    protected String jobName;
 
     // 任务配置
     protected static JSONObject job_param = new JSONObject();
 
-    protected static String jobConf;
+    protected String jobConf;
 
     protected AbstractJob(String[] args) {
         if (ObjectUtils.isNotEmpty(args)) {
             jobName = args[0];
             jobConf = args[1];
-            job_param = JSONObject.parseObject(args[1]);
+            //job_param = JSONObject.parseObject(args[1]);
         }
     }
 
     @Override
     public void init() {
-        this.flinkConf = getParamValue("flinkConf", null);
-        this.source = JSONObject.parseObject(JSON.toJSONString(getParamValue("source", null)));
-        this.bootStrapServer = source.getString("bootStrapServer");
-        this.topics = JSONArray.parseArray(source.getString("topics"), String.class);
-        this.groupId = source.getString("groupId");
-        this.sink = JSONObject.parseObject(JSON.toJSONString(getParamValue("sink", null)));
-        this.sinkType = sink.getString("sinkType");
-        this.engine = sink.getString("engine");
-        log.info("接收到参数:" + jobConf);
+//        this.flinkConf = getParamValue("flinkConf", null);
+//        this.source = JSONObject.parseObject(JSON.toJSONString(getParamValue("source", null)));
+//        this.bootStrapServer = source.getString("bootStrapServer");
+//        this.topics = JSONArray.parseArray(source.getString("topics"), String.class);
+//        this.groupId = source.getString("groupId");
+//        this.sink = JSONObject.parseObject(JSON.toJSONString(getParamValue("sink", null)));
+//        this.sinkType = sink.getString("sinkType");
+//        this.engine = sink.getString("engine");
+        log.info("接收到参数，任务名称：{}, 任务参数：{}", jobName, jobConf);
     }
 
     @Override
@@ -81,7 +81,7 @@ public abstract class AbstractJob implements IJob {
         try {
             init();
             afterInit();
-            buildKafkaSource();
+//            buildKafkaSource();
             handle();
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -118,10 +118,11 @@ public abstract class AbstractJob implements IJob {
      * @param topic topic
      */
     protected FlinkKafkaProducer<String> kafkaSink(String bootStrapServers, String topic) {
+        log.info("开发往kafka，topic：{}", topic);
         // 定义kafka producer
         return new FlinkKafkaProducer<>(topic, new KafkaSerializationSchema<String>() {
             @Override
-            public ProducerRecord<byte[], byte[]> serialize(String data, @Nullable Long aLong) {
+            public ProducerRecord<byte[], byte[]> serialize(String data, Long aLong) {
                 return new ProducerRecord<>(topic, data.getBytes());
             }
         }, buildKafkaProducerProps(bootStrapServers), FlinkKafkaProducer.Semantic.EXACTLY_ONCE);

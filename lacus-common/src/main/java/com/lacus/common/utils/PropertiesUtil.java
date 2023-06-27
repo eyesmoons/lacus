@@ -12,7 +12,7 @@ import java.util.Properties;
 @Slf4j
 public class PropertiesUtil {
 
-    private static final String DEFAULT_PROPERTIES = "application-basic.yml";
+    private static final String DEFAULT_PROPERTIES = "flink-common.yml";
 
     /**
      * 获取properties属性值
@@ -100,8 +100,6 @@ public class PropertiesUtil {
     }
 
     public static void main(String[] args) {
-        System.out.println(getPropValue("kafka.properties.bootstrap-servers"));
-        System.out.println(getProps("kafka.properties.*"));
-        System.out.println(getPropsWithoutPrefix("kafka.properties."));
+        System.out.println(getPropValue("kafka.bootstrapServers"));
     }
 }

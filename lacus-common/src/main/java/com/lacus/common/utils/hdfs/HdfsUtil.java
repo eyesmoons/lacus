@@ -13,6 +13,7 @@ import org.apache.hadoop.util.ReflectionUtils;
 
 import java.io.*;
 import java.net.URI;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -45,12 +46,10 @@ public class HdfsUtil {
 
     /**
      * 查看hdfs文件列表
-     *
-     * @param filePath
      */
     public static FileStatus[] listPaths(String filePath) {
         init();
-        FileStatus[] fileStatuses = null;
+        FileStatus[] fileStatuses;
         try {
             FileSystem fs = FileSystem.get(conf);
             fileStatuses = fs.listStatus(new Path(filePath));
@@ -67,8 +66,6 @@ public class HdfsUtil {
 
     /**
      * 新建hdfs文件
-     * @param filePath
-     * @param data
      */
     public static void createFile(String filePath, byte[] data) throws IOException {
         FileSystem fs = FileSystem.get(conf);
@@ -80,8 +77,6 @@ public class HdfsUtil {
 
     /**
      * 新建文件
-     * @param filePath
-     * @param data
      */
     public static void createFile(String filePath, String data) throws IOException {
         createFile(filePath, data.getBytes());
@@ -111,8 +106,6 @@ public class HdfsUtil {
 
     /**
      * 递归删除文件
-     *
-     * @param filePath
      */
     public static boolean deleteFileRecursive(String filePath) throws IllegalArgumentException, IOException {
         return deleteFile(filePath, true);
@@ -120,8 +113,6 @@ public class HdfsUtil {
 
     /**
      * 非递归删除文件
-     *
-     * @param filePath
      */
     public static boolean deleteFile(String filePath) throws IllegalArgumentException, IOException {
         return deleteFile(filePath, false);
@@ -135,7 +126,6 @@ public class HdfsUtil {
 
     /**
      * 创建文件夹
-     * @param dirPath
      */
     public static boolean mkdir(String dirPath) throws IllegalArgumentException, IOException {
         init();
@@ -313,7 +303,8 @@ public class HdfsUtil {
     public static void main(String[] args) throws IOException {
         conf = new Configuration();
         System.setProperty("HADOOP_USER_NAME", "hdfs");
-        conf.set("fs.defaultFS", "hdfs://127.0.0.1:8020");
-        HdfsUtil.copyToLocalFile("/flink/demo/demo.txt", "/Users/casey/demo/");
+        conf.set("fs.defaultFS", "hdfs://gaia-dev-bigdata1:8020");
+        FileStatus[] listPaths = HdfsUtil.listPaths("/flink/libs/ext/");
+        System.out.println(Arrays.toString(listPaths));
     }
 }

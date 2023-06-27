@@ -38,7 +38,7 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
 
     @ApiModelProperty("同步方式")
     @TableField("sync_type")
-    private Integer syncType;
+    private String syncType;
 
     @ApiModelProperty("任务提交时间")
     @TableField("submit_time")

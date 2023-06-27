@@ -3,42 +3,49 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <parent>
-        <groupId>com.lacus</groupId>
-        <artifactId>lacus</artifactId>
-        <version>1.0.0</version>
-    </parent>
+    <groupId>com.lacus</groupId>
+    <artifactId>lacus-job</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
 
     <description>
         flink任务中心
     </description>
 
-    <artifactId>lacus-job</artifactId>
-
     <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink.version>1.16.0</flink.version>
         <flink-shaded.version>2.6.5-10.0</flink-shaded.version>
+        <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
         <flink-doris-connector-version>1.3.0</flink-doris-connector-version>
         <fastjson2.version>2.0.26</fastjson2.version>
         <mysql-connector-java.version>8.0.30</mysql-connector-java.version>
         <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
         <flink-connector-mysql-cdc.version>1.3.0</flink-connector-mysql-cdc.version>
-        <!--<scope.setting>provided</scope.setting>-->
-        <scope.setting>compile</scope.setting>
+        <lombok.version>1.18.2</lombok.version>
+        <slf4j.version>1.7.25</slf4j.version>
+        <log4j.version>1.2.17</log4j.version>
+        <flink.version>1.13.5</flink.version>
+        <scope.setting>provided</scope.setting>
+<!--        <scope.setting>compile</scope.setting>-->
     </properties>
 
     <dependencies>
+
         <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
         </dependency>
 
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-lang3</artifactId>
+            <version>3.12.0</version>
         </dependency>
 
         <dependency>
@@ -50,14 +57,14 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-clients</artifactId>
+            <artifactId>flink-clients_2.12</artifactId>
             <version>${flink.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-streaming-java</artifactId>
+            <artifactId>flink-streaming-java_2.12</artifactId>
             <version>${flink.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
@@ -71,25 +78,17 @@
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka</artifactId>
-            <version>${flink.version}</version>
+            <artifactId>flink-connector-kafka_2.12</artifactId>
+            <version>${flink-connector-kafka.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime</artifactId>
-            <version>${flink.version}</version>
+            <artifactId>flink-runtime-web_2.12</artifactId>
+            <version>1.11.3</version>
             <scope>${scope.setting}</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-runtime-web</artifactId>
-            <version>${flink.version}</version>
-            <scope>${scope.setting}</scope>
-        </dependency>
-
 
         <!-- flink-doris-connector -->
         <dependency>
@@ -98,25 +97,24 @@
             <version>1.3.0</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.alibaba.fastjson2</groupId>
             <artifactId>fastjson2</artifactId>
             <version>${fastjson2.version}</version>
         </dependency>
 
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>
             <version>1.2.18</version>
+            <scope>${scope.setting}</scope>
         </dependency>
-
 
         <dependency>
             <groupId>com.mysql</groupId>
             <artifactId>mysql-connector-j</artifactId>
             <version>8.0.31</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <!-- flink mysql cdc-->
@@ -124,18 +122,78 @@
             <groupId>com.alibaba.ververica</groupId>
             <artifactId>flink-connector-mysql-cdc</artifactId>
             <version>${flink-connector-mysql-cdc.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-jdbc_2.12</artifactId>
             <version>${flink-connector-jdbc_2.12.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
             <version>${mysql-connector-java.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+            <version>${slf4j.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+            <version>${log4j.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-scala-bridge_2.12</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-api-java-bridge_2.12</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-table-common</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>31.0.1-jre</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.30</version>
+            <scope>compile</scope>
         </dependency>
     </dependencies>
 
