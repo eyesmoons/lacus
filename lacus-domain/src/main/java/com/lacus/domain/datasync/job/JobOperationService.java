@@ -98,7 +98,8 @@ public class JobOperationService {
         List<SourceConf> sourceJobConf = buildSourceJobConf(jobs, syncType, timeStamp);
         // 构建sink任务json
         List<FlinkSinkJobConf> sinkJobConf = buildSinkJobConf(jobs);
-
+        log.info("sourceJobConf：{}", sourceJobConf);
+        log.info("sinkJobConf：{}", sinkJobConf);
         String flinkJobPath = getJobJarPath(flinkJobJarName);
         try {
             String sourceJobName = "source_task_" + catalogName;
@@ -107,11 +108,11 @@ public class JobOperationService {
             Thread.sleep(1000);
             if (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-//                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
-//                Thread.sleep(1000);
-//                if (Objects.nonNull(sinkAppId)) {
-//                    createInstance(catalogId, 2, sinkAppId, syncType);
-//                }
+                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
+                Thread.sleep(1000);
+                if (Objects.nonNull(sinkAppId)) {
+                    createInstance(catalogId, 2, sinkAppId, syncType);
+                }
             }
         } catch (Exception e) {
             log.error("任务提交失败：{}", e.getMessage());

@@ -127,7 +127,7 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 kafka:
-  bootstrapServers: localhost:9092
+  bootstrapServers: gaia-dev-bigdata5:9092,gaia-dev-bigdata6:9092,gaia-dev-bigdata7:9092
 
 yarn:
   restapi-address: http://gaia-dev-bigdata1:8088/proxy/

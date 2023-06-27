@@ -22,10 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Slf4j
 @Service("monitorService")
@@ -80,16 +77,20 @@ public class JobMonitorService {
     }
 
     public String getFlinkJobId(String applicationId) {
-        String sb = flinkRestPrefix + applicationId + "/jobs/overview";
-        log.info("获取flinkJobId请求地址：{}", sb);
-        JSONObject jsonObject = restUtil.getForJsonObject(sb);
-        log.debug("rest返回信息:{}", JSON.toJSONString(jsonObject));
-        JSONArray jobs = JSON.parseObject(JSON.toJSONString(jsonObject)).getJSONArray("jobs");
-        if (ObjectUtils.isEmpty(jobs)) {
-            log.error("获取Flink JobId 失败");
-            throw new ApiException(ErrorCode.Internal.UNKNOWN_ERROR, "获取Flink JobId 失败");
+        try {
+            String sb = flinkRestPrefix + applicationId + "/jobs/overview";
+            log.info("获取flinkJobId请求地址：{}", sb);
+            JSONObject jsonObject = restUtil.getForJsonObject(sb);
+            log.debug("rest返回信息:{}", JSON.toJSONString(jsonObject));
+            JSONArray jobs = JSON.parseObject(JSON.toJSONString(jsonObject)).getJSONArray("jobs");
+            if (ObjectUtils.isEmpty(jobs)) {
+                log.error("获取Flink JobId 失败");
+            }
+            return jobs.getJSONObject(0).getString("jid");
+        } catch (Exception e) {
+            log.error("获取Flink JobId 失败：{}", e.getMessage());
+            return null;
         }
-        return jobs.getJSONObject(0).getString("jid");
     }
 
     public Object flinkJobOverview(String applicationId) {
@@ -99,6 +100,14 @@ public class JobMonitorService {
 
     public FlinkJobDetail flinkJobDetail(String applicationId) {
         String flinkJobId = getFlinkJobId(applicationId);
+        if (Objects.isNull(flinkJobId)) {
+            for (int i = 0; i < 3; i++) {
+                flinkJobId = getFlinkJobId(applicationId);
+            }
+        }
+        if (Objects.isNull(flinkJobId)) {
+            throw new RuntimeException("flinkJobId为null");
+        }
         String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId;
         Object forObject = restUtil.getForObject(sb);
         return JSONObject.parseObject(JSON.toJSONString(forObject), FlinkJobDetail.class);
