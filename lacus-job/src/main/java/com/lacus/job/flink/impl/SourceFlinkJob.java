@@ -40,7 +40,6 @@ public class SourceFlinkJob extends BaseFlinkJob {
                     .deserializer(new CustomerDeserializationSchemaMysql())
                     .build();
             SingleOutputStreamOperator<String> mysqlDS = env.addSource(mysqlSource).name("source_" + sourceConf.getJobName());
-            mysqlDS.print("data");
             mysqlDS.addSink(kafkaSink(sourceConf.getBootStrapServer(),sourceConf.getTopic())).name("sink_" + sourceConf.getJobName());
         }
         env.execute(jobName);

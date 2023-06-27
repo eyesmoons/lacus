@@ -108,14 +108,14 @@ public class JobOperationService {
             Thread.sleep(1000);
             if (Objects.nonNull(sourceAppId)) {
                 createInstance(catalogId, 1, sourceAppId, syncType);
-//                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
-//                Thread.sleep(1000);
-//                if (Objects.nonNull(sinkAppId)) {
-//                    createInstance(catalogId, 2, sinkAppId, syncType);
-//                }
+                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
+                Thread.sleep(1000);
+                if (Objects.nonNull(sinkAppId)) {
+                    createInstance(catalogId, 2, sinkAppId, syncType);
+                }
             }
         } catch (Exception e) {
-            log.error("任务提交失败：{}", e.getMessage());
+            log.error("任务提交失败", e);
         }
     }
 
@@ -184,14 +184,14 @@ public class JobOperationService {
                         }
 
                         JSONObject columnJson = new JSONObject();
-                        String sinkDbTable = savedTable.getSourceDbName() + "." + savedTable.getSourceTableName();
+                        String sourceTable = savedTable.getSourceTableName();
                         columnJson.put("sinkTable", savedTable.getSinkTableName());
                         columnJson.put("format", "json");
                         columnJson.put("max_filter_ratio", "1.0");
                         columnJson.put("strip_outer_array", true);
                         columnJson.put("columns", String.join(",", columns));
                         columnJson.put("jsonpaths", "[" + String.join(",", jsonPaths) + "]");
-                        columnMap.put(sinkDbTable, columnJson);
+                        columnMap.put(sourceTable, columnJson);
                     }
                 }
                 engine.setColumnMap(columnMap);
@@ -225,7 +225,7 @@ public class JobOperationService {
             sourceConf.setJobName(job.getJobName());
             List<DataSyncSourceTableEntity> sourceTableEntities = sourceTablesMap.get(job.getJobId());
             String sourceDbName = sourceTableEntities.get(0).getSourceDbName();
-            List<String> sourceTableNames = sourceTableEntities.stream().map(entity -> entity.getSourceDbName() + "." + entity.getSourceTableName()).collect(Collectors.toList());
+            List<String> sourceTableNames = sourceTableEntities.stream().map(DataSyncSourceTableEntity::getSourceTableName).collect(Collectors.toList());
             MetaDatasourceEntity metaDatasource = dataSourceService.getById(job.getSourceDatasourceId());
             if (ObjectUtils.isNotEmpty(metaDatasource)) {
                 sourceConf.setBootStrapServer(bootstrapServers);
