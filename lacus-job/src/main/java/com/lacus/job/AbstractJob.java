@@ -4,6 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.lacus.job.flink.KafkaSourceConfig;
+import com.lacus.job.model.SourceConf;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -13,7 +14,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.Properties;
 
@@ -22,32 +22,11 @@ public abstract class AbstractJob implements IJob {
 
     private static final long serialVersionUID = -8435891490675922619L;
 
-    protected KafkaSource<ConsumerRecord<String, String>> kafkaSource;
-
-    //base
-    protected JSONObject flinkConf;
-
-    //source
-    protected JSONObject source;
-    protected List<String> topics;
-    protected String bootStrapServer;
-    protected String groupId;
-
-    //sink
-    protected JSONObject sink;
-    protected String sinkType;
-    protected String engine;
-
-
-    protected Properties conf = new Properties();
-
 
     // 任务名称
     protected String jobName;
 
     // 任务配置
-    protected static JSONObject job_param = new JSONObject();
-
     protected String jobConf;
 
     protected AbstractJob(String[] args) {
@@ -60,14 +39,6 @@ public abstract class AbstractJob implements IJob {
 
     @Override
     public void init() {
-//        this.flinkConf = getParamValue("flinkConf", null);
-//        this.source = JSONObject.parseObject(JSON.toJSONString(getParamValue("source", null)));
-//        this.bootStrapServer = source.getString("bootStrapServer");
-//        this.topics = JSONArray.parseArray(source.getString("topics"), String.class);
-//        this.groupId = source.getString("groupId");
-//        this.sink = JSONObject.parseObject(JSON.toJSONString(getParamValue("sink", null)));
-//        this.sinkType = sink.getString("sinkType");
-//        this.engine = sink.getString("engine");
         log.info("接收到参数，任务名称：{}, 任务参数：{}", jobName, jobConf);
     }
 
@@ -81,7 +52,6 @@ public abstract class AbstractJob implements IJob {
         try {
             init();
             afterInit();
-//            buildKafkaSource();
             handle();
         } catch (Throwable e) {
             throw new RuntimeException(e);
@@ -90,20 +60,12 @@ public abstract class AbstractJob implements IJob {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private <T> T getParamValue(String name, T defaultValue) {
-        return paramContainKey(name) ? (T) job_param.get(name) : defaultValue;
-    }
-
-    private boolean paramContainKey(String name) {
-        return job_param.containsKey(name);
-    }
 
 
     //默认从最新时间开始消费
-    private void buildKafkaSource() {
-        this.kafkaSource = KafkaSourceConfig.builder()
-                .bootstrapServer(bootStrapServer)
+    protected KafkaSource<ConsumerRecord<String, String>> buildKafkaSource(String bootstrapServers, String groupId, List<String> topics, Properties conf) {
+        return KafkaSourceConfig.builder()
+                .bootstrapServers(bootstrapServers)
                 .groupId(groupId)
                 .topics(topics)
                 .conf(conf)
@@ -114,8 +76,9 @@ public abstract class AbstractJob implements IJob {
 
     /**
      * 发送数据到kafka
+     *
      * @param bootStrapServers bootStrapServers
-     * @param topic topic
+     * @param topic            topic
      */
     protected FlinkKafkaProducer<String> kafkaSink(String bootStrapServers, String topic) {
         log.info("开发往kafka，topic：{}", topic);

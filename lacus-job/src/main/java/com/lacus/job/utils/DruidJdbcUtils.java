@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.lacus.job.constants.SinkResponse.*;
+import static com.lacus.job.constants.SinkResponseEnums.*;
 
 public class DruidJdbcUtils {
 

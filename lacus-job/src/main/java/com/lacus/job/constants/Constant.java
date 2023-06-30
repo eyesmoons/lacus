@@ -1,5 +1,7 @@
 package com.lacus.job.constants;
 
+import org.omg.CORBA.PUBLIC_MEMBER;
+
 public class Constant {
 
 
@@ -14,7 +16,7 @@ public class Constant {
 
     public static final String DB = "db";
 
-    public static final String TABLE = "table";
+    public static final String TABLE = "tableName";
 
     //----------------------LOAD DATA COMMON FILED ------------------------//
     public static final String IS_DELETE_FILED = "_is_delete";
@@ -28,6 +30,43 @@ public class Constant {
 
     public static final int DELETE_TRUE = 1;
 
+
+    //------------------------sink conf -------------------------//
+
+
+    public static final String SINK_SOURCE = "source";
+
+    public static final String SINK_SOURCE_BOOTSTRAP_SERVERS = "bootstrapServers";
+
+    public static final String SINK_SOURCE_GROUP_ID = "groupId";
+
+    public static final String SINK_SOURCE_TOPICS = "topics";
+
+
+    public static final String SINK_FLINK = "flinkConf";
+
+    public static final String SINK_FLINK_MAX_BATCH_INTERVAL = "maxBatchInterval";
+
+    public static final String SINK_FLINK_MAX_BATCH_ROWS = "maxBatchRows";
+
+    public static final String SINK_FLINK_MAX_BATCH_SIZE = "maxBatchSize";
+
+
+    public static final String SINK_ENGINE = "sink";
+
+    public static final String SINK_ENGINE_TYPE = "sinkType";
+
+    public static final String SINK_ENGINE_CONF = "engine";
+
+    public static final String SINK_DORIS_FORMAT = "json";
+
+    public static final String SINK_DORIS_COLUMNS = "columns";
+
+    public static final String SINK_DORIS_JSON_PATHS = "jsonpaths";
+
+    public static final String MAX_FILTER_RATIO = "1.0";
+
+    public static final String STRIP_OUTER_ARRAY = "true";
 
 
 }

@@ -18,7 +18,9 @@ import java.util.List;
 @Slf4j
 public class SourceFlinkJob extends BaseFlinkJob {
 
-    public SourceFlinkJob(String[] args) {super(args);}
+    public SourceFlinkJob(String[] args) {
+        super(args);
+    }
 
     @Override
     public void handle() throws Throwable {
@@ -40,9 +42,9 @@ public class SourceFlinkJob extends BaseFlinkJob {
                     .deserializer(new CustomerDeserializationSchemaMysql())
                     .build();
             SingleOutputStreamOperator<String> mysqlDS = env.addSource(mysqlSource).name("source_" + sourceConf.getJobName());
-            mysqlDS.addSink(kafkaSink(sourceConf.getBootStrapServer(),sourceConf.getTopic())).name("sink_" + sourceConf.getJobName());
+            mysqlDS.addSink(kafkaSink(sourceConf.getBootStrapServer(), sourceConf.getTopic())).name("sink_" + sourceConf.getJobName());
         }
-        env.execute(jobName);
+        env.execute("source_job_" + jobName);
     }
 
     private static StartupOptions getStartupOptions(String syncType, Long timeStamp) {

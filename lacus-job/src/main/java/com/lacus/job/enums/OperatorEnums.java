@@ -5,6 +5,7 @@ public enum OperatorEnums {
 
 
     INSERT_OP("c", "insert"),
+    CREATE_OP("CREATE", "CREATE"),
 
     UPDATE_OP("u", "update"),
 
