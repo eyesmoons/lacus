@@ -163,8 +163,9 @@ public class SinkFlinkJob extends BaseFlinkJob {
             }
             return JSON.toJSONString(formatData);
         }
-
-
     }
 
+    public static void main(String[] args) {
+        new SinkFlinkJob(args).run();
+    }
 }
