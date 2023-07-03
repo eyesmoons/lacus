@@ -3,11 +3,11 @@ package com.lacus.job.flink.warehouse;
 
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
+import com.google.common.collect.Maps;
 import com.lacus.job.constants.Constant;
 import com.lacus.job.constants.SinkResponse;
 import com.lacus.job.constants.SinkResponseEnums;
 import com.lacus.job.exception.SinkException;
-import com.lacus.job.utils.DruidJdbcUtils;
 import com.lacus.job.utils.HttpClientUtils;
 import com.lacus.job.utils.StringUtils;
 import lombok.Data;
@@ -15,7 +15,6 @@ import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
-import org.apache.flink.util.CollectionUtil;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
@@ -110,7 +109,7 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
 
 
     public void sink2(Mapping mapping, String data) {
-        String ipPort = this.feIp + ":8030" /*+ this.port*/;
+        String ipPort = this.feIp + ":8030";
         String httpUrl = String.format(STREAM_LOAD_URL, ipPort, this.dorisDb, mapping.getSinkTable());
         String loadLabel = "lacus-" + mapping.getSinkTable() + "-" + new Date().getTime() + "-" + UUID.randomUUID().toString().replaceAll("-", "");
         List<Header> headers = buildLoadHeader(mapping);
@@ -138,13 +137,24 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
     }
 
 
+    private Map<String, String> buildLoadMap(Mapping mapping) {
+        Map<String, String> confMap = Maps.newHashMap();
+
+        confMap.put(Constant.SINK_DORIS_FORMAT, mapping.getFormat());
+        confMap.put(Constant.SINK_DORIS_COLUMNS, mapping.getColumns());
+        confMap.put(Constant.SINK_DORIS_JSON_PATHS, mapping.getJsonPaths());
+        confMap.put(Constant.MAX_FILTER_RATIO, mapping.getMaxFilterRatio());
+        confMap.put(Constant.STRIP_OUTER_ARRAY, mapping.getStripOuterArray());
+        return confMap;
+    }
+
+
     //sink data to doris
-    private SinkResponse sink(Mapping mapping, String data) throws IOException {
-        String ipPort = this.feIp + this.port;
+    private void sink(Mapping mapping, String data) throws IOException {
+        String ipPort = this.feIp + ":8030" /*+ this.port*/;
         String httpUrl = String.format(STREAM_LOAD_URL, ipPort, this.dorisDb, mapping.getSinkTable());
         String loadLabel = "lacus-" + mapping.getSinkTable() + "-" + new Date().getTime() + "-" + UUID.randomUUID().toString().replaceAll("-", "");
-        Map<String, String> confMap = new HashMap<>();
-        confMap.put("jsonpaths", mapping.getFormat());
+        Map<String, String> confMap = buildLoadMap(mapping);
         HttpURLConnection httpConn = getHttpConn(httpUrl, confMap, loadLabel);
         try {
             BufferedOutputStream bs = new BufferedOutputStream(httpConn.getOutputStream());
@@ -167,7 +177,8 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
         br.close();
 
         log.info("AuditLoader plugin load with label: {}, response code: {}, msg: {}, content: {}", loadLabel, returnStatus, returnMsg, response.toString());
-        return new SinkResponse(returnStatus, returnMsg, response.toString(), loadLabel);
+        new SinkResponse(returnStatus, returnMsg, response.toString(), loadLabel);
+        System.out.println(response.toString());
     }
 
 
@@ -181,7 +192,7 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
             String authEncoding = Base64.getEncoder().encodeToString(String.format("%s:%s", this.userName, this.password).getBytes(StandardCharsets.UTF_8));
             conn.setRequestProperty("Authorization", "Basic " + authEncoding);
             conn.addRequestProperty("Expect", "100-continue");
-            conn.addRequestProperty("Content-Type", "text/plain; charset=UTF-8");
+            conn.addRequestProperty("content-Type", "text/plain; charset=UTF-8");
             conn.addRequestProperty("label", label);
             conn.addRequestProperty("max_filter_ratio", "1.0");
 
