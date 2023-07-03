@@ -674,3 +674,33 @@ INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, 
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+
+
+-- ----------------------------
+-- Table structure for api_server
+-- ----------------------------
+DROP TABLE IF EXISTS `dataserver_api_info`;
+CREATE TABLE `dataserver_api_info` (
+    `api_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
+    `api_name` varchar(64) NOT NULL COMMENT '接口名称',
+    `driver_type` varchar(20) DEFAULT NULL COMMENT '接口驱动类型:Mysql,Doris,oracle...',
+    `datasource_id` bigint(20) DEFAULT NULL COMMENT '字段名称',
+    `api_url` varchar(100) DEFAULT NULL COMMENT '接口Url',
+    `api_desc` varchar(256) DEFAULT NULL COMMENT '接口描述',
+    `request_method` varchar(10) DEFAULT NULL COMMENT '接口请求方式',
+    `project_team` varchar(20) DEFAULT NULL COMMENT '接口所属项目组,默认为admin项目组',
+    `query_timeout` int(2) DEFAULT '5' COMMENT '接口超时时间，默认60s超时',
+    `current_limit` tinyint(1) DEFAULT '0' COMMENT '是否开启限流，不开启0,开启1,默认为0',
+    `api_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '接口状态,下线为0,上线为1，默认为0',
+    `max_return_rows` bigint(20) DEFAULT NULL COMMENT '接口最大返回行数',
+    `api_script` text COMMENT '接口脚本',
+    `api_params` varchar(512) DEFAULT NULL COMMENT '接口参数',
+    `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`api_id`),
+    KEY `unique_key_column` (`api_id`,`api_url`)
+) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='数据服务接口详情表'
