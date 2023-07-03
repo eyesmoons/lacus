@@ -4,9 +4,9 @@ package com.lacus.job.enums;
 public enum SinkEnums {
 
 
-    DORIS(0, "doris"),
-    CLICKHOUSE(1, "clickhouse"),
-    PRESTO(2, "presto");
+    DORIS(0, "DORIS"),
+    CLICKHOUSE(1, "CLICKHOUSE"),
+    PRESTO(2, "PRESTO");
 
 
     private String type;

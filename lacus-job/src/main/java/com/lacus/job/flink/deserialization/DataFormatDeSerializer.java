@@ -1,4 +1,4 @@
-package com.lacus.job.flink;
+package com.lacus.job.flink.deserialization;
 
 import com.lacus.job.utils.StringUtils;
 import org.apache.flink.api.common.typeinfo.TypeHint;
@@ -28,7 +28,6 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
         if (StringUtils.checkValNull(record)) {
             return null;
         }
-        String key = new String(record.key(), StandardCharsets.UTF_8);
         String originValue = new String(record.value(), StandardCharsets.UTF_8);
         if (StringUtils.checkValNull(originValue)) {
             return null;
@@ -42,7 +41,7 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
                 record.checksum(),
                 record.serializedKeySize(),
                 record.serializedValueSize(),
-                key,
+                record.key(),
                 originValue,
                 record.headers(),
                 record.leaderEpoch());

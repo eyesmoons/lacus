@@ -1,24 +1,24 @@
 package com.lacus.job.exception;
 
 
-import com.lacus.job.constants.SinkResponse;
+import com.lacus.job.constants.SinkResponseEnums;
 
 public class SinkException extends RuntimeException {
 
 
-    private SinkResponse sinkResponse;
+    private SinkResponseEnums sinkResponse;
 
     private Integer status;
 
     private Object data;
 
 
-    public SinkException(SinkResponse sinkResponse) {
+    public SinkException(SinkResponseEnums sinkResponse) {
         this.sinkResponse = sinkResponse;
     }
 
 
-    public SinkException(SinkResponse sinkResponse, Throwable throwable) {
+    public SinkException(SinkResponseEnums sinkResponse, Throwable throwable) {
         super(throwable);
         this.sinkResponse = sinkResponse;
     }
@@ -50,7 +50,7 @@ public class SinkException extends RuntimeException {
         return data;
     }
 
-    public SinkResponse getSinkResponse() {
+    public SinkResponseEnums getSinkResponse() {
         return sinkResponse;
     }
 }

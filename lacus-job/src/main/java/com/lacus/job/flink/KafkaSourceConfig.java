@@ -1,5 +1,6 @@
 package com.lacus.job.flink;
 
+import com.lacus.job.flink.deserialization.DataFormatDeSerializer;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
@@ -11,7 +12,7 @@ import java.util.Properties;
 
 public class KafkaSourceConfig {
 
-    private String bootstrapServer;
+    private String bootstrapServers;
     private List<String> topics;
     private String groupId;
     private KafkaDeserializationSchema<ConsumerRecord<String, String>> valueSerialize;
@@ -24,8 +25,8 @@ public class KafkaSourceConfig {
     }
 
 
-    public KafkaSourceConfig bootstrapServer(String bootstrapServer) {
-        this.bootstrapServer = bootstrapServer;
+    public KafkaSourceConfig bootstrapServers(String bootstrapServers) {
+        this.bootstrapServers = bootstrapServers;
         return this;
     }
 
@@ -47,7 +48,7 @@ public class KafkaSourceConfig {
 
 
     public KafkaSourceConfig offsetsInitializer(OffsetsInitializer offsetsInitializer) {
-        this.offsetsInitializer = (offsetsInitializer == null) ? OffsetsInitializer.latest() : offsetsInitializer;
+        this.offsetsInitializer = (offsetsInitializer == null) ? OffsetsInitializer.earliest() : offsetsInitializer;
         return this;
     }
 
@@ -56,12 +57,39 @@ public class KafkaSourceConfig {
         return this;
     }
 
+
+    public String getBootstrapServers() {
+        return bootstrapServers;
+    }
+
+    public List<String> getTopics() {
+        return topics;
+    }
+
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public KafkaDeserializationSchema<ConsumerRecord<String, String>> getValueSerialize() {
+        return valueSerialize;
+    }
+
+    public OffsetsInitializer getOffsetsInitializer() {
+        return offsetsInitializer;
+    }
+
+    public Properties getConf() {
+        return conf;
+    }
+
+
+
     public KafkaSource<ConsumerRecord<String, String>> build() {
         return KafkaSource.<ConsumerRecord<String, String>>builder()
                 .setTopics(topics)
                 .setStartingOffsets(offsetsInitializer)
                 .setGroupId(groupId)
-                .setBootstrapServers(bootstrapServer)
+                .setBootstrapServers(bootstrapServers)
                 .setDeserializer(KafkaRecordDeserializationSchema.of(valueSerialize))
                 .setProperties(conf).build();
 
