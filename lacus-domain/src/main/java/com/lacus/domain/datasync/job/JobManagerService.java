@@ -694,6 +694,14 @@ public class JobManagerService {
                 catalogDTO.setJobName(catalog.getCatalogName());
                 catalogDTO.setRemark(catalog.getRemark());
                 catalogDTO.setCreateTime(catalog.getCreateTime());
+                DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(catalog.getCatalogId(), 1);
+                DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(catalog.getCatalogId(), 2);
+                if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
+                    catalogDTO.setSourceStatus(lastSourceInstance.getStatus());
+                }
+                if (ObjectUtils.isNotEmpty(lastSinkInstance)) {
+                    catalogDTO.setSinkStatus(lastSinkInstance.getStatus());
+                }
                 result.add(catalogDTO);
             }
         }
@@ -713,21 +721,22 @@ public class JobManagerService {
             List<MetaDatasourceEntity> metaDatasourceEntityList = metaDataSourceService.listByIds(datasourceIds);
             metaDatasourceEntityMap = metaDatasourceEntityList.stream().collect(Collectors.toMap(MetaDatasourceEntity::getDatasourceId, MetaDatasourceEntity::getDatasourceName));
         }
-        Map<Long, String> finalMetaDatasourceEntityMap = metaDatasourceEntityMap;
-        List<JobTreeDTO> jobTreeDTOList = jobList.stream().map(entity -> {
-            entity.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
-            entity.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
-            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
-            DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 2);
-            if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
-                entity.setSourceStatus(lastSourceInstance.getStatus());
-            }
-            if (ObjectUtils.isNotEmpty(lastSinkInstance)) {
-                entity.setSinkStatus(lastSinkInstance.getStatus());
-            }
-            return new JobTreeDTO(entity);
-        }).collect(Collectors.toList());
+
+        List<JobTreeDTO> jobTreeDTOList = new ArrayList<>();
+        for (DataSyncJobEntity entity : jobList) {
+            entity.setSourceDatasourceName(metaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
+            entity.setSinkDatasourceName(metaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
+            jobTreeDTOList.add(new JobTreeDTO(entity));
+        }
         result.addAll(jobTreeDTOList);
         return result;
+    }
+
+    public void remove(String jobId) {
+        DataSyncJobEntity byId = dataSyncJobService.getById(jobId);
+        if (ObjectUtils.isEmpty(byId)) {
+            throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "记录为空");
+        }
+        dataSyncJobService.removeById(jobId);
     }
 }

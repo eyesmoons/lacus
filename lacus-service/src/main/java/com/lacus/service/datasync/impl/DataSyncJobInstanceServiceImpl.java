@@ -36,7 +36,7 @@ public class DataSyncJobInstanceServiceImpl extends ServiceImpl<DataSyncJobInsta
         }
         entity.setApplicationId(applicationId);
         entity.setFlinkJobId(jobDetail.getJid());
-        this.save(entity);
+        entity.insert();
     }
 
     @Override
@@ -49,5 +49,6 @@ public class DataSyncJobInstanceServiceImpl extends ServiceImpl<DataSyncJobInsta
         entity.setSubmitTime(new Date());
         entity.setFinishedTime(new Date());
         entity.setStatus(FlinkStatusEnum.STOP.getStatus());
+        entity.insert();
     }
 }

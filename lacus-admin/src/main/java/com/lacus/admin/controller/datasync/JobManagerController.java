@@ -57,6 +57,15 @@ public class JobManagerController {
         return ResponseDTO.ok();
     }
 
+    @ApiOperation("删除任务")
+    @PreAuthorize("@permission.has('datasync:job:remove')")
+    @AccessLog(title = "任务管理", businessType = BusinessTypeEnum.DELETE)
+    @GetMapping("/remove/{jobId}")
+    public ResponseDTO<?> remove(@PathVariable("jobId") String jobId) {
+        jobManagerService.remove(jobId);
+        return ResponseDTO.ok();
+    }
+
     @ApiOperation("查询映射表列表")
     @PreAuthorize("@permission.has('datasync:job:list')")
     @PostMapping("/listMappedTable")
