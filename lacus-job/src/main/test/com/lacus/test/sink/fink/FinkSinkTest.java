@@ -34,7 +34,7 @@ public class FinkSinkTest {
             "                        \"jsonpaths\": \"[\\\"$.app_container\\\",\\\"$.catalog_id\\\"]\"\n" +
             "                    }\n" +
             "                },\n" +
-            "                \"dbName\": \"lacus\",\n" +
+            "                \"dbName\": \"demo\",\n" +
             "                \"ip\": \"10.220.146.10\",\n" +
             "                \"password\": \"\",\n" +
             "                \"port\": 9030,\n" +
