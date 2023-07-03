@@ -1,10 +1,6 @@
 package com.lacus.job;
 
-import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONArray;
-import com.alibaba.fastjson2.JSONObject;
 import com.lacus.job.flink.KafkaSourceConfig;
-import com.lacus.job.model.SourceConf;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.connector.kafka.source.KafkaSource;
@@ -33,7 +29,6 @@ public abstract class AbstractJob implements IJob {
         if (ObjectUtils.isNotEmpty(args)) {
             jobName = args[0];
             jobConf = args[1];
-            //job_param = JSONObject.parseObject(args[1]);
         }
     }
 
