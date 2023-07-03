@@ -1,6 +1,5 @@
 package com.lacus.job.constants;
 
-import org.omg.CORBA.PUBLIC_MEMBER;
 
 public class Constant {
 

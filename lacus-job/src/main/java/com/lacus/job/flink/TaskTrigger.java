@@ -50,7 +50,7 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
         ReducingState<Long> counterState = context.getPartitionedState(counter);
         counterState.add(1L);
         if (counterState.get() >= maxBatchCount) {
-            log.info("fired counter trigger：{}", counterState.get());
+            log.info("Fired counter trigger：{}", counterState.get());
             clear(window, context);
             return TriggerResult.FIRE_AND_PURGE;
         }
@@ -59,7 +59,7 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
         int bytes = String.valueOf(ele).getBytes(StandardCharsets.UTF_8).length;
         capacityState.add(bytes);
         if (capacityState.get() >= maxBatchSize) {
-            log.info("fired capacity trigger：{}", capacityState.get());
+            log.info("Fired capacity trigger：{}", capacityState.get());
             clear(window, context);
             return TriggerResult.FIRE_AND_PURGE;
         }
@@ -69,7 +69,7 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
     @Override
     public TriggerResult onProcessingTime(long time, TimeWindow window, TriggerContext context) throws Exception {
         clear(window, context);
-        log.info("fired time is :{}", time);
+        log.info("Fired time is :{}", time);
         return TriggerResult.FIRE_AND_PURGE;
     }
 
@@ -78,7 +78,7 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
         if (time < window.getEnd()) {
             return TriggerResult.CONTINUE;
         } else {
-            log.info("fire with event time: " + time);
+            log.info("Fire with event time: " + time);
             clear(window, context);
             return TriggerResult.FIRE_AND_PURGE;
         }
