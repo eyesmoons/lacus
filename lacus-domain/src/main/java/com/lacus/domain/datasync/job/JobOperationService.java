@@ -44,6 +44,9 @@ public class JobOperationService {
     private IDataSyncSourceTableService sourceTableService;
 
     @Autowired
+    private IDataSyncSinkTableService sinkTableService;
+
+    @Autowired
     private IDataSyncTableMappingService tableMappingService;
 
     @Autowired
@@ -148,7 +151,7 @@ public class JobOperationService {
             FlinkTaskSink sink = new FlinkTaskSink();
             MetaDatasourceEntity sourceDatasource = dataSourceService.getById(job.getSourceDatasourceId());
             MetaDatasourceEntity sinkDatasource = dataSourceService.getById(job.getSinkDatasourceId());
-            List<DataSyncSourceTableEntity> sourceTableEntities = sourceTableService.listByJobId(job.getJobId());
+            List<DataSyncSinkTableEntity> sinkTableEntities = sinkTableService.listByJobId(job.getJobId());
             if (ObjectUtils.isNotEmpty(sourceDatasource)) {
                 sink.setSinkType(sinkDatasource.getType());
             }
@@ -158,8 +161,8 @@ public class JobOperationService {
                 engine.setPort(sinkDatasource.getPort());
                 engine.setUserName(sinkDatasource.getUsername());
                 engine.setPassword(sinkDatasource.getPassword());
-                if (ObjectUtils.isNotEmpty(sourceTableEntities)) {
-                    engine.setDbName(sourceTableEntities.get(0).getSourceDbName());
+                if (ObjectUtils.isNotEmpty(sinkTableEntities)) {
+                    engine.setDbName(sinkTableEntities.get(0).getSinkDbName());
                 }
                 Map<String, JSONObject> columnMap = new HashMap<>();
                 DataSyncSavedTable syncSavedTableQuery = new DataSyncSavedTable();
