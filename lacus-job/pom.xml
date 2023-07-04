@@ -30,6 +30,7 @@
         <slf4j.version>1.7.25</slf4j.version>
         <log4j.version>1.2.17</log4j.version>
         <flink.version>1.13.5</flink.version>
+        <http.version>4.5.13</http.version>
         <scope.setting>provided</scope.setting>
 <!--        <scope.setting>compile</scope.setting>-->
     </properties>
@@ -91,10 +92,16 @@
         </dependency>
 
         <!-- flink-doris-connector -->
+<!--        <dependency>-->
+<!--            <groupId>org.apache.doris</groupId>-->
+<!--            <artifactId>flink-doris-connector-1.16</artifactId>-->
+<!--            <version>1.3.0</version>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>org.apache.doris</groupId>
-            <artifactId>flink-doris-connector-1.16</artifactId>
-            <version>1.3.0</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>${http.version}</version>
         </dependency>
 
         <dependency>
