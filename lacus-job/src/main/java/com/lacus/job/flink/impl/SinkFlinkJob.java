@@ -86,7 +86,7 @@ public class SinkFlinkJob extends BaseFlinkJob {
                         tmpMap.put(key, dataList);
                         count++;
                     }
-                    log.info("单次处理数据量:{}", count);
+                    log.info("本次处理数据量:{}", count);
                     System.out.println(tmpMap);
                     Map<String, String> dataMap = Maps.newHashMap();
                     tmpMap.forEach((key, value) -> dataMap.put(key, value.toString()));
