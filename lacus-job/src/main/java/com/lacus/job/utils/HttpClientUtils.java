@@ -1,5 +1,6 @@
 package com.lacus.job.utils;
 
+import com.lacus.job.constants.SinkResponseEnums;
 import com.lacus.job.exception.SinkException;
 import org.apache.http.Header;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -23,25 +24,16 @@ public class HttpClientUtils {
     public static String put(String requestUrl, String data, List<Header> headers) {
 
         HttpPut httpPut = new HttpPut(requestUrl);
-      //  httpPut.setConfig(timeout());
         StringEntity entity = new StringEntity(data, "utf-8");
         httpPut.setEntity(entity);
         httpPut.setHeaders(headers.toArray(new Header[]{}));
         httpPut.addHeader("Content-Type", "application/json");
         httpPut.addHeader("Accept", "application/json");
         log.info("Request url: {}", requestUrl);
-        return request(httpPut);
+        return sendRequest(httpPut);
     }
 
-
-/*    public static RequestConfig timeout() {
-        return RequestConfig.custom()
-                .setConnectTimeout(5000)
-                .setConnectionRequestTimeout(5000)
-                .setSocketTimeout(5000).build();
-    }*/
-
-    public static String request(HttpRequestBase request) {
+    public static String sendRequest(HttpRequestBase request) {
         CloseableHttpClient httpclient = null;
         CloseableHttpResponse response = null;
         try {
@@ -49,7 +41,8 @@ public class HttpClientUtils {
             response = httpclient.execute(request);
             return EntityUtils.toString(response.getEntity());
         } catch (IOException iox) {
-            throw new SinkException(iox.getMessage(), iox);
+            log.info("Doris streamLoad http connected failed: {}", iox.getMessage());
+            throw new SinkException(SinkResponseEnums.DORIS_SINK_HTTP_CONNECTED_FAILED, iox);
         } finally {
             close(response, httpclient);
             request.releaseConnection();
