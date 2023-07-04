@@ -151,6 +151,6 @@ lacus
 - 如需要生成新的表，请使用CodeGenerator类进行生成。
   - 填入数据库地址，账号密码，库名。然后填入所需的表名执行代码即可。
 
-欢迎关注我的公众号，查看更多大数据文章。
+欢迎关注以下公众号，留言或公众号回复"交流"加入技术交流群，一起学习。
 
-![img.png](images/eyesmoons.png)
+![img.png](images/communicate.png)
