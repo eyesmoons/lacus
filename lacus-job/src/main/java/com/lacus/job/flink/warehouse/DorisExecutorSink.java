@@ -8,6 +8,7 @@ import com.lacus.job.constants.Constant;
 import com.lacus.job.constants.SinkResponse;
 import com.lacus.job.constants.SinkResponseEnums;
 import com.lacus.job.exception.SinkException;
+import com.lacus.job.utils.DruidJdbcUtils;
 import com.lacus.job.utils.HttpClientUtils;
 import com.lacus.job.utils.StringUtils;
 import lombok.Data;
@@ -15,6 +16,7 @@ import org.apache.commons.compress.utils.Lists;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
+import org.apache.flink.util.CollectionUtil;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
@@ -26,6 +28,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
+import static com.lacus.job.constants.SinkResponseEnums.DORIS_BACKEND_ALIVE_NOT_FOUND;
 
 public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> implements SinkExecutor {
 
@@ -39,6 +42,8 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
     private final Map<String, Mapping> mappingMap = new HashMap<>();
 
     private String dorisConfig;
+
+    private String BE_IP_PORT = null;
 
     private String STREAM_LOAD_URL = "http://%s/api/%s/%s/_stream_load";
 
@@ -69,6 +74,9 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
                 Mapping mapping = JSONObject.parseObject(columnMaps.getString(key), Mapping.class);
                 this.mappingMap.put(key, mapping);
             }
+            if (Objects.isNull(BE_IP_PORT)) {
+                BE_IP_PORT = dorisBEConfig();
+            }
         }
     }
 
@@ -87,7 +95,7 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
     }
 
 
-/*    private String dorisBEConfig() {
+    private String dorisBEConfig() {
         List<String> backendsList = Lists.newArrayList();
         DruidJdbcUtils druidJdbcUtils = new DruidJdbcUtils(this.feIp, this.port, this.dorisDb, this.userName, this.password);
         List<Map<String, Object>> backends = druidJdbcUtils.execQuery("SHOW backends;");
@@ -105,22 +113,17 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
         Collections.shuffle(backendsList);
         log.info("Doris backends config :{}", backendsList);
         return backendsList.get(0);
-    }*/
+    }
 
 
     public void sink2(Mapping mapping, String data) {
-        String ipPort = this.feIp + ":8030";
-        String httpUrl = String.format(STREAM_LOAD_URL, ipPort, this.dorisDb, mapping.getSinkTable());
+        String httpUrl = String.format(STREAM_LOAD_URL, BE_IP_PORT, this.dorisDb, mapping.getSinkTable());
         String loadLabel = "lacus-" + mapping.getSinkTable() + "-" + new Date().getTime() + "-" + UUID.randomUUID().toString().replaceAll("-", "");
         List<Header> headers = buildLoadHeader(mapping);
         headers.add(new BasicHeader("label", loadLabel));
-        System.out.println("---------------------------");
-        System.out.println(httpUrl);
         String result = HttpClientUtils.put(httpUrl, data, headers);
-        System.out.println(result);
-        System.out.println("---------------------------");
+        log.info("result：{}", result);
     }
-
 
     private List<Header> buildLoadHeader(Mapping mapping) {
         List<Header> headers = Lists.newArrayList();
@@ -178,7 +181,6 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
 
         log.info("AuditLoader plugin load with label: {}, response code: {}, msg: {}, content: {}", loadLabel, returnStatus, returnMsg, response.toString());
         new SinkResponse(returnStatus, returnMsg, response.toString(), loadLabel);
-        System.out.println(response.toString());
     }
 
 

@@ -57,15 +57,14 @@ public class Constant {
 
     public static final String SINK_ENGINE_CONF = "engine";
 
-    public static final String SINK_DORIS_FORMAT = "json";
+    public static final String SINK_DORIS_FORMAT = "format";
 
     public static final String SINK_DORIS_COLUMNS = "columns";
 
     public static final String SINK_DORIS_JSON_PATHS = "jsonpaths";
 
-    public static final String MAX_FILTER_RATIO = "1.0";
+    public static final String MAX_FILTER_RATIO = "max_filter_ratio";
 
-    public static final String STRIP_OUTER_ARRAY = "true";
-
+    public static final String STRIP_OUTER_ARRAY = "strip_outer_array";
 
 }
