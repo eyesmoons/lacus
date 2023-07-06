@@ -104,7 +104,6 @@ public class JobManagerService {
             model.setCatalogName(finalCatalogEntityMap.get(entity.getCatalogId()));
             model.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             model.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
-            model.setSyncTypeName(SyncTypeEnum.getByCode(entity.getSyncType()));
             DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
             DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 2);
             if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
@@ -726,6 +725,10 @@ public class JobManagerService {
         for (DataSyncJobEntity entity : jobList) {
             entity.setSourceDatasourceName(metaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             entity.setSinkDatasourceName(metaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
+            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
+            if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
+                entity.setSyncType(lastSourceInstance.getSyncType());
+            }
             jobTreeDTOList.add(new JobTreeDTO(entity));
         }
         result.addAll(jobTreeDTOList);

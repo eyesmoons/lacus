@@ -10,6 +10,7 @@ import com.lacus.common.utils.yarn.FlinkJobDetail;
 import com.lacus.common.utils.yarn.FlinkParams;
 import com.lacus.common.utils.yarn.YarnUtil;
 import com.lacus.dao.datasync.entity.*;
+import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.domain.datasync.job.dto.SourceConf;
 import com.lacus.domain.datasync.job.model.FlinkJobSource;
@@ -247,5 +248,95 @@ public class JobOperationService {
             }
         }
         return sourceConfList;
+    }
+
+    public void stopJob(String catalogId) {
+        // 停止 flink source job
+        doStop(catalogId, 1);
+        // 停止 flink sink job
+        doStop(catalogId, 2);
+    }
+
+    /**
+     * 停止 flink 任务
+     * @param catalogId 任务分组ID
+     * @param type 任务类型：1 source 2 sink
+     */
+    private void doStop(String catalogId, Integer type) {
+        DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(catalogId, type);
+        if (ObjectUtils.isNotEmpty(lastInstance)) {
+            // 状态为失败，直接停止
+            if (Objects.equals(FlinkStatusEnum.FAILED.getName(), lastInstance.getStatus())) {
+                doStopWithoutSavePoint(lastInstance);
+            } else {
+                doStopWithSavePoint(lastInstance);
+            }
+        }
+    }
+
+    /**
+     * 正常停止任务，并保存save point
+     * @param instance 任务实例
+     */
+    private void doStopWithSavePoint(DataSyncJobInstanceEntity instance) {
+        String applicationId = instance.getApplicationId();
+        String flinkJobId = monitorService.getFlinkJobId(applicationId);
+        String savePoint = null;
+        for (int i = 0; i < 3; i++) {
+            try {
+                savePoint = YarnUtil.stopYarnJob(applicationId, flinkJobId, flinkConfPath);
+                log.info("savePoint：{}", savePoint);
+                if (ObjectUtils.isNotEmpty(savePoint)) {
+                    // 保存 savePoint
+                    instance.setSavepoint(savePoint);
+                    instance.updateById();
+                    break;
+                }
+            } catch (Exception e) {
+                log.error("savePoint获取失败，重试第[{}]次", i+1, e);
+            }
+        }
+        if (ObjectUtils.isEmpty(savePoint)) {
+            try {
+                log.info("savePoint获取失败，cancel任务：{}", applicationId);
+                YarnUtil.cancelYarnJob(applicationId, flinkJobId, flinkConfPath);
+                // 设置 savePoint 为 null
+                instance.setSavepoint(null);
+                instance.updateById();
+            } catch (Exception e) {
+                log.error("cancel任务失败：{}", applicationId, e);
+                throw new ApiException(ErrorCode.FAIL, "flink 任务停止失败");
+            }
+        }
+    }
+
+    /**
+     * 停止任务
+     * @param instance 任务实例
+     */
+    private void doStopWithoutSavePoint(DataSyncJobInstanceEntity instance) {
+        DataSyncJobCatalogEntity catalogEntity = catalogService.getById(instance.getCatalogId());
+        if (Objects.isNull(catalogEntity)) {
+            throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "任务分组不存在");
+        }
+        if (!FlinkStatusEnum.couldStop(instance.getStatus())) {
+            log.warn("当前状态无法停止：{}", instance.getStatus());
+            instance.setStatus(FlinkStatusEnum.STOP.getStatus());
+            instance.updateById();
+        } else {
+            String applicationId = instance.getApplicationId();
+            String flinkJobId = monitorService.getFlinkJobId(applicationId);
+            try {
+                // 停止 flink 任务
+                YarnUtil.cancelYarnJob(applicationId, flinkJobId, flinkConfPath);
+                // 修改任务状态
+                instance.setStatus(FlinkStatusEnum.STOP.getStatus());
+                instance.setFinishedTime(new Date());
+                instance.updateById();
+            } catch (Exception e) {
+                log.error("flink 任务停止失败：", e);
+                throw new ApiException(ErrorCode.Internal.UNKNOWN_ERROR, "flink 任务停止失败");
+            }
+        }
     }
 }
