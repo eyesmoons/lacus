@@ -60,11 +60,11 @@ spring:
         # 地址
         host: localhost
         # 端口，默认为6379
-        port: 16379
+        port: 36379
         # 数据库索引
         database: 13
         # 密码
-        password: redis_test
+        password:
         # 连接超时时间
         timeout: 10s
         lettuce:
