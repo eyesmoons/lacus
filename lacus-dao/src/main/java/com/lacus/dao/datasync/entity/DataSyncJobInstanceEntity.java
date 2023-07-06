@@ -49,7 +49,7 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
     private Date finishedTime;
 
     @ApiModelProperty("savepoint地址")
-    @TableField("savepoint")
+    @TableField("save_point")
     private String savepoint;
 
     @ApiModelProperty("任务状态 1 RUNNING, 2 KILL, 3 FAILED")

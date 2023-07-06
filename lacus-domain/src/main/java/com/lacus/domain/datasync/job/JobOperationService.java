@@ -287,7 +287,7 @@ public class JobOperationService {
                 savePoint = YarnUtil.stopYarnJob(applicationId, flinkJobId, flinkConfPath);
                 log.info("savePoint：{}", savePoint);
                 if (ObjectUtils.isNotEmpty(savePoint)) {
-                    // 保存 savePoint
+                    instance.setStatus(FlinkStatusEnum.STOP.getStatus());
                     instance.setSavepoint(savePoint);
                     instance.updateById();
                     break;
@@ -300,12 +300,14 @@ public class JobOperationService {
             try {
                 log.info("savePoint获取失败，cancel任务：{}", applicationId);
                 YarnUtil.cancelYarnJob(applicationId, flinkJobId, flinkConfPath);
-                // 设置 savePoint 为 null
+                instance.setStatus(FlinkStatusEnum.STOP.getStatus());
                 instance.setSavepoint(null);
                 instance.updateById();
             } catch (Exception e) {
                 log.error("cancel任务失败：{}", applicationId, e);
-                throw new ApiException(ErrorCode.FAIL, "flink 任务停止失败");
+                instance.setStatus(FlinkStatusEnum.STOP.getStatus());
+                instance.setSavepoint(null);
+                instance.updateById();
             }
         }
     }
