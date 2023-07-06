@@ -29,7 +29,7 @@ public class JobTreeDTO {
     private String jobId;
     private String catalogId;
     private String jobName;
-    private Integer syncType;
+    private String syncType;
     private String appContainer;
     private String remark;
     private String sourceDatasourceName;

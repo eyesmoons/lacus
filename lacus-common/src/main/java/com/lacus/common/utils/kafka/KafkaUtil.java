@@ -94,7 +94,7 @@ public class KafkaUtil {
         Properties props =  new Properties();
         props.put("bootstrap.servers",bootstrapServers);
         KafkaAdminClient kafkaAdminClient = (KafkaAdminClient) AdminClient.create(props);
-        DeleteConsumerGroupsResult result = kafkaAdminClient.deleteConsumerGroups(Lists.newArrayList(groupId));
+       kafkaAdminClient.deleteConsumerGroups(Lists.newArrayList(groupId));
     }
 
     public static void main(String[] args) {

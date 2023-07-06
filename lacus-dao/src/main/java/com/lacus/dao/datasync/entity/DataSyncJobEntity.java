@@ -40,8 +40,8 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     private String appContainer;
 
     @ApiModelProperty("同步方式：1 初始快照，2 最早，3 最近，4 指定时间戳")
-    @TableField("sync_type")
-    private Integer syncType;
+    @TableField(exist = false)
+    private String syncType;
 
     @ApiModelProperty("任务描述")
     @TableField("remark")
