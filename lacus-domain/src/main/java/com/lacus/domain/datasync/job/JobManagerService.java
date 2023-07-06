@@ -701,6 +701,9 @@ public class JobManagerService {
                 if (ObjectUtils.isNotEmpty(lastSinkInstance)) {
                     catalogDTO.setSinkStatus(lastSinkInstance.getStatus());
                 }
+                if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
+                    catalogDTO.setSyncType(lastSourceInstance.getSyncType());
+                }
                 result.add(catalogDTO);
             }
         }
@@ -725,10 +728,6 @@ public class JobManagerService {
         for (DataSyncJobEntity entity : jobList) {
             entity.setSourceDatasourceName(metaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             entity.setSinkDatasourceName(metaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
-            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
-            if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
-                entity.setSyncType(lastSourceInstance.getSyncType());
-            }
             jobTreeDTOList.add(new JobTreeDTO(entity));
         }
         result.addAll(jobTreeDTOList);
