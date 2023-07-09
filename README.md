@@ -5,20 +5,49 @@
    <img src="https://img.shields.io/badge/Spring%20Boot-2.7.1-blue.svg" alt="Downloads">
  </p>
 <h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Lacus v1.0.0</h1>
-<h4 align="center">基于 SpringBoot + Vue3 前后端分离的开源大数据平台项目</h4>
+<h4 align="center">基于 SpringBoot + Vue3前后端分离的开源大数据平台项目</h4>
 <p align="center">
 </p>
 
 ## 平台简介
 
-Lacus是一个开源大数据平台项目，致力于让数据同步变得更简单、好用。
-
-* 前端采用Vue3、Element UI。对应前端仓库 [lacus-ui](https://github.com/eyesmoons/lacus-ui)
-* 后端采用Spring Boot、redis、Mybatis Plus、MySql、kafka、flink、flinkCDC、yarn、hadoop。
-
+- Lacus是一个开源大数据平台项目，致力于让数据同步变得更简单、好用。基础框架使用的是若依，感谢若依及其他开源作者。
+- 如果你厌烦了每天大量的数据接入工作，不想把大把的时间放在数据接入中，那么这个项目很可能值得你去花点时间研究一下。
+- 借用一位前辈的话：<h3>`一个人走得很快，但一群人会走的更远` </h3>如果你热爱开源，喜欢折腾，不想把业余时间浪费在刷抖音或者其他无用事情上，并且对大数据感兴趣，欢迎加入这个项目，或者联系作者加入相关讨论群，交流大数据架构及开发技术。
 ## 如何使用
-
-### 一、开发环境
+### 一、系统截图
+- 登录界面，若依系统内置菜单
+![img.png](images/login.png)
+- 系统管理，若依系统内置菜单
+![img.png](images/system-setting.png)
+- 系统监控，若依系统内置菜单
+![img.png](images/system-monitor.png)
+- 系统接口
+![img.png](images/api.png)
+- 元数据管理-数据源管理列表
+![img.png](images/datasource.png)
+- 元数据管理-新增数据源
+![img.png](images/datasource_add.png)
+- 元数据管理-数据表查询列表
+![img.png](images/table-query.png)
+- 元数据管理-数据表详情
+![img.png](images/table-detail.png)
+- 数据同步-任务分组管理列表
+![img.png](images/job-catalog.png)
+- 数据同步-任务管理列表
+![img.png](images/job-list.png)
+- 数据同步-接入任务启动
+![img.png](images/job-start.png)
+- 数据同步-输入源配置
+![img.png](images/job-source-conf.png)
+- 数据同步-表映射关系配置
+![img.png](images/job-mappings.png)
+- 数据同步-字段映射关系配置
+![img.png](images/job-mapping-columns.png)
+- 数据同步-任务参数配置
+![img.png](images/job-params.png)
+- 
+### 二、开发环境
 
 - JDK
 - Mysql
@@ -29,7 +58,7 @@ Lacus是一个开源大数据平台项目，致力于让数据同步变得更简
 - yarn
 - hadoop
 
-### 二、技术栈
+### 三、技术栈
 
 | 技术                | 说明                  | 版本     |
 |-------------------|---------------------|--------|
@@ -42,7 +71,7 @@ Lacus是一个开源大数据平台项目，致力于让数据同步变得更简
 | `yarn`            | 资源调度框架              | 1.13.5 |
 | `hadoop`          | 主要提供hdfs存储          | 1.13.5 |
 
-### 三、启动说明
+### 四、启动说明
 
 #### 1. 前置准备
 
@@ -64,7 +93,7 @@ Lacus是一个开源大数据平台项目，致力于让数据同步变得更简
 **如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.13.5 所有资源及配置文件放到了我的百度网盘中了。**
 
 **微信关注"毛毛小妖的笔记"公众号，公众号回复关键字"lacus"，即可获得专属网盘链接和密码。**
-![img.png](images/img.png)
+![img.png](images/flink-hdfs.png)
 #### 3. 后端启动
 ```
 - 生成所需的数据库表
@@ -152,5 +181,4 @@ lacus
   - 填入数据库地址，账号密码，库名。然后填入所需的表名执行代码即可。
 
 欢迎关注以下公众号，留言或公众号回复"交流"加入技术交流群，一起学习。
-
 ![img.png](images/communicate.png)
