@@ -46,7 +46,6 @@
 ![img.png](images/job-mapping-columns.png)
 - 数据同步-任务参数配置
 ![img.png](images/job-params.png)
-- 
 ### 二、开发环境
 
 - JDK
@@ -70,6 +69,7 @@
 | `mysql-flink-cdc` | mysql cdc connector | 1.3.0  |
 | `yarn`            | 资源调度框架              | 1.13.5 |
 | `hadoop`          | 主要提供hdfs存储          | 1.13.5 |
+| `apache doris`    | MPP数据库              | 1.2.5  |
 
 ### 四、启动说明
 
