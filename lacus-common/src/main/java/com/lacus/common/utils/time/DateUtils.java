@@ -648,6 +648,10 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
     static final long C5 = C4 * 60L;
     static final long C6 = C5 * 24L;
 
+    public static String getDatetimeStr(Date date){
+        return DateFormatUtils.format(date,YYYY_MM_DD_HH_MM_SS);
+    }
+
     /**
      * Time unit representing one thousandth of a second
      */

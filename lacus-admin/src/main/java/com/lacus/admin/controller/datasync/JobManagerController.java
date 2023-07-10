@@ -103,4 +103,10 @@ public class JobManagerController {
     public ResponseDTO<?> preCheck(@RequestBody MappedTableColumnQuery query) {
         return ResponseDTO.ok(jobManagerService.preCheck(query));
     }
+
+    @ApiOperation("根据catalogId获取作业运行信息")
+    @GetMapping("/jobDetail")
+    public ResponseDTO<?> jobDetail(@RequestParam(value = "catalogId") String catalogId, @RequestParam("type") Integer type) {
+        return ResponseDTO.ok(jobManagerService.jobDetail(catalogId, type));
+    }
 }

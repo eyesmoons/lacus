@@ -1,13 +1,15 @@
 package com.lacus.domain.datasync.job;
 
-import cn.hutool.core.lang.generator.SnowflakeGenerator;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.CustomException;
 import com.lacus.common.exception.error.ErrorCode;
+import com.lacus.common.utils.time.DateUtils;
+import com.lacus.common.utils.yarn.ApplicationModel;
+import com.lacus.common.utils.yarn.FlinkJobDetail;
 import com.lacus.dao.datasync.entity.*;
-import com.lacus.dao.datasync.enums.SyncTypeEnum;
+import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaColumnEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDbTableEntity;
@@ -25,6 +27,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -71,7 +74,10 @@ public class JobManagerService {
     private IDataSyncJobInstanceService instanceService;
 
     @Autowired
-    private SnowflakeGenerator snowflakeGenerator;
+    private JobMonitorService monitorService;
+
+    @Value("${yarn.restapi-address}")
+    private String flinkRestPrefix;
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public PageDTO pageList(JobPageQuery query) {
@@ -740,5 +746,24 @@ public class JobManagerService {
             throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "记录为空");
         }
         dataSyncJobService.removeById(jobId);
+    }
+
+    public ApplicationModel jobDetail(String catalogId, Integer type) {
+        DataSyncJobInstanceEntity instance = instanceService.getLastInstanceByJobId(catalogId, type);
+        if (ObjectUtils.isEmpty(instance)) {
+            throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "未查询到source任务状态");
+        }
+        ApplicationModel applicationModel = new ApplicationModel();
+        if (FlinkStatusEnum.isRunning(instance.getStatus())) {
+            FlinkJobDetail jobDetail = monitorService.flinkJobDetail(instance.getApplicationId());
+            applicationModel = monitorService.yarnJobDetail(instance.getApplicationId());
+            applicationModel.setDuration(DateUtils.convertNumber2DateString(jobDetail.getDuration()));
+        } else {
+            applicationModel.setApplicationId(instance.getApplicationId());
+            applicationModel.setStartTime(DateUtils.getDatetimeStr(instance.getSubmitTime()));
+            applicationModel.setTrackingUrl(flinkRestPrefix + instance.getApplicationId());
+        }
+        applicationModel.setFlinkStatus(FlinkStatusEnum.getName(instance.getStatus()));
+        return applicationModel;
     }
 }
