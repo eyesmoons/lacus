@@ -1,3 +1,19 @@
+/*
+ Navicat Premium Data Transfer
+
+ Source Server         : localhost
+ Source Server Type    : MySQL
+ Source Server Version : 80030 (8.0.30)
+ Source Host           : localhost:3306
+ Source Schema         : lacus
+
+ Target Server Type    : MySQL
+ Target Server Version : 80030 (8.0.30)
+ File Encoding         : 65001
+
+ Date: 17/07/2023 13:21:09
+*/
+
 SET NAMES utf8mb4;
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -28,7 +44,6 @@ CREATE TABLE `data_sync_job` (
   `catalog_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分组ID',
   `source_datasource_id` bigint NOT NULL COMMENT '输入源ID',
   `sink_datasource_id` bigint NOT NULL COMMENT '输出源ID',
-  `sync_type` tinyint NOT NULL DEFAULT '1' COMMENT '同步方式：1 初始快照，2 最早，3 最近，4 指定时间戳',
   `app_container` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT 'yarn' COMMENT '调度容器',
   `window_size` int NOT NULL COMMENT '窗口大小(秒)',
   `max_size` int NOT NULL COMMENT '最大数据量(MB)',
@@ -41,6 +56,7 @@ CREATE TABLE `data_sync_job` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='数据同步任务主表';
+
 
 -- ----------------------------
 -- Table structure for data_sync_job_catalog
@@ -67,22 +83,22 @@ CREATE TABLE `data_sync_job_catalog` (
 DROP TABLE IF EXISTS `data_sync_job_instance`;
 CREATE TABLE `data_sync_job_instance` (
   `instance_id` bigint NOT NULL AUTO_INCREMENT COMMENT '自增主键',
-  `catalog_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '任务分组ID',
-  `application_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'flink任务ID',
-  `flink_job_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL COMMENT 'flink任务ID',
+  `catalog_id` varchar(64) NOT NULL COMMENT '任务分组ID',
+  `application_id` varchar(100) DEFAULT NULL COMMENT 'flink任务ID',
+  `flink_job_id` varchar(100) DEFAULT NULL COMMENT 'flink任务ID',
   `type` tinyint NOT NULL DEFAULT '1' COMMENT '类型 1 source 2 sink',
-  `sync_type` tinyint NOT NULL COMMENT '启动方式',
+  `sync_type` varchar(10) NOT NULL COMMENT '启动方式',
   `submit_time` datetime DEFAULT NULL COMMENT '任务提交时间',
   `finished_time` datetime DEFAULT NULL COMMENT '任务结束时间',
-  `savepoint` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT 'savepoint地址',
-  `status` tinyint NOT NULL DEFAULT '1' COMMENT '任务状态 1 RUNNING, 2 KILL, 3 FAILED',
+  `save_point` varchar(200) DEFAULT NULL COMMENT 'savepoint地址',
+  `status` varchar(10) NOT NULL DEFAULT '1' COMMENT '任务状态 RUNNING, KILL, FAILED',
   `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
-  `creator_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '创建人',
+  `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
   `create_time` datetime NOT NULL COMMENT '创建时间',
-  `updater_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT NULL COMMENT '修改人',
+  `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-  PRIMARY KEY (`instance_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='数据同步实例';
+  PRIMARY KEY (`instance_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci ROW_FORMAT=DYNAMIC COMMENT='数据同步实例';
 
 
 -- ----------------------------
@@ -102,6 +118,7 @@ CREATE TABLE `data_sync_sink_column` (
   PRIMARY KEY (`sink_column_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='输出源字段信息';
 
+
 -- ----------------------------
 -- Table structure for data_sync_sink_table
 -- ----------------------------
@@ -118,6 +135,7 @@ CREATE TABLE `data_sync_sink_table` (
   `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
   PRIMARY KEY (`sink_table_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='输出源表信息';
+
 
 -- ----------------------------
 -- Table structure for data_sync_source_column
@@ -349,7 +367,7 @@ CREATE TABLE `sys_login_info` (
   `login_time` datetime DEFAULT NULL COMMENT '访问时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`info_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=555 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='系统访问记录';
 
 -- ----------------------------
 -- Table structure for sys_menu
@@ -377,7 +395,7 @@ CREATE TABLE `sys_menu` (
   `remark` varchar(512) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci DEFAULT '' COMMENT '备注',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`menu_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=2015 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
+) ENGINE=InnoDB AUTO_INCREMENT=2017 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='菜单权限表';
 
 -- ----------------------------
 -- Records of sys_menu
@@ -452,6 +470,8 @@ INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2012, '数据同步', 0, 4, 'datasync', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'example', 1, '2023-05-10 17:36:09', 1, '2023-05-10 17:37:40', '', 0);
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2013, '分组管理', 2012, 1, 'catalog', 'datasync/catalog/index', NULL, 0, 0, 2, 1, 1, 'datasync:catalog:list', 'tool', 1, '2023-05-10 17:43:08', 1, '2023-05-14 18:58:19', '', 0);
 INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2014, '任务管理', 2012, 2, 'job', 'datasync/job/index', NULL, 0, 0, 2, 1, 1, 'datasync:job:list', 'select', 1, '2023-05-11 18:14:36', 1, '2023-05-14 18:58:28', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2015, '系统工具', 0, 1, 'tool', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'tool', 1, '2023-07-06 16:27:09', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2016, '系统接口', 2015, 1, 'swagger', 'tool/swagger/index', NULL, 0, 1, 2, 1, 1, 'tool:swagger:list', 'swagger', 1, '2023-07-06 16:28:21', NULL, NULL, '', 0);
 COMMIT;
 
 -- ----------------------------
@@ -506,7 +526,7 @@ CREATE TABLE `sys_operation_log` (
   `operation_time` datetime NOT NULL COMMENT '操作时间',
   `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '逻辑删除',
   PRIMARY KEY (`operation_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=703 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='操作日志记录';
 
 -- ----------------------------
 -- Table structure for sys_post
@@ -668,39 +688,9 @@ CREATE TABLE `sys_user` (
 -- Records of sys_user
 -- ----------------------------
 BEGIN;
-INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, `nick_name`, `user_type`, `email`, `phone_number`, `sex`, `avatar`, `password`, `status`, `login_ip`, `login_date`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (1, 1, 1, 4, 'admin', 'valarchie1', 0, 'pandora@163.com', '15888888889', 0, '', '$2a$10$rb1wRoEIkLbIknREEN1LH.FGs4g0oOS5t6l5LQ793nRaFO.SPHDHy', 1, '0:0:0:0:0:0:0:1', '2023-06-16 15:56:09', NULL, '2022-05-21 08:30:54', 1, '2023-06-16 15:56:09', '管理员', 0);
+INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, `nick_name`, `user_type`, `email`, `phone_number`, `sex`, `avatar`, `password`, `status`, `login_ip`, `login_date`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (1, 1, 1, 4, 'admin', 'valarchie1', 0, 'pandora@163.com', '15888888889', 0, '', '$2a$10$rb1wRoEIkLbIknREEN1LH.FGs4g0oOS5t6l5LQ793nRaFO.SPHDHy', 1, '0:0:0:0:0:0:0:1', '2023-07-14 20:17:53', NULL, '2022-05-21 08:30:54', 1, '2023-07-14 20:17:53', '管理员', 0);
 INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, `nick_name`, `user_type`, `email`, `phone_number`, `sex`, `avatar`, `password`, `status`, `login_ip`, `login_date`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2, 2, 2, 5, 'ag1', 'valarchie2', 0, 'pandora@qq.com', '15666666666', 1, '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 1, '127.0.0.1', '2022-05-21 08:30:54', NULL, '2022-05-21 08:30:54', NULL, NULL, '测试员1', 1);
 INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, `nick_name`, `user_type`, `email`, `phone_number`, `sex`, `avatar`, `password`, `status`, `login_ip`, `login_date`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (3, 2, 0, 5, 'ag2', 'valarchie3', 0, 'pandora@qq.com', '15666666667', 1, '', '$2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2', 1, '127.0.0.1', '2022-05-21 08:30:54', NULL, '2022-05-21 08:30:54', NULL, NULL, '测试员2', 1);
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
-
-
-
--- ----------------------------
--- Table structure for api_server
--- ----------------------------
-DROP TABLE IF EXISTS `dataserver_api_info`;
-CREATE TABLE `dataserver_api_info` (
-    `api_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '主键id',
-    `api_name` varchar(64) NOT NULL COMMENT '接口名称',
-    `driver_type` varchar(20) DEFAULT NULL COMMENT '接口驱动类型:Mysql,Doris,oracle...',
-    `datasource_id` bigint(20) DEFAULT NULL COMMENT '字段名称',
-    `api_url` varchar(100) DEFAULT NULL COMMENT '接口Url',
-    `api_desc` varchar(256) DEFAULT NULL COMMENT '接口描述',
-    `request_method` varchar(10) DEFAULT NULL COMMENT '接口请求方式',
-    `project_team` varchar(20) DEFAULT NULL COMMENT '接口所属项目组,默认为admin项目组',
-    `query_timeout` int(2) DEFAULT '5' COMMENT '接口超时时间，默认60s超时',
-    `current_limit` tinyint(1) DEFAULT '0' COMMENT '是否开启限流，不开启0,开启1,默认为0',
-    `api_status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '接口状态,下线为0,上线为1，默认为0',
-    `max_return_rows` bigint(20) DEFAULT NULL COMMENT '接口最大返回行数',
-    `api_script` text COMMENT '接口脚本',
-    `api_params` varchar(512) DEFAULT NULL COMMENT '接口参数',
-    `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
-    `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
-    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`api_id`),
-    KEY `unique_key_column` (`api_id`,`api_url`)
-) ENGINE=InnoDB AUTO_INCREMENT=0 DEFAULT CHARSET=utf8mb4 COMMENT='数据服务接口详情表'
