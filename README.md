@@ -17,7 +17,7 @@
 ## 如何使用
 ### 一、系统截图
 - 登录界面，若依系统内置菜单
-![img.png](images/login.png)
+![img.png](images/lacus_login.png)
 - 系统管理，若依系统内置菜单
 ![img.png](images/system-setting.png)
 - 系统监控，若依系统内置菜单
