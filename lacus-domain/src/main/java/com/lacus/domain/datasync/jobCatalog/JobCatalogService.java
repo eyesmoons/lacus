@@ -35,7 +35,7 @@ public class JobCatalogService {
         model.updateById();
     }
 
-    public void removeJobCatalog(List<Long> catalogIds) {
+    public void removeJobCatalog(List<String> catalogIds) {
         dataSyncJobCatalogService.removeBatchByIds(catalogIds);
     }
 
