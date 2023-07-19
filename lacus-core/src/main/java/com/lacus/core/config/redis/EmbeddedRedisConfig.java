@@ -20,6 +20,8 @@ public class EmbeddedRedisConfig {
     @PostConstruct
     public void postConstruct() {
         RedisServer redisServer = RedisServer.builder().port(port)
+//          window系统如果报错需要加上 maxheap 参数
+//          .setting("maxheap 32M")
             .setting("daemonize no")
             .setting("appendonly no").build();
         this.redisServer = redisServer;
