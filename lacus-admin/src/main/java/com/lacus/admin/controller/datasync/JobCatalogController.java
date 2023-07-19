@@ -73,7 +73,7 @@ public class JobCatalogController {
     @PreAuthorize("@permission.has('datasync:catalog:remove')")
     @AccessLog(title = "分组管理", businessType = BusinessTypeEnum.DELETE)
     @DeleteMapping("/{catalogIds}")
-    public ResponseDTO<?> remove(@PathVariable @NotNull List<Long> catalogIds) {
+    public ResponseDTO<?> remove(@PathVariable @NotNull List<String> catalogIds) {
         jobCatalogService.removeJobCatalog(catalogIds);
         return ResponseDTO.ok();
     }
