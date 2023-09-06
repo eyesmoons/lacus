@@ -34,7 +34,7 @@
         left join (select * from data_sync_sink_table where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tt on tt.sink_table_id = tc.sink_table_id
         left join (select * from data_sync_table_mapping where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) sm on st.source_table_id = sm.source_table_id
         left join (select * from data_sync_table_mapping where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) tm on tt.sink_table_id = tm.sink_table_id
-        left join (select * from data_sync_job where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) job on cm.job_id = cm.job_id
+        left join (select * from data_sync_job where deleted = 0 <if test="jobId != null and jobId != ''"> and job_id = #{jobId} </if>) job on cm.job_id = job.job_id
         <where>
             <if test="sourceDatasourceId != null and sourceDatasourceId != ''"> and job.source_datasource_id = #{sourceDatasourceId} </if>
             <if test="sourceDbName != null and sourceDbName != ''"> and st.source_db_name = #{sourceDbName} </if>
