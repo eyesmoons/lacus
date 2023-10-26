@@ -20,8 +20,7 @@ public class JobTreeDTO {
             this.remark = entity.getRemark();
             this.sourceDatasourceName = entity.getSourceDatasourceName();
             this.sinkDatasourceName = entity.getSinkDatasourceName();
-            this.sourceStatus = entity.getSourceStatus();
-            this.sinkStatus = entity.getSinkStatus();
+            this.status = entity.getStatus();
             this.createTime = entity.getCreateTime();
         }
     }
@@ -34,7 +33,6 @@ public class JobTreeDTO {
     private String remark;
     private String sourceDatasourceName;
     private String sinkDatasourceName;
-    private String sourceStatus;
-    private String sinkStatus;
+    private String status;
     private Date createTime;
 }

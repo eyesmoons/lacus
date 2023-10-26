@@ -1,8 +1,6 @@
 package com.lacus.test.sink.fink;
 
 
-import com.lacus.job.flink.impl.SinkFlinkJob;
-
 public class FinkSinkTest {
 
 

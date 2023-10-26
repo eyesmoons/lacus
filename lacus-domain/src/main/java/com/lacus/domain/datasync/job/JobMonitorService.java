@@ -76,26 +76,68 @@ public class JobMonitorService {
         return YarnUtil.yarnJobDetail(yarnConf, appId);
     }
 
-    public String getFlinkJobId(String applicationId) {
-        try {
-            String sb = flinkRestPrefix + applicationId + "/jobs/overview";
-            log.info("获取flinkJobId请求地址：{}", sb);
-            JSONObject jsonObject = restUtil.getForJsonObject(sb);
-            log.debug("rest返回信息:{}", JSON.toJSONString(jsonObject));
-            JSONArray jobs = JSON.parseObject(JSON.toJSONString(jsonObject)).getJSONArray("jobs");
-            if (ObjectUtils.isEmpty(jobs)) {
-                log.error("获取Flink JobId 失败");
-            }
-            return jobs.getJSONObject(0).getString("jid");
-        } catch (Exception e) {
-            log.error("获取Flink JobId 失败：{}", e.getMessage());
-            return null;
-        }
-    }
-
     public Object flinkJobOverview(String applicationId) {
         String sb = flinkRestPrefix + applicationId + "/jobs/overview";
         return restUtil.getForObject(sb);
+    }
+
+    public FlinkJobDetail getFlinkJobDetailWithRetry(String applicationId, String flinkJobId) {
+        FlinkJobDetail flinkJobDetail = null;
+        for (int i = 0; i < 5; i++) {
+            flinkJobDetail = getFlinkJobDetail(applicationId, flinkJobId);
+            if (Objects.nonNull(flinkJobDetail)) {
+                break;
+            }
+        }
+        return flinkJobDetail;
+    }
+
+    public String getFlinkJobIdWithRetry(String applicationId) {
+        String flinkJobId = null;
+        for (int i = 0; i < 5; i++) {
+            flinkJobId = getFlinkJobId(applicationId);
+            if (Objects.nonNull(flinkJobId)) {
+                break;
+            }
+        }
+        return flinkJobId;
+    }
+
+    private FlinkJobDetail getFlinkJobDetail(String applicationId, String flinkJobId) {
+        FlinkJobDetail jobDetail;
+        String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId;
+        try {
+            Object result = restUtil.getForObject(sb);
+            while (ObjectUtils.isEmpty(result)) {
+                result = restUtil.getForObject(sb);
+            }
+            jobDetail = JSONObject.parseObject(JSON.toJSONString(result), FlinkJobDetail.class);
+        } catch (Exception e) {
+            log.error("获取flink application信息失败：{}", e.getMessage());
+            return null;
+        }
+        return jobDetail;
+    }
+
+    public String getFlinkJobId(String applicationId) {
+        String flinkJobId;
+        try {
+            String sb = flinkRestPrefix + applicationId + "/jobs/overview";
+            JSONObject result = restUtil.getForJsonObject(sb);
+            log.info("[{}：尝试获取flink job id]，请求地址：{}；返回信息：{}", applicationId, sb, JSON.toJSONString(result));
+            JSONArray jobs = JSON.parseObject(JSON.toJSONString(result)).getJSONArray("jobs");
+            int cnt = 0;
+            while (ObjectUtils.isEmpty(jobs)) {
+                JSONObject result2 = restUtil.getForJsonObject(sb);
+                jobs = JSON.parseObject(JSON.toJSONString(result2)).getJSONArray("jobs");
+                log.info("{}：重试获取flink job id，当前第[{}]次，结果：{}", applicationId, (++cnt), JSON.toJSONString(result2));
+            }
+            flinkJobId = jobs.getJSONObject(0).getString("jid");
+        } catch (Exception e) {
+            log.error("{}：获取flink job id失败：{}", applicationId, e.getMessage());
+            return null;
+        }
+        return flinkJobId;
     }
 
     public FlinkJobDetail flinkJobDetail(String applicationId) {
@@ -256,8 +298,7 @@ public class JobMonitorService {
         return jsonArray;
     }
 
-
-    public Object taskmanagerMemory(String applicationId) {
+    public Object taskManagerMemory(String applicationId) {
         String sb = flinkRestPrefix + applicationId +
                 "/taskmanagers/metrics?get=Status.JVM.Memory.NonHeap.Committed,Status.JVM.Memory.Heap.Used,Status.JVM.Memory.Heap.Committed,Status.JVM.Memory.Direct.MemoryUsed,Status.JVM.Memory.Mapped.MemoryUsed";
         Object rs = restUtil.getForObject(sb);

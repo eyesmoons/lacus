@@ -1,5 +1,6 @@
 package com.lacus.job.flink;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.ReduceFunction;
 import org.apache.flink.api.common.state.ReducingState;
 import org.apache.flink.api.common.state.ReducingStateDescriptor;
@@ -8,36 +9,29 @@ import org.apache.flink.api.common.typeutils.base.LongSerializer;
 import org.apache.flink.streaming.api.windowing.triggers.Trigger;
 import org.apache.flink.streaming.api.windowing.triggers.TriggerResult;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 
+@Slf4j
 public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
+    private static final long serialVersionUID = -378259171742648366L;
+
+    // 批量导入最大字节限制
+    private final Long maxBatchSize;
+    // 批量导入最大条数限制
+    private final Integer maxBatchCount;
 
 
-    private static final Logger log = LoggerFactory.getLogger(TaskTrigger.class);
-
-
-    //批量导入最大字节限制
-    private Integer maxBatchSize;
-
-    //批量导入最大条数限制
-    private Integer maxBatchCount;
-
-
-    private TaskTrigger(Integer maxBatchSize, Integer maxBatchCount) {
+    public TaskTrigger(Long maxBatchSize, Integer maxBatchCount) {
         this.maxBatchSize = maxBatchSize;
         this.maxBatchCount = maxBatchCount;
     }
 
-    //计数器
-    private final ReducingStateDescriptor<Long> counter =
-            new ReducingStateDescriptor<>("batch-counter", new Counter(), LongSerializer.INSTANCE);
+    // 计数器
+    private final ReducingStateDescriptor<Long> counter = new ReducingStateDescriptor<>("batch-counter", new Counter(), LongSerializer.INSTANCE);
 
-    //容量器
-    private final ReducingStateDescriptor<Integer> capacity =
-            new ReducingStateDescriptor<>("batch-size", new Capacity(), IntSerializer.INSTANCE);
+    // 容量器
+    private final ReducingStateDescriptor<Integer> capacity = new ReducingStateDescriptor<>("batch-size", new Capacity(), IntSerializer.INSTANCE);
 
 
     @Override
@@ -46,7 +40,7 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
             return TriggerResult.FIRE_AND_PURGE;
         }
         context.registerProcessingTimeTimer(window.maxTimestamp());
-        //判断counter定时器是否注册
+        // 判断counter定时器是否注册
         ReducingState<Long> counterState = context.getPartitionedState(counter);
         counterState.add(1L);
         if (counterState.get() >= maxBatchCount) {
@@ -90,7 +84,6 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
         ctx.getPartitionedState(capacity).clear();
     }
 
-
     private static class Counter implements ReduceFunction<Long> {
         @Override
         public Long reduce(Long l1, Long l2) throws Exception {
@@ -98,17 +91,10 @@ public class TaskTrigger<T> extends Trigger<T, TimeWindow> {
         }
     }
 
-
     private static class Capacity implements ReduceFunction<Integer> {
         @Override
         public Integer reduce(Integer cap1, Integer cap2) throws Exception {
             return cap1 + cap2;
         }
-    }
-
-
-    public static Trigger build(Integer maxBatchSize, Integer maxBatchCount) {
-        return new TaskTrigger<>(maxBatchSize, maxBatchCount);
-
     }
 }
