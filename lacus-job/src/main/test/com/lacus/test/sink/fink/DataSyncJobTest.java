@@ -1,9 +1,9 @@
 package com.lacus.test.sink.fink;
 
 
-public class FinkSinkTest {
+import com.lacus.job.flink.impl.DataSyncJob;
 
-
+public class DataSyncJobTest {
     static String paramJson = "[\n" +
             "    {\n" +
             "        \"flinkConf\": {\n" +
@@ -51,20 +51,9 @@ public class FinkSinkTest {
             "]";
 
     public static void main(String[] args) {
-
         String[] params = new String[2];
-
         params[0]  = "lacus";
         params[1] = paramJson;
-
-
-
-
-
-        SinkFlinkJob sinkFlinkJob = new SinkFlinkJob(params);
-        sinkFlinkJob.run();
-
+        new DataSyncJob(params).run();
     }
-
-
 }
