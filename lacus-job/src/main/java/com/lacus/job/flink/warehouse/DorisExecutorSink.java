@@ -1,12 +1,14 @@
 package com.lacus.job.flink.warehouse;
 
 
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import com.alibaba.fastjson2.annotation.JSONField;
 import com.lacus.job.constants.Constant;
 import com.lacus.job.constants.SinkResponseEnums;
 import com.lacus.job.exception.SinkException;
+import com.lacus.job.model.FlinkTaskEngine;
 import com.lacus.job.utils.DruidJdbcUtils;
 import com.lacus.job.utils.HttpClientUtils;
 import com.lacus.job.utils.StringUtils;
@@ -19,7 +21,8 @@ import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.io.*;
+
+import java.io.Serializable;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -37,15 +40,15 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
     private Integer port;
     private final Map<String, Mapping> mappingMap = new HashMap<>();
 
-    private String dorisConfig;
+    private FlinkTaskEngine engine;
 
     private String BE_IP_PORT = null;
 
     private String STREAM_LOAD_URL = "http://%s/api/%s/%s/_stream_load";
 
 
-    public DorisExecutorSink(String dorisConfig) {
-        this.dorisConfig = dorisConfig;
+    public DorisExecutorSink(FlinkTaskEngine engine) {
+        this.engine = engine;
         init();
     }
 
@@ -57,17 +60,16 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
 
     @Override
     public void init() {
-        if (StringUtils.checkValNotNull(dorisConfig)) {
-            JSONObject config = JSONObject.parseObject(dorisConfig);
-            this.feIp = config.getString("ip");
-            this.port = config.getInteger("port");
-            this.dorisDb = config.getString("dbName");
-            this.userName = config.getString("userName");
-            this.password = config.getString("password");
-            JSONObject columnMaps = config.getJSONObject("columnMap");
-            Set<String> keySet = columnMaps.keySet();
+        if (StringUtils.checkValNotNull(engine)) {
+            this.feIp = engine.getIp();
+            this.port = engine.getPort();
+            this.dorisDb = engine.getDbName();
+            this.userName = engine.getUserName();
+            this.password = engine.getPassword();
+            Map<String, JSONObject> columnMap = engine.getColumnMap();
+            Set<String> keySet = columnMap.keySet();
             for (String key : keySet) {
-                Mapping mapping = JSONObject.parseObject(columnMaps.getString(key), Mapping.class);
+                Mapping mapping = JSONObject.parseObject(JSON.toJSONString(columnMap.get(key)), Mapping.class);
                 buildJsonPath(mapping);
                 this.mappingMap.put(key, mapping);
             }

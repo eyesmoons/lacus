@@ -5,10 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SourceConf {
-    private String jobName;
-    private String bootStrapServer;
-    private String topic;
+public class FlinkJobSource {
     private String hostname;
     private Integer port;
     private String username;

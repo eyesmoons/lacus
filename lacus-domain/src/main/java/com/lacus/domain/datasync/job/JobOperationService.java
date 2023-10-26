@@ -12,9 +12,8 @@ import com.lacus.common.utils.yarn.YarnUtil;
 import com.lacus.dao.datasync.entity.*;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.domain.datasync.job.dto.SourceConf;
 import com.lacus.domain.datasync.job.model.FlinkJobSource;
-import com.lacus.domain.datasync.job.model.FlinkSinkJobConf;
+import com.lacus.domain.datasync.job.model.DataSyncJobConf;
 import com.lacus.domain.datasync.job.model.FlinkTaskEngine;
 import com.lacus.domain.datasync.job.model.FlinkTaskSink;
 import com.lacus.service.datasync.*;
@@ -59,12 +58,7 @@ public class JobOperationService {
     @Autowired
     private JobMonitorService monitorService;
 
-    private static final String sourceJobMainClass = "com.lacus.job.flink.impl.SourceFlinkJob";
-
-    private static final String sinkJobMainClass = "com.lacus.job.flink.impl.SinkFlinkJob";
-
-    @Value("${kafka.bootstrapServers}")
-    private String bootstrapServers;
+    private static final String JOB_MAIN_CLASS = "com.lacus.job.flink.impl.DataSyncJob";
 
     @Value("${flink.jar-name}")
     private String flinkJobJarName;
@@ -98,37 +92,26 @@ public class JobOperationService {
         flinkParams.setJobName(catalogName);
 
         List<DataSyncJobEntity> jobs = jobService.listByCatalogId(catalogId);
-        // 构建Source任务json
-        List<SourceConf> sourceJobConf = buildSourceJobConf(jobs, syncType, timeStamp);
-        // 构建sink任务json
-        List<FlinkSinkJobConf> sinkJobConf = buildSinkJobConf(jobs);
-        log.info("sourceJobConf：{}", JSON.toJSONString(sourceJobConf));
-        log.info("sinkJobConf：{}", JSON.toJSONString(sinkJobConf));
+        // 构建任务json
+        List<DataSyncJobConf> jobConf = buildJobConf(jobs, syncType, timeStamp);
+        log.info("jobConf：{}", JSON.toJSONString(jobConf));
         String flinkJobPath = getJobJarPath(flinkJobJarName);
         try {
-            String sourceJobName = "source_task_" + catalogName;
-            String sinkJobName = "sink_task_" + catalogName;
-            String sourceAppId = YarnUtil.deployOnYarn(sourceJobMainClass, new String[]{sourceJobName, JSON.toJSONString(sourceJobConf)}, sourceJobName, flinkParams, flinkJobPath, flinkConfPath, "");
-            Thread.sleep(1000);
+            String sourceAppId = YarnUtil.deployOnYarn(JOB_MAIN_CLASS, new String[]{catalogName, JSON.toJSONString(jobConf)}, catalogName, flinkParams, flinkJobPath, flinkConfPath, "");
             if (Objects.nonNull(sourceAppId)) {
-                createInstance(catalogId, 1, sourceAppId, syncType);
-                String sinkAppId = YarnUtil.deployOnYarn(sinkJobMainClass, new String[]{sinkJobName, JSON.toJSONString(sinkJobConf)}, sinkJobName, flinkParams, flinkJobPath, flinkConfPath, "");
-                Thread.sleep(1000);
-                if (Objects.nonNull(sinkAppId)) {
-                    createInstance(catalogId, 2, sinkAppId, syncType);
-                }
+                createInstance(catalogId, sourceAppId, syncType);
             }
         } catch (Exception e) {
             log.error("任务提交失败", e);
         }
     }
 
-    private void createInstance(String catalogId, Integer type, String applicationId, String syncType) {
+    private void createInstance(String catalogId, String applicationId, String syncType) {
         try {
             FlinkJobDetail flinkJobDetail = monitorService.flinkJobDetail(applicationId);
-            instanceService.saveInstance(catalogId, type, syncType, applicationId, flinkJobDetail);
+            instanceService.saveInstance(catalogId, syncType, applicationId, flinkJobDetail);
         } catch (Exception e) {
-            instanceService.failInstance(catalogId, type, syncType, applicationId);
+            instanceService.failInstance(catalogId, syncType, applicationId);
         }
     }
 
@@ -141,13 +124,32 @@ public class JobOperationService {
         return hdfsJarPath;
     }
 
-    private List<FlinkSinkJobConf> buildSinkJobConf(List<DataSyncJobEntity> jobs) {
-        List<FlinkSinkJobConf> sinkJobConfList = new ArrayList<>();
+    private List<DataSyncJobConf> buildJobConf(List<DataSyncJobEntity> jobs, String syncType, String timeStamp) {
+        List<DataSyncJobConf> sinkJobConfList = new ArrayList<>();
+        List<String> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
         for (DataSyncJobEntity job : jobs) {
             FlinkJobSource source = new FlinkJobSource();
-            source.setBootstrapServers(bootstrapServers);
-            source.setGroupId("data_sync_group_" + job.getJobId());
-            source.setTopics(Collections.singletonList("data_sync_topic_" + job.getJobId()));
+            List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobIds(jobIds);
+            Map<String, List<DataSyncSourceTableEntity>> sourceTablesMap = new HashMap<>();
+            if (ObjectUtils.isNotEmpty(sourceTables)) {
+                sourceTablesMap = sourceTables.stream().collect(Collectors.groupingBy(DataSyncSourceTableEntity::getJobId));
+            }
+            List<DataSyncSourceTableEntity> sourceTableEntities = sourceTablesMap.get(job.getJobId());
+            String sourceDbName = sourceTableEntities.get(0).getSourceDbName();
+            List<String> sourceTableNames = sourceTableEntities.stream().map(DataSyncSourceTableEntity::getSourceTableName).collect(Collectors.toList());
+            MetaDatasourceEntity metaDatasource = dataSourceService.getById(job.getSourceDatasourceId());
+            if (ObjectUtils.isNotEmpty(metaDatasource)) {
+                source.setHostname(metaDatasource.getIp());
+                source.setPort(metaDatasource.getPort());
+                source.setUsername(metaDatasource.getUsername());
+                source.setPassword(metaDatasource.getPassword());
+                source.setDatabaseList(Collections.singletonList(sourceDbName));
+                source.setTableList(sourceTableNames);
+                source.setSyncType(syncType);
+                if (ObjectUtils.isNotEmpty(timeStamp)) {
+                    source.setTimeStamp(Long.valueOf(timeStamp));
+                }
+            }
 
             FlinkTaskSink sink = new FlinkTaskSink();
             MetaDatasourceEntity sourceDatasource = dataSourceService.getById(job.getSourceDatasourceId());
@@ -207,7 +209,7 @@ public class JobOperationService {
             flinkConf.setMaxBatchInterval(job.getWindowSize());
             flinkConf.setMaxBatchSize(job.getMaxSize() * 1024 * 1024);
             flinkConf.setMaxBatchRows(job.getMaxCount() * 10000);
-            FlinkSinkJobConf sinkJobConf = new FlinkSinkJobConf();
+            DataSyncJobConf sinkJobConf = new DataSyncJobConf();
             sinkJobConf.setFlinkConf(flinkConf);
             sinkJobConf.setSource(source);
             sinkJobConf.setSink(sink);
@@ -216,54 +218,18 @@ public class JobOperationService {
         return sinkJobConfList;
     }
 
-    private List<SourceConf> buildSourceJobConf(List<DataSyncJobEntity> jobs, String syncType, String timeStamp) {
-        List<SourceConf> sourceConfList = new ArrayList<>();
-        List<String> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
-        List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobIds(jobIds);
-        Map<String, List<DataSyncSourceTableEntity>> sourceTablesMap = new HashMap<>();
-        if (ObjectUtils.isNotEmpty(sourceTables)) {
-            sourceTablesMap = sourceTables.stream().collect(Collectors.groupingBy(DataSyncSourceTableEntity::getJobId));
-        }
-        for (DataSyncJobEntity job : jobs) {
-            SourceConf sourceConf = new SourceConf();
-            sourceConf.setJobName(job.getJobName());
-            List<DataSyncSourceTableEntity> sourceTableEntities = sourceTablesMap.get(job.getJobId());
-            String sourceDbName = sourceTableEntities.get(0).getSourceDbName();
-            List<String> sourceTableNames = sourceTableEntities.stream().map(DataSyncSourceTableEntity::getSourceTableName).collect(Collectors.toList());
-            MetaDatasourceEntity metaDatasource = dataSourceService.getById(job.getSourceDatasourceId());
-            if (ObjectUtils.isNotEmpty(metaDatasource)) {
-                sourceConf.setBootStrapServer(bootstrapServers);
-                sourceConf.setTopic("data_sync_topic_" + job.getJobId());
-                sourceConf.setHostname(metaDatasource.getIp());
-                sourceConf.setPort(metaDatasource.getPort());
-                sourceConf.setUsername(metaDatasource.getUsername());
-                sourceConf.setPassword(metaDatasource.getPassword());
-                sourceConf.setDatabaseList(Collections.singletonList(sourceDbName));
-                sourceConf.setTableList(sourceTableNames);
-                sourceConf.setSyncType(syncType);
-                if (ObjectUtils.isNotEmpty(timeStamp)) {
-                    sourceConf.setTimeStamp(Long.valueOf(timeStamp));
-                }
-                sourceConfList.add(sourceConf);
-            }
-        }
-        return sourceConfList;
-    }
-
     public void stopJob(String catalogId) {
-        // 停止 flink source job
-        doStop(catalogId, 1);
-        // 停止 flink sink job
-        doStop(catalogId, 2);
+        // 停止 flink job
+        doStop(catalogId);
     }
 
     /**
      * 停止 flink 任务
+     *
      * @param catalogId 任务分组ID
-     * @param type 任务类型：1 source 2 sink
      */
-    private void doStop(String catalogId, Integer type) {
-        DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(catalogId, type);
+    private void doStop(String catalogId) {
+        DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(catalogId);
         if (ObjectUtils.isNotEmpty(lastInstance)) {
             // 状态为失败，直接停止
             if (Objects.equals(FlinkStatusEnum.FAILED.getName(), lastInstance.getStatus())) {
@@ -276,6 +242,7 @@ public class JobOperationService {
 
     /**
      * 正常停止任务，并保存save point
+     *
      * @param instance 任务实例
      */
     private void doStopWithSavePoint(DataSyncJobInstanceEntity instance) {
@@ -293,7 +260,7 @@ public class JobOperationService {
                     break;
                 }
             } catch (Exception e) {
-                log.error("savePoint获取失败，重试第[{}]次", i+1, e);
+                log.error("savePoint获取失败，重试第[{}]次", i + 1, e);
             }
         }
         if (ObjectUtils.isEmpty(savePoint)) {
@@ -314,6 +281,7 @@ public class JobOperationService {
 
     /**
      * 停止任务
+     *
      * @param instance 任务实例
      */
     private void doStopWithoutSavePoint(DataSyncJobInstanceEntity instance) {

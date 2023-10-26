@@ -66,7 +66,5 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     @TableField(exist = false)
     private String sinkDatasourceName;
     @TableField(exist = false)
-    private String sourceStatus;
-    @TableField(exist = false)
-    private String sinkStatus;
+    private String status;
 }

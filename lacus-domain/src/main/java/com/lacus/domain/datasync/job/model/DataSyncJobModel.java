@@ -10,11 +10,11 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class DataSyncJobModel extends DataSyncJobEntity {
+    private static final long serialVersionUID = -9052533747911630039L;
     private String catalogName;
     private String sourceDatasourceName;
     private String sinkDatasourceName;
-    private String sourceStatus;
-    private String sinkStatus;
+    private String status;
 
     public DataSyncJobModel(DataSyncJobEntity entity) {
         BeanUtil.copyProperties(entity, this);

@@ -6,7 +6,12 @@ import java.util.List;
 
 @Data
 public class FlinkJobSource {
-    private String bootstrapServers;
-    private String groupId;
-    private List<String> topics;
+    private String hostname;
+    private Integer port;
+    private String username;
+    private String password;
+    private List<String> databaseList;
+    private List<String> tableList;
+    private String syncType;
+    private Long timeStamp;
 }

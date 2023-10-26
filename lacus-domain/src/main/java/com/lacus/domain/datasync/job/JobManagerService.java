@@ -110,13 +110,9 @@ public class JobManagerService {
             model.setCatalogName(finalCatalogEntityMap.get(entity.getCatalogId()));
             model.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             model.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
-            DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 1);
-            DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId(), 2);
-            if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
-                model.setSourceStatus(lastSourceInstance.getStatus());
-            }
-            if (ObjectUtils.isNotEmpty(lastSinkInstance)) {
-                model.setSinkStatus(lastSinkInstance.getStatus());
+            DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId());
+            if (ObjectUtils.isNotEmpty(lastInstance)) {
+                model.setStatus(lastInstance.getStatus());
             }
             return model;
         }).collect(Collectors.toList());
@@ -699,16 +695,12 @@ public class JobManagerService {
                 catalogDTO.setJobName(catalog.getCatalogName());
                 catalogDTO.setRemark(catalog.getRemark());
                 catalogDTO.setCreateTime(catalog.getCreateTime());
-                DataSyncJobInstanceEntity lastSourceInstance = instanceService.getLastInstanceByJobId(catalog.getCatalogId(), 1);
-                DataSyncJobInstanceEntity lastSinkInstance = instanceService.getLastInstanceByJobId(catalog.getCatalogId(), 2);
-                if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
-                    catalogDTO.setSourceStatus(lastSourceInstance.getStatus());
+                DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(catalog.getCatalogId());
+                if (ObjectUtils.isNotEmpty(lastInstance)) {
+                    catalogDTO.setStatus(lastInstance.getStatus());
                 }
-                if (ObjectUtils.isNotEmpty(lastSinkInstance)) {
-                    catalogDTO.setSinkStatus(lastSinkInstance.getStatus());
-                }
-                if (ObjectUtils.isNotEmpty(lastSourceInstance)) {
-                    catalogDTO.setSyncType(lastSourceInstance.getSyncType());
+                if (ObjectUtils.isNotEmpty(lastInstance)) {
+                    catalogDTO.setSyncType(lastInstance.getSyncType());
                 }
                 result.add(catalogDTO);
             }
@@ -749,7 +741,7 @@ public class JobManagerService {
     }
 
     public ApplicationModel jobDetail(String catalogId, Integer type) {
-        DataSyncJobInstanceEntity instance = instanceService.getLastInstanceByJobId(catalogId, type);
+        DataSyncJobInstanceEntity instance = instanceService.getLastInstanceByJobId(catalogId);
         if (ObjectUtils.isEmpty(instance)) {
             throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "未查询到source任务状态");
         }

@@ -24,6 +24,9 @@ public abstract class BaseFlinkJob extends AbstractJob {
 
         env = StreamExecutionEnvironment.getExecutionEnvironment().setParallelism(1);
 
+        // 设置时间语义为processingTime
+        env.getConfig().setAutoWatermarkInterval(0);
+
         // 每隔60s启动一个检查点
         env.enableCheckpointing(60000, CheckpointingMode.EXACTLY_ONCE);
 

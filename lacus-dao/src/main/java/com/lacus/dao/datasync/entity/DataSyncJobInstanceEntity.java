@@ -32,10 +32,6 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
     @TableField("flink_job_id")
     private String flinkJobId;
 
-    @ApiModelProperty("类型 1 source 2 sink")
-    @TableField("type")
-    private Integer type;
-
     @ApiModelProperty("同步方式")
     @TableField("sync_type")
     private String syncType;
