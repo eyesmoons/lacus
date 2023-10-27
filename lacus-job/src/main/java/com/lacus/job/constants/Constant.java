@@ -1,6 +1,9 @@
 package com.lacus.job.constants;
 
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Constant {
 
 
@@ -67,4 +70,10 @@ public class Constant {
 
     public static final String STRIP_OUTER_ARRAY = "strip_outer_array";
 
+    public static final List<String> OPERATION_TYPES = Arrays.asList("READ", "CREATE", "UPDATE", "DELETE");
+    public final static String OPERATION_DELETE = "DELETE";
+    public final static Integer DELETE_VALUE_NORMAL = 0;
+    public final static Integer DELETE_VALUE_DELETED = 1;
+    public static final String DELETE_KEY = "_is_delete";
+    public static final String UPDATE_STAMP_KEY = "_update_stamp";
 }

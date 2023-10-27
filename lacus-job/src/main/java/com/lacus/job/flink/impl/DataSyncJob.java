@@ -1,35 +1,33 @@
 package com.lacus.job.flink.impl;
 
 import com.alibaba.fastjson2.JSON;
-import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.ververica.cdc.connectors.mysql.MySQLSource;
-import com.alibaba.ververica.cdc.connectors.mysql.table.StartupOptions;
-import com.alibaba.ververica.cdc.debezium.DebeziumSourceFunction;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.lacus.job.constants.Constant;
-import com.lacus.job.enums.OperatorEnums;
 import com.lacus.job.enums.SinkEnums;
 import com.lacus.job.flink.BaseFlinkJob;
 import com.lacus.job.flink.TaskTrigger;
 import com.lacus.job.flink.deserialization.CustomerDeserializationSchemaMysql;
+import com.lacus.job.flink.function.BinlogFilterFunction;
+import com.lacus.job.flink.function.BinlogMapFunction;
+import com.lacus.job.flink.function.BinlogProcessWindowFunction;
+import com.lacus.job.flink.serialization.ConsumerRecordDeserializationSchema;
 import com.lacus.job.flink.warehouse.DorisExecutorSink;
 import com.lacus.job.model.*;
-import com.lacus.job.utils.DateUtils;
-import com.lacus.job.utils.StringUtils;
+import com.ververica.cdc.connectors.mysql.source.MySqlSource;
+import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.flink.api.common.functions.FilterFunction;
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.typeinfo.Types;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.connector.kafka.source.KafkaSource;
+import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
+import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
+import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.functions.windowing.WindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
+import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 
 /**
  * 数据同步任务
@@ -46,15 +44,17 @@ public class DataSyncJob extends BaseFlinkJob {
     public void handle() throws Throwable {
         log.info("jobName：{}", jobName);
         List<DataSyncJobConf> dataSyncJobConfList = JSON.parseArray(jobConf, DataSyncJobConf.class);
-        log.info("dataSyncJobConfList：{}", JSON.toJSONString(dataSyncJobConfList));
+        log.info("任务配置：{}", JSON.toJSONString(dataSyncJobConfList));
         for (DataSyncJobConf dataSyncJobConf : dataSyncJobConfList) {
             FlinkJobSource source = dataSyncJobConf.getSource();
             FlinkConf flinkConf = dataSyncJobConf.getFlinkConf();
             FlinkTaskSink sink = dataSyncJobConf.getSink();
             FlinkTaskEngine engine = sink.getEngine();
             String sinkType = sink.getSinkType();
+            String subJobName = flinkConf.getJobName();
+            String topic = source.getTopic();
             StartupOptions startupOptions = getStartupOptions(source.getSyncType(), source.getTimeStamp());
-            DebeziumSourceFunction<String> mysqlSource = MySQLSource.<String>builder()
+            MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
                     .hostname(source.getHostname())
                     .port(source.getPort())
                     .username(source.getUsername())
@@ -64,42 +64,46 @@ public class DataSyncJob extends BaseFlinkJob {
                     .tableList(source.getTableList().toArray(new String[0]))
                     // 指定数据读取位置：initial，latest-offset，timestamp，specific-offset
                     .startupOptions(startupOptions)
+                    // 设置时间格式
+                    .debeziumProperties(getDebeziumProperties())
+                    // 启用扫描新添加的表功能
+                    .scanNewlyAddedTableEnabled(true)
+                    // 自定义序列化
                     .deserializer(new CustomerDeserializationSchemaMysql())
                     .build();
-            SingleOutputStreamOperator<String> mysqlDS = env.addSource(mysqlSource).name(flinkConf.getJobName());
+            SingleOutputStreamOperator<String> mysqlDS = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), subJobName);
+            // 发往kafka
+            mysqlDS.addSink(kafkaSink(source.getBootStrapServers(), topic)).name("sink_" + subJobName);
 
-            SingleOutputStreamOperator<Tuple2<String, String>> dataTuple2 = mysqlDS
-                    .filter((FilterFunction<String>) StringUtils::checkValNotNull)
-                    .map(new FormatFunction()).returns(Types.TUPLE(Types.STRING, Types.STRING));
-
-            SingleOutputStreamOperator<Map<String, String>> result = dataTuple2.keyBy(kv -> kv.f0).window(TumblingProcessingTimeWindows.of(Time.seconds(flinkConf.getMaxBatchInterval()))).trigger(new TaskTrigger<>(flinkConf.getMaxBatchSize(), flinkConf.getMaxBatchRows())).apply((WindowFunction<Tuple2<String, String>, Map<String, String>, String, TimeWindow>) (k, window, iterable, collector) -> {
-                Map<String, List<String>> tmpMap = Maps.newHashMap();
-                long count = 0L;
-                for (Tuple2<String, String> tuple2 : iterable) {
-                    String key = tuple2.f0;
-                    List<String> dataList = tmpMap.containsKey(key) ? tmpMap.get(key) : Lists.newArrayList();
-                    dataList.add(tuple2.f1);
-                    tmpMap.put(key, dataList);
-                    count++;
-                }
-                log.info("本次处理数据量:{}", count);
-                System.out.println(tmpMap);
-                Map<String, String> dataMap = Maps.newHashMap();
-                tmpMap.forEach((key, value) -> dataMap.put(key, value.toString()));
-                collector.collect(dataMap);
-            });
-
-            //sink data
+            // kafka 到 doris
+            KafkaSource<ConsumerRecord<String, String>> kafkaSource = KafkaSource.<ConsumerRecord<String, String>>builder()
+                    // 设置bootstrapServers
+                    .setBootstrapServers(source.getBootStrapServers())
+                    // 设置topics
+                    .setTopics(Collections.singletonList(topic))
+                    // 设置groupId
+                    .setGroupId(source.getGroupId())
+                    // 设置从最新消息消费
+                    .setStartingOffsets(OffsetsInitializer.latest())
+                    // 自定义反序列化
+                    .setDeserializer(KafkaRecordDeserializationSchema.of(new ConsumerRecordDeserializationSchema()))
+                    .build();
+            DataStreamSource<ConsumerRecord<String, String>> kafkaSourceDs = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), subJobName + "_kafka_source");
+            SingleOutputStreamOperator<ConsumerRecord<String, String>> filterDs = kafkaSourceDs.filter(new BinlogFilterFunction());
+            SingleOutputStreamOperator<Map<String, String>> mapDs = filterDs.map(new BinlogMapFunction());
+            SingleOutputStreamOperator<Map<String, String>> triggerDs = mapDs
+                    .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(flinkConf.getMaxBatchInterval())))
+                    .trigger(new TaskTrigger<>(flinkConf.getMaxBatchSize(), flinkConf.getMaxBatchRows()))
+                    .apply(new BinlogProcessWindowFunction()).name(jobName + "_kafka_trigger");
             SinkEnums sinkEnum = SinkEnums.getSinkEnums(sinkType);
             if (sinkEnum == null) {
                 log.debug("Flink sink executor type not found");
                 return;
             }
-
             log.info("Initialize flink sink executor type : {} ", sinkEnum);
             switch (sinkEnum) {
                 case DORIS:
-                    result.addSink(new DorisExecutorSink(engine));
+                    triggerDs.addSink(new DorisExecutorSink(engine));
                     break;
                 case PRESTO:
                 case CLICKHOUSE:
@@ -128,49 +132,22 @@ public class DataSyncJob extends BaseFlinkJob {
         return startupOptions;
     }
 
-    private static class FormatFunction implements MapFunction<String, Tuple2<String, String>> {
-        private static final long serialVersionUID = 5873400146844630909L;
-
-        @Override
-        public Tuple2<String, String> map(String value) {
-            JSONObject source = JSONObject.parseObject(value);
-            String db = source.getString(Constant.DB);
-            String table = source.getString(Constant.TABLE);
-            String key = String.join(".", db, table);
-            return Tuple2.of(key, loadFormat(value));
-        }
-
-        private String loadFormat(String originData) {
-            if (StringUtils.checkValNull(originData)) {
-                return null;
-            }
-            JSONObject jData = JSONObject.parseObject(originData);
-            String op = jData.getString(Constant.OP);
-            OperatorEnums opEnums = OperatorEnums.getOpEnums(op);
-            if (StringUtils.checkValNull(opEnums)) {
-                return null;
-            }
-            JSONObject formatData = null;
-            switch (opEnums) {
-                case INSERT_OP:
-                case UPDATE_OP:
-                case CREATE_OP:
-                case ROW_OP:
-                    formatData = jData.getJSONObject(Constant.AFTER);
-                    formatData.put(Constant.IS_DELETE_FILED, Constant.DELETE_FALSE);
-                    break;
-                case DELETE_OP:
-                    formatData = jData.getJSONObject(Constant.BEFORE);
-                    formatData.put(Constant.IS_DELETE_FILED, Constant.DELETE_TRUE);
-                    break;
-                default:
-                    break;
-            }
-            if (StringUtils.checkValNotNull(formatData)) {
-                formatData.put(Constant.UPDATE_STAMP_FILED, DateUtils.getCurrentTime());
-            }
-            return JSON.toJSONString(formatData);
-        }
+    private static Properties getDebeziumProperties() {
+        Properties properties = new Properties();
+        properties.setProperty("converters", "dateConverters");
+        //根据类在那个包下面修改
+        properties.setProperty("dateConverters.type", "com.lacus.job.flink.function.MySqlDateTimeConverter");
+        properties.setProperty("dateConverters.format.date", "yyyy-MM-dd");
+        properties.setProperty("dateConverters.format.time", "HH:mm:ss");
+        properties.setProperty("dateConverters.format.datetime", "yyyy-MM-dd HH:mm:ss");
+        properties.setProperty("dateConverters.format.timestamp", "yyyy-MM-dd HH:mm:ss");
+        properties.setProperty("dateConverters.format.timestamp.zone", "UTC+8");
+        // 全局读写锁，可能会影响在线业务，跳过锁设置
+        properties.setProperty("debezium.snapshot.locking.mode", "none");
+        properties.setProperty("include.schema.changes", "true");
+        properties.setProperty("bigint.unsigned.handling.mode", "long");
+        properties.setProperty("decimal.handling.mode", "double");
+        return properties;
     }
 
     public static void main(String[] args) {

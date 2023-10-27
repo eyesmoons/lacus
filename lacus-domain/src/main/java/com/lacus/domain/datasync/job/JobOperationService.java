@@ -12,8 +12,8 @@ import com.lacus.common.utils.yarn.YarnUtil;
 import com.lacus.dao.datasync.entity.*;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.domain.datasync.job.model.FlinkJobSource;
 import com.lacus.domain.datasync.job.model.DataSyncJobConf;
+import com.lacus.domain.datasync.job.model.FlinkJobSource;
 import com.lacus.domain.datasync.job.model.FlinkTaskEngine;
 import com.lacus.domain.datasync.job.model.FlinkTaskSink;
 import com.lacus.service.datasync.*;
@@ -71,6 +71,9 @@ public class JobOperationService {
 
     @Value("${hdfs.defaultFS}")
     private String defaultFS;
+
+    @Value("${kafka.bootstrapServers}")
+    private String bootstrapServers;
 
     /**
      * 为了节省服务器资源，所有任务以分组形式启动
@@ -149,6 +152,9 @@ public class JobOperationService {
                 if (ObjectUtils.isNotEmpty(timeStamp)) {
                     source.setTimeStamp(Long.valueOf(timeStamp));
                 }
+                source.setBootStrapServers(bootstrapServers);
+                source.setTopic("data_sync_topic_" + job.getJobId());
+                source.setGroupId("data_sync_group_" + job.getJobId());
             }
 
             FlinkTaskSink sink = new FlinkTaskSink();

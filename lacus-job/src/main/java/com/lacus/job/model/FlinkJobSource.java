@@ -14,4 +14,7 @@ public class FlinkJobSource {
     private List<String> tableList;
     private String syncType;
     private Long timeStamp;
+    private String bootStrapServers;
+    private String topic;
+    private String groupId;
 }
