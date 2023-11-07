@@ -19,38 +19,37 @@
         <maven.compiler.source>18</maven.compiler.source>
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <flink-shaded.version>2.6.5-10.0</flink-shaded.version>
+        <flink-shaded.version>2.8.3-10.0</flink-shaded.version>
         <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
         <fastjson2.version>2.0.26</fastjson2.version>
         <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
         <flink-connector-mysql-cdc.version>2.3.0</flink-connector-mysql-cdc.version>
-        <lombok.version>1.18.2</lombok.version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <log4j.version>1.2.17</log4j.version>
-        <flink.version>1.16.0</flink.version>
-        <http.version>4.5.13</http.version>
-        <guava.version>30.1-jre</guava.version>
+        <flink-connector-oracle-cdc.version>2.3.0</flink-connector-oracle-cdc.version>
+        <lombok.version>1.18.26</lombok.version>
+        <slf4j.version>2.0.7</slf4j.version>
+        <flink.version>1.16.2</flink.version>
+        <http.version>4.5.14</http.version>
+        <guava.version>31.1-jre</guava.version>
         <jackson-databind.version>2.15.2</jackson-databind.version>
         <jetty.version>11.0.15</jetty.version>
         <protobuf-java.version>3.24.2</protobuf-java.version>
         <commons-codec.version>1.16.0</commons-codec.version>
         <kafka-clients.version>3.5.1</kafka-clients.version>
-        <commons-collections.version>3.2.2</commons-collections.version>
+        <commons-collections4.version>4.4</commons-collections4.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <druid.version>1.2.18</druid.version>
-        <hutool.version>5.8.9</hutool.version>
+        <dynamic-etl.version>1.0-SNAPSHOT</dynamic-etl.version>
+        <hutool.version>5.8.22</hutool.version>
+        <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
+        <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
+        <connect-runtime.version>3.5.1</connect-runtime.version>
+        <mysql-connector-j.version>8.0.33</mysql-connector-j.version>
         <scope.setting>provided</scope.setting>
-<!--        <scope.setting>compile</scope.setting>-->
+        <!--        <scope.setting>compile</scope.setting>-->
     </properties>
 
     <dependencyManagement>
         <dependencies>
-            <dependency>
-                <groupId>org.apache.flink</groupId>
-                <artifactId>flink-shaded-guava</artifactId>
-                <version>30.1.1-jre-16.0</version>
-            </dependency>
-
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
@@ -106,16 +105,18 @@
                 <version>${kafka-clients.version}</version>
                 <scope>${scope.setting}</scope>
             </dependency>
+
+            <dependency>
+                <groupId>org.apache.kafka</groupId>
+                <artifactId>connect-runtime</artifactId>
+                <version>${connect-runtime.version}</version>
+                <scope>${scope.setting}</scope>
+            </dependency>
         </dependencies>
     </dependencyManagement>
 
     <dependencies>
-        <dependency>
-            <groupId>org.yaml</groupId>
-            <artifactId>snakeyaml</artifactId>
-            <version>2.0</version>
-            <scope>compile</scope>
-        </dependency>
+
         <!-- lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
@@ -141,9 +142,9 @@
         </dependency>
 
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
-            <version>${commons-collections.version}</version>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
+            <version>${commons-collections4.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
@@ -157,13 +158,21 @@
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-core</artifactId>
-            <version>1.16.2</version>
+            <version>${flink.version}</version>
+            <scope>${scope.setting}</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-collections</groupId>
+                    <artifactId>commons-collections</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
             <artifactId>flink-shaded-curator</artifactId>
-            <version>1.10.3</version>
+            <version>${flink-shaded-curator.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
@@ -178,13 +187,6 @@
             <artifactId>flink-shaded-hadoop-2-uber</artifactId>
             <version>${flink-shaded.version}</version>
             <scope>${scope.setting}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.flink</groupId>
-            <artifactId>flink-connector-kafka</artifactId>
-            <version>${flink.version}</version>
-            <!--            <scope>${scope.setting}</scope>-->
         </dependency>
 
         <dependency>
@@ -240,27 +242,23 @@
         </dependency>
 
         <dependency>
-            <groupId>com.ververica</groupId>
-            <artifactId>flink-connector-mysql-cdc</artifactId>
-            <version>${flink-connector-mysql-cdc.version}</version>
-            <!--            <scope>${scope.setting}</scope>-->
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.flink</groupId>
-                    <artifactId>flink-shaded-guava</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-shaded-guava</artifactId>
+            <version>${flink-shaded-guava.version}</version>
+            <scope>${scope.setting}</scope>
         </dependency>
 
         <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-shaded-guava</artifactId>
-            <version>30.1.1-jre-16.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.flink</groupId>
             <artifactId>flink-connector-jdbc</artifactId>
             <version>${flink.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mysql</groupId>
+            <artifactId>mysql-connector-j</artifactId>
+            <version>${mysql-connector-j.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
@@ -269,13 +267,6 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-log4j12</artifactId>
             <version>${slf4j.version}</version>
-            <scope>${scope.setting}</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
             <scope>${scope.setting}</scope>
         </dependency>
 
@@ -301,11 +292,38 @@
             <scope>${scope.setting}</scope>
         </dependency>
 
+        <!-- 动态代码清洗 -->
+        <dependency>
+            <groupId>com.qtone</groupId>
+            <artifactId>dynamic-etl</artifactId>
+            <version>${dynamic-etl.version}</version>
+            <scope>${scope.setting}</scope>
+        </dependency>
+
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
             <version>${hutool.version}</version>
             <scope>${scope.setting}</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-kafka</artifactId>
+            <version>${flink.version}</version>
+        </dependency>
+
+        <!-- flink mysql cdc -->
+        <dependency>
+            <groupId>com.ververica</groupId>
+            <artifactId>flink-connector-mysql-cdc</artifactId>
+            <version>${flink-connector-mysql-cdc.version}</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>mysql</groupId>
+                    <artifactId>mysql-connector-java</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -314,9 +332,6 @@
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
-                <excludes>
-                    <exclude>application*.properties</exclude>
-                </excludes>
             </resource>
         </resources>
         <plugins>

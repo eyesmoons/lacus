@@ -1,69 +1,50 @@
 package com.lacus.job.utils;
 
+
 import lombok.extern.slf4j.Slf4j;
-import org.yaml.snakeyaml.Yaml;
 
 import java.io.*;
+import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Properties;
 
 @Slf4j
 public class PropertiesUtil {
 
-    private static final String DEFAULT_PROPERTIES = "application-basic.yml";
+    private static final String APPLICATION_PROPERTIES = "/application.properties";
 
     /**
      * 获取properties属性值
+     *
+     * @param key key
      */
-    public static String getPropValue(String propKey) {
+    public static String getPropValue(String key) {
         try {
-            Yaml yaml = new Yaml();
-            InputStream inputStream = PropertiesUtil.class.getClassLoader().getResourceAsStream(DEFAULT_PROPERTIES);
-            Map<String, Object> obj = yaml.load(inputStream);
-            return getProperty(obj, propKey);
-        } catch (Exception e) {
-            log.error("获取propKey错误:", e);
+            Properties props = new Properties();
+            InputStream inputStream = PropertiesUtil.class.getResourceAsStream(APPLICATION_PROPERTIES);
+            assert inputStream != null;
+            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            props.load(bf);
+            return props.getProperty(key);
+        } catch (IOException e) {
+            log.error("获取key错误:", e);
         }
         return null;
-    }
-    private static String getProperty(Map<String, Object> obj, String path) {
-        String[] parts = path.split("\\.");
-        Object value = obj;
-        for (String part : parts) {
-            if (value instanceof Map) {
-                value = ((Map<String, Object>) value).get(part);
-            } else {
-                return null;
-            }
-        }
-        return (String) value;
-    }
-
-    public static Properties loadPropertiesByStr(String str) {
-        Properties props = new Properties();
-        try {
-            ByteArrayInputStream inputStream = new ByteArrayInputStream(str.getBytes());
-            props.load(inputStream);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return props;
     }
 
     /**
      * 根据正则获取properties属性值集合
+     *
+     * @param regex 正则表达式
      */
     public static Properties getProps(String regex) {
         Properties propsResult = new Properties();
         try {
             Properties props = new Properties();
-            InputStream inputStream = PropertiesUtil.class.getResourceAsStream(DEFAULT_PROPERTIES);
-            if (Objects.isNull(inputStream)) {
-                throw new RuntimeException("输入流获取失败");
-            }
-            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            InputStream inputStream = PropertiesUtil.class.getResourceAsStream(APPLICATION_PROPERTIES);
+            assert inputStream != null;
+            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
             props.load(bf);
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String key = entry.getKey().toString();
@@ -72,20 +53,23 @@ public class PropertiesUtil {
                 }
             }
         } catch (IOException e) {
-            log.error("获取propKey错误:", e);
+            log.error("获取key错误:", e);
         }
         return propsResult;
     }
 
     /**
      * 根据前缀获取properties属性值集合，并且key去掉前缀
+     *
+     * @param prefix 前缀
      */
     public static Properties getPropsWithoutPrefix(String prefix) {
         Properties propsResult = new Properties();
         try {
             Properties props = new Properties();
-            InputStream inputStream = PropertiesUtil.class.getResourceAsStream(DEFAULT_PROPERTIES);
-            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+            InputStream inputStream = PropertiesUtil.class.getResourceAsStream(APPLICATION_PROPERTIES);
+            assert inputStream != null;
+            BufferedReader bf = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             props.load(bf);
             for (Map.Entry<Object, Object> entry : props.entrySet()) {
                 String key = entry.getKey().toString();
@@ -94,13 +78,13 @@ public class PropertiesUtil {
                 }
             }
         } catch (IOException e) {
-            log.error("获取propKey错误:", e);
+            log.error("获取key错误:", e);
         }
         return propsResult;
     }
 
     public static void main(String[] args) {
-        System.out.println(getPropValue("kafka.properties.bootstrap-servers"));
+        System.out.println(getPropValue("kafka.properties.retries"));
         System.out.println(getProps("kafka.properties.*"));
         System.out.println(getPropsWithoutPrefix("kafka.properties."));
     }
