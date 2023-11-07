@@ -17,6 +17,7 @@ public class JobPageQuery extends AbstractPageQuery {
     public QueryWrapper toQueryWrapper() {
         QueryWrapper<DataSyncJobEntity> wrapper = new QueryWrapper<>();
         wrapper.like(ObjectUtils.isNotEmpty(jobName), "job_name", jobName);
+        wrapper.orderByDesc("job_id");
         return wrapper;
     }
 }
