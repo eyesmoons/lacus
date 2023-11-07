@@ -65,11 +65,11 @@
 | `druid`           | alibaba数据库连接池       | 1.2.8  |
 | `mybatis-plus`    | 数据库框架               | 3.5.2  |
 | `kafka`           | 用来做数据缓冲和解耦          | 2.1.1  |
-| `flink`           | flink项目必备           | 1.13.5 |
-| `mysql-flink-cdc` | mysql cdc connector | 1.3.0  |
-| `yarn`            | 资源调度框架              | 1.13.5 |
-| `hadoop`          | 主要提供hdfs存储          | 1.13.5 |
-| `apache doris`    | MPP数据库              | 1.2.5  |
+| `flink`           | flink项目必备           | 1.16.2 |
+| `mysql-flink-cdc` | mysql cdc connector | 2.3.0  |
+| `yarn`            | 资源调度框架              | 1.16.2 |
+| `hadoop`          | 主要提供hdfs存储          | 1.16.2 |
+| `apache doris`    | MPP数据库              | 1.2.6  |
 
 ### 四、启动说明
 
