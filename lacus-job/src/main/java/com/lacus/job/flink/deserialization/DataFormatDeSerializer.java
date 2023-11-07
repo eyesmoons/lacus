@@ -5,8 +5,6 @@ import org.apache.flink.api.common.typeinfo.TypeHint;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.nio.charset.StandardCharsets;
 
@@ -14,9 +12,6 @@ import java.nio.charset.StandardCharsets;
 public class DataFormatDeSerializer implements KafkaDeserializationSchema<ConsumerRecord<String, String>> {
 
     private static final long serialVersionUID = 1L;
-
-    private static final Logger log = LoggerFactory.getLogger(DataFormatDeSerializer.class);
-
 
     @Override
     public boolean isEndOfStream(ConsumerRecord<String, String> record) {
@@ -38,7 +33,6 @@ public class DataFormatDeSerializer implements KafkaDeserializationSchema<Consum
                 record.offset(),
                 record.timestamp(),
                 record.timestampType(),
-                record.checksum(),
                 record.serializedKeySize(),
                 record.serializedValueSize(),
                 record.key(),
