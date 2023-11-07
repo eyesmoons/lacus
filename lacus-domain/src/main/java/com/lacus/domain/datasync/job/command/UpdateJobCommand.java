@@ -9,6 +9,6 @@ import javax.validation.constraints.NotNull;
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class UpdateJobCommand extends AddJobCommand{
-    @NotBlank(message = "jobId不能为空")
-    private String jobId;
+    @NotNull(message = "jobId不能为空")
+    private Long jobId;
 }

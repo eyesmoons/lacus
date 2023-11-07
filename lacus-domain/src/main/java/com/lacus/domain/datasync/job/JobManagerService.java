@@ -79,6 +79,12 @@ public class JobManagerService {
     @Value("${yarn.restapi-address}")
     private String flinkRestPrefix;
 
+    @Value("${hdfs.defaultFS}")
+    private String defaultHdfs;
+
+    @Value("${hdfs.username}")
+    private String hadoopUserName;
+
     @SuppressWarnings({"unchecked", "rawtypes"})
     public PageDTO pageList(JobPageQuery query) {
         Page page = dataSyncJobService.page(query.toPage(), query.toQueryWrapper());
@@ -110,7 +116,7 @@ public class JobManagerService {
             model.setCatalogName(finalCatalogEntityMap.get(entity.getCatalogId()));
             model.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             model.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
-            DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(entity.getCatalogId());
+            DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(entity.getJobId());
             if (ObjectUtils.isNotEmpty(lastInstance)) {
                 model.setStatus(lastInstance.getStatus());
             }
@@ -130,7 +136,7 @@ public class JobManagerService {
     /**
      * save table and column mappings
      */
-    private void saveTableMappings(String jobId, AddJobCommand addJobCommand) {
+    private void saveTableMappings(Long jobId, AddJobCommand addJobCommand) {
         resetTableAndColumnMappings(jobId);
         List<TableMapping> tableMappings = addJobCommand.getTableMappings();
         List<DataSyncTableMappingEntity> tableMappingEntities = new ArrayList<>();
@@ -202,7 +208,7 @@ public class JobManagerService {
      * 重置表及字段映射关系
      * @param jobId 任务ID
      */
-    private void resetTableAndColumnMappings(String jobId) {
+    private void resetTableAndColumnMappings(Long jobId) {
         tableMappingService.removeByJobId(jobId);
         columnMappingService.removeByJobId(jobId);
         sourceTableService.removeByJobId(jobId);
@@ -232,7 +238,7 @@ public class JobManagerService {
 
     @SuppressWarnings("unchecked")
     public MappedTableDTO listMappedTable(MappedTableQuery query) {
-        String jobId = query.getJobId();
+        Long jobId = query.getJobId();
         MappedTableDTO result = new MappedTableDTO();
         LinkedList<TableDTO> sourceTables = new LinkedList<>();
         LinkedList<TableDTO> sinkTables = new LinkedList<>();
@@ -352,7 +358,7 @@ public class JobManagerService {
         return result;
     }
 
-    private Map<String, Object> convertMappedAndSourceMetaTables(List<String> sourceDbTables, String jobId, Long sourceDatasourceId) {
+    private Map<String, Object> convertMappedAndSourceMetaTables(List<String> sourceDbTables, Long jobId, Long sourceDatasourceId) {
         Map<String, Object> mappedAndSourceMetaTablesMap = new HashMap<>();
         List<DataSyncSavedTable> params = new ArrayList<>();
         List<MetaDbTableEntity> sourceParams = new ArrayList<>();
@@ -442,7 +448,7 @@ public class JobManagerService {
 
     public MappedColumnDTO listMappedColumn(MappedColumnQuery query) {
         String sourceTableNameStr = query.getSourceTableName();
-        String jobId = query.getJobId();
+        Long jobId = query.getJobId();
         String[] sourceTableNameArr = sourceTableNameStr.split("\\.");
         String sourceTableName = sourceTableNameArr[1];
         MappedColumnDTO result = new MappedColumnDTO();
@@ -539,7 +545,7 @@ public class JobManagerService {
     public List<TableDTO> listSavedSourceDbTable(Long datasourceId, String dbName) {
         List<DataSyncJobEntity> jobs = dataSyncJobService.listBySourceDatasourceId(datasourceId);
         if (ObjectUtils.isNotEmpty(jobs)) {
-            List<String> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
+            List<Long> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
             List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobIdsAndDbName(jobIds, dbName);
             if (ObjectUtils.isNotEmpty(sourceTables)) {
                 return sourceTables.stream().map(entity -> {
@@ -553,7 +559,7 @@ public class JobManagerService {
         return null;
     }
 
-    public List<TableDTO> listSavedSourceTableByJobId(String jobId) {
+    public List<TableDTO> listSavedSourceTableByJobId(Long jobId) {
         List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobId(jobId);
         if (ObjectUtils.isNotEmpty(sourceTables)) {
             return sourceTables.stream().map(entity -> {
@@ -566,7 +572,7 @@ public class JobManagerService {
         return null;
     }
 
-    public JobDTO detail(String jobId) {
+    public JobDTO detail(Long jobId) {
         DataSyncJobEntity byId = dataSyncJobService.getById(jobId);
         JobDTO jobDTO = new JobDTO(byId);
         MappedTableQuery mappedTableQuery = new MappedTableQuery();
@@ -594,7 +600,7 @@ public class JobManagerService {
 
     public List<TableMapping> preCheck(MappedTableColumnQuery query) {
         List<TableMapping> result = new ArrayList<>();
-        String jobId = query.getJobId();
+        Long jobId = query.getJobId();
         List<TableMapping> tableMappings = query.getTableMappings();
         if (ObjectUtils.isEmpty(tableMappings)) {
             throw new ApiException(ErrorCode.Internal.INVALID_PARAMETER, "请传入正确的映射表和字段信息");
@@ -682,56 +688,6 @@ public class JobManagerService {
         return result;
     }
 
-    public List<JobTreeDTO> jobListTree(JobQuery query) {
-        List<JobTreeDTO> result = new ArrayList<>();
-        List<String> catalogIds = new ArrayList<>();
-        List<DataSyncJobCatalogEntity> catalogList = catalogService.listByName(query.getCatalogName());
-        if (ObjectUtils.isNotEmpty(catalogList)) {
-            for (DataSyncJobCatalogEntity catalog : catalogList) {
-                catalogIds.add(catalog.getCatalogId());
-                JobTreeDTO catalogDTO = new JobTreeDTO();
-                catalogDTO.setJobId(catalog.getCatalogId());
-                catalogDTO.setCatalogId("0");
-                catalogDTO.setJobName(catalog.getCatalogName());
-                catalogDTO.setRemark(catalog.getRemark());
-                catalogDTO.setCreateTime(catalog.getCreateTime());
-                DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(catalog.getCatalogId());
-                if (ObjectUtils.isNotEmpty(lastInstance)) {
-                    catalogDTO.setStatus(lastInstance.getStatus());
-                }
-                if (ObjectUtils.isNotEmpty(lastInstance)) {
-                    catalogDTO.setSyncType(lastInstance.getSyncType());
-                }
-                result.add(catalogDTO);
-            }
-        }
-        DataSyncJobEntity tpl = new DataSyncJobEntity();
-        tpl.setJobName(query.getJobName());
-        tpl.setCatalogIds(catalogIds);
-        List<DataSyncJobEntity> jobList = dataSyncJobService.listByQuery(tpl);
-
-        List<Long> datasourceIds = new ArrayList<>();
-        for (DataSyncJobEntity job : jobList) {
-            datasourceIds.add(job.getSourceDatasourceId());
-            datasourceIds.add(job.getSinkDatasourceId());
-        }
-
-        Map<Long, String> metaDatasourceEntityMap = new HashMap<>();
-        if (ObjectUtils.isNotEmpty(datasourceIds)) {
-            List<MetaDatasourceEntity> metaDatasourceEntityList = metaDataSourceService.listByIds(datasourceIds);
-            metaDatasourceEntityMap = metaDatasourceEntityList.stream().collect(Collectors.toMap(MetaDatasourceEntity::getDatasourceId, MetaDatasourceEntity::getDatasourceName));
-        }
-
-        List<JobTreeDTO> jobTreeDTOList = new ArrayList<>();
-        for (DataSyncJobEntity entity : jobList) {
-            entity.setSourceDatasourceName(metaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
-            entity.setSinkDatasourceName(metaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
-            jobTreeDTOList.add(new JobTreeDTO(entity));
-        }
-        result.addAll(jobTreeDTOList);
-        return result;
-    }
-
     public void remove(String jobId) {
         DataSyncJobEntity byId = dataSyncJobService.getById(jobId);
         if (ObjectUtils.isEmpty(byId)) {
@@ -740,15 +696,15 @@ public class JobManagerService {
         dataSyncJobService.removeById(jobId);
     }
 
-    public ApplicationModel jobDetail(String catalogId, Integer type) {
-        DataSyncJobInstanceEntity instance = instanceService.getLastInstanceByJobId(catalogId);
+    public ApplicationModel jobDetail(Long jobId) {
+        DataSyncJobInstanceEntity instance = instanceService.getLastInstanceByJobId(jobId);
         if (ObjectUtils.isEmpty(instance)) {
-            throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "未查询到source任务状态");
+            throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "未查询到任务状态");
         }
         ApplicationModel applicationModel = new ApplicationModel();
         if (FlinkStatusEnum.isRunning(instance.getStatus())) {
             FlinkJobDetail jobDetail = monitorService.flinkJobDetail(instance.getApplicationId());
-            applicationModel = monitorService.yarnJobDetail(instance.getApplicationId());
+            applicationModel = monitorService.yarnJobDetail(defaultHdfs, hadoopUserName, instance.getApplicationId());
             applicationModel.setDuration(DateUtils.convertNumber2DateString(jobDetail.getDuration()));
         } else {
             applicationModel.setApplicationId(instance.getApplicationId());

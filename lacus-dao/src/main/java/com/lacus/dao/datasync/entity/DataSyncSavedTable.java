@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class DataSyncSavedTable {
-    private String jobId;
+    private Long jobId;
     private Long sourceDatasourceId;
     private String sourceDbName;
     private String sourceTableName;

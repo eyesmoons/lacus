@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 public class DataSyncSourceColumnServiceImpl extends ServiceImpl<DataSyncSourceColumnMapper, DataSyncSourceColumnEntity> implements IDataSyncSourceColumnService {
 
     @Override
-    public void removeByJobId(String jobId) {
+    public void removeByJobId(Long jobId) {
         LambdaQueryWrapper<DataSyncSourceColumnEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncSourceColumnEntity::getJobId, jobId);
         this.remove(wrapper);

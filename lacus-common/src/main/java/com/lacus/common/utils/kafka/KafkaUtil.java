@@ -99,10 +99,10 @@ public class KafkaUtil {
 
     public static void main(String[] args) {
         Map<String, Object> map = Maps.newHashMap();
-        map.put("bootstrap.servers","gaia-dev-bigdata5:9092,gaia-dev-bigdata6:9092,gaia-dev-bigdata7:9092");
+        map.put("bootstrap.servers","hadoop1:9092,hadoop2:9092,hadoop3:9092");
         map.put("value.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
         map.put("key.deserializer","org.apache.kafka.common.serialization.StringDeserializer");
-        map.put("group.id","2342312333233131");
+        map.put("group.id","group_1");
         kafkaMessageLag(map,"test1233");
     }
 }

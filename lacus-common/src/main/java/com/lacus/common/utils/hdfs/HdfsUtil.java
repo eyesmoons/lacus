@@ -1,6 +1,5 @@
 package com.lacus.common.utils.hdfs;
 
-import com.lacus.common.utils.PropertiesUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FileSystem;
@@ -13,7 +12,6 @@ import org.apache.hadoop.util.ReflectionUtils;
 
 import java.io.*;
 import java.net.URI;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
@@ -22,33 +20,31 @@ import java.util.zip.ZipOutputStream;
 public class HdfsUtil {
 
     private static Configuration conf;
-    public static final String DEFAULT_HDFS = "hdfs.defaultFS";
 
     private static final String HADOOP_USER_KEY = "HADOOP_USER_NAME";
 
-    private static final String HADOOP_USER_VALUE = "hdfs.username";
+    public static final String DEFAULT_HDFS = "hdfs.defaultFS";
 
-    private static void init() {
-        envSetting();
-        String hdfsPath = PropertiesUtil.getPropValue(DEFAULT_HDFS);
+    private static void init(String defaultHdfs, String hadoopUserName) {
+        envSetting(hadoopUserName);
         if (conf == null) {
             conf = new Configuration();
-            conf.set(DEFAULT_HDFS, hdfsPath);
+            conf.set(DEFAULT_HDFS, defaultHdfs);
         }
     }
 
     /**
      * 设置hadoop用户环境变量
      */
-    public static void envSetting() {
-        System.setProperty(HADOOP_USER_KEY, Objects.requireNonNull(PropertiesUtil.getPropValue(HADOOP_USER_VALUE)));
+    public static void envSetting(String hadoopUserName) {
+        System.setProperty(HADOOP_USER_KEY, Objects.requireNonNull(hadoopUserName));
     }
 
     /**
      * 查看hdfs文件列表
      */
-    public static FileStatus[] listPaths(String filePath) {
-        init();
+    public static FileStatus[] listPaths(String defaultHdfs, String hadoopUserName, String filePath) {
+        init(defaultHdfs, hadoopUserName);
         FileStatus[] fileStatuses;
         try {
             FileSystem fs = FileSystem.get(conf);
@@ -95,11 +91,12 @@ public class HdfsUtil {
 
     /**
      * 从HDFS下载到本地
+     *
      * @param remotePath hdfs路径
      * @param localPath  HDF文件S路径
      */
-    public static void copyToLocalFile(String remotePath, String localPath) throws IllegalArgumentException, IOException {
-        init();
+    public static void copyToLocalFile(String defaultHdfs, String hadoopUserName, String remotePath, String localPath) throws IllegalArgumentException, IOException {
+        init(defaultHdfs, hadoopUserName);
         FileSystem fs = FileSystem.get(conf);
         fs.copyToLocalFile(false, new Path(remotePath), new Path(localPath), true);
     }
@@ -107,19 +104,19 @@ public class HdfsUtil {
     /**
      * 递归删除文件
      */
-    public static boolean deleteFileRecursive(String filePath) throws IllegalArgumentException, IOException {
-        return deleteFile(filePath, true);
+    public static boolean deleteFileRecursive(String defaultHdfs, String hadoopUserName, String filePath) throws IllegalArgumentException, IOException {
+        return deleteFile(defaultHdfs, hadoopUserName, filePath, true);
     }
 
     /**
      * 非递归删除文件
      */
-    public static boolean deleteFile(String filePath) throws IllegalArgumentException, IOException {
-        return deleteFile(filePath, false);
+    public static boolean deleteFile(String defaultHdfs, String hadoopUserName, String filePath) throws IllegalArgumentException, IOException {
+        return deleteFile(defaultHdfs, hadoopUserName, filePath, false);
     }
 
-    private static boolean deleteFile(String filePath, boolean recursive) throws IllegalArgumentException, IOException {
-        init();
+    private static boolean deleteFile(String defaultHdfs, String hadoopUserName, String filePath, boolean recursive) throws IllegalArgumentException, IOException {
+        init(defaultHdfs, hadoopUserName);
         FileSystem fs = FileSystem.get(conf);
         return fs.delete(new Path(filePath), recursive);
     }
@@ -127,8 +124,8 @@ public class HdfsUtil {
     /**
      * 创建文件夹
      */
-    public static boolean mkdir(String dirPath) throws IllegalArgumentException, IOException {
-        init();
+    public static boolean mkdir(String defaultHdfs, String hadoopUserName, String dirPath) throws IllegalArgumentException, IOException {
+        init(defaultHdfs, hadoopUserName);
         FileSystem fs = FileSystem.get(conf);
         return fs.mkdirs(new Path(dirPath));
     }
@@ -136,10 +133,10 @@ public class HdfsUtil {
     /**
      * 读取文件内容
      */
-    public static String readFile(String filePath) throws IOException {
-        init();
-        String res = null;
-        FileSystem fs = null;
+    public static String readFile(String defaultHdfs, String hadoopUserName, String filePath) throws IOException {
+        init(defaultHdfs, hadoopUserName);
+        String res;
+        FileSystem fs;
         FSDataInputStream inputStream = null;
         ByteArrayOutputStream outputStream = null;
         try {
@@ -164,8 +161,8 @@ public class HdfsUtil {
      *
      * @param path 路径
      */
-    public static boolean exists(String path) {
-        init();
+    public static boolean exists(String defaultHdfs, String hadoopUserName, String path) {
+        init(defaultHdfs, hadoopUserName);
         FileSystem fs;
         try {
             fs = FileSystem.get(conf);
@@ -183,8 +180,8 @@ public class HdfsUtil {
      * @param filePath       被压缩的文件路径
      * @param compressPath   压缩文件路径
      */
-    public static void compress(String codecClassName, String filePath, String compressPath) throws Exception {
-        init();
+    public static void compress(String defaultHdfs, String hadoopUserName, String codecClassName, String filePath, String compressPath) throws Exception {
+        init(defaultHdfs, hadoopUserName);
         Class<?> codecClass = Class.forName(codecClassName);
         FileSystem fs = FileSystem.get(conf);
         CompressionCodec codec = (CompressionCodec) ReflectionUtils.newInstance(codecClass, conf);
@@ -205,9 +202,9 @@ public class HdfsUtil {
      * @param baseDir         文件目录
      * @param zipOutputStream zip文件输出流
      */
-    public static void compressFolder(String baseDir, ZipOutputStream zipOutputStream) throws IOException {
+    public static void compressFolder(String defaultHdfs, String hadoopUserName, String baseDir, ZipOutputStream zipOutputStream) throws IOException {
         try {
-            init();
+            init(defaultHdfs, hadoopUserName);
             FileSystem fs = FileSystem.get(conf);
             FileStatus[] fileStatusList = fs.listStatus(new Path(baseDir));
             log.info("basedir = " + baseDir);
@@ -226,7 +223,7 @@ public class HdfsUtil {
                 } else {
                     zipOutputStream.putNextEntry(new ZipEntry(fileStatus.getPath().getName() + "/"));
                     log.info("file = " + fileStatus.getPath().toString());
-                    compressFolder(fileStatus.getPath().toString(), zipOutputStream);
+                    compressFolder(defaultHdfs, hadoopUserName, fileStatus.getPath().toString(), zipOutputStream);
                 }
             }
         } catch (IOException e) {
@@ -236,6 +233,7 @@ public class HdfsUtil {
 
     /**
      * 解压缩
+     *
      * @param fileName       文件名称
      * @param codecClassName 压缩类型
      */
@@ -253,6 +251,7 @@ public class HdfsUtil {
 
     /**
      * 使用文件扩展名来推断codec来对文件进行解压缩
+     *
      * @param uri 文件路径
      */
     public static void uncompressByExtension(String uri) throws IOException {
@@ -279,8 +278,8 @@ public class HdfsUtil {
         }
     }
 
-    public static void copyFileFromHdfs(String fsFile, String LocalDir) throws IOException {
-        init();
+    public static void copyFileFromHdfs(String defaultHdfs, String hadoopUserName, String fsFile, String LocalDir) throws IOException {
+        init(defaultHdfs, hadoopUserName);
         FileSystem fs = FileSystem.get(conf); // fs是HDFS文件系统
 
         Path HDFSFile = new Path(fsFile);
@@ -292,19 +291,11 @@ public class HdfsUtil {
 
             FSDataInputStream in = fs.open(temp);
             FileOutputStream out = new FileOutputStream(LocalDir);
-            IOUtils.copyBytes(in, out, 4096, false); //读取in流中的内容放入out
+            IOUtils.copyBytes(in, out, 4096, false); // 读取in流中的内容放入out
 
             out.close();
             in.close();
         }
         outFile.close();
-    }
-
-    public static void main(String[] args) throws IOException {
-        conf = new Configuration();
-        System.setProperty("HADOOP_USER_NAME", "hdfs");
-        conf.set("fs.defaultFS", "hdfs://gaia-dev-bigdata1:8020");
-        FileStatus[] listPaths = HdfsUtil.listPaths("/flink/libs/ext/");
-        System.out.println(Arrays.toString(listPaths));
     }
 }

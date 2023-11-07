@@ -104,10 +104,6 @@
 配置数据库以及 Redis 的 地址、端口、账号密码；
 配置 flink、kafka 等信息。
 
-- 修改配置文件：flink-common.yml
-在 lacus-common 模块下，找到 flink-common.yml 文件，
-配置 flink、kafka 等信息，由于是静态类，无法通过值注入办法解决，暂时在 flink-common.yml 中进行配置
-
 - 项目编译
 在根目录执行 mvn install
 

@@ -18,7 +18,7 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
 
     @ApiModelProperty("主键")
     @TableId(value = "job_id", type = IdType.ASSIGN_ID)
-    private String jobId;
+    private Long jobId;
 
     @ApiModelProperty("任务名称")
     @TableField("job_name")
@@ -36,9 +36,6 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     @TableField("sink_datasource_id")
     private Long sinkDatasourceId;
 
-    @ApiModelProperty("app_container")
-    private String appContainer;
-
     @ApiModelProperty("同步方式：1 初始快照，2 最早，3 最近，4 指定时间戳")
     @TableField(exist = false)
     private String syncType;
@@ -46,6 +43,14 @@ public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
     @ApiModelProperty("任务描述")
     @TableField("remark")
     private String remark;
+
+    @ApiModelProperty("jobManager内存，单位为GB")
+    @TableField("job_manager")
+    private Integer jobManager;
+
+    @ApiModelProperty("taskManager内存，单位为GB")
+    @TableField("task_manager")
+    private Integer taskManager;
 
     @ApiModelProperty("窗口大小(秒)")
     @TableField("window_size")

@@ -18,7 +18,7 @@
     <select id="getLastInstanceByJobId" resultMap="jobInstanceMap">
         select *
         from data_sync_job_instance
-        where catalog_id = #{catalogId} and type = #{type} and deleted = 0
-        and create_time = (select max(create_time) from data_sync_job_instance where catalog_id = #{catalogId} and deleted = 0)
+        where job_id = #{jobId} and deleted = 0
+        and instance_id = (select max(instance_id) from data_sync_job_instance where job_id = #{jobId} and deleted = 0)
     </select>
 </mapper>

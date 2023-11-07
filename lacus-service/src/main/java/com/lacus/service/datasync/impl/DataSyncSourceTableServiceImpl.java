@@ -13,14 +13,14 @@ import java.util.List;
 public class DataSyncSourceTableServiceImpl extends ServiceImpl<DataSyncSourceTableMapper, DataSyncSourceTableEntity> implements IDataSyncSourceTableService {
 
     @Override
-    public void removeByJobId(String jobId) {
+    public void removeByJobId(Long jobId) {
         LambdaQueryWrapper<DataSyncSourceTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncSourceTableEntity::getJobId, jobId);
         this.remove(wrapper);
     }
 
     @Override
-    public List<DataSyncSourceTableEntity> listByJobIdsAndDbName(List<String> jobIds, String dbName) {
+    public List<DataSyncSourceTableEntity> listByJobIdsAndDbName(List<Long> jobIds, String dbName) {
         LambdaQueryWrapper<DataSyncSourceTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(DataSyncSourceTableEntity::getJobId, jobIds);
         wrapper.eq(DataSyncSourceTableEntity::getSourceDbName, dbName);
@@ -28,14 +28,14 @@ public class DataSyncSourceTableServiceImpl extends ServiceImpl<DataSyncSourceTa
     }
 
     @Override
-    public List<DataSyncSourceTableEntity> listByJobId(String jobId) {
+    public List<DataSyncSourceTableEntity> listByJobId(Long jobId) {
         LambdaQueryWrapper<DataSyncSourceTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncSourceTableEntity::getJobId, jobId);
         return this.list(wrapper);
     }
 
     @Override
-    public List<DataSyncSourceTableEntity> listByJobIds(List<String> jobIds) {
+    public List<DataSyncSourceTableEntity> listByJobIds(List<Long> jobIds) {
         LambdaQueryWrapper<DataSyncSourceTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.in(DataSyncSourceTableEntity::getJobId, jobIds);
         return this.list(wrapper);

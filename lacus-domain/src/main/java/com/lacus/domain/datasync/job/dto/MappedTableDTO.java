@@ -6,7 +6,7 @@ import java.util.LinkedList;
 
 @Data
 public class MappedTableDTO {
-    private String jobId;
+    private Long jobId;
     private LinkedList<TableDTO> mappedSourceTables;
     private LinkedList<TableDTO> mappedSinkTables;
 }

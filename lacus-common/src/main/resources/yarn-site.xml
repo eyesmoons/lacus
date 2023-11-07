@@ -12,27 +12,27 @@
   </property>
   <property>
     <name>yarn.resourcemanager.address</name>
-    <value>gaia-dev-bigdata1:8032</value>
+    <value>hadoop2:8032</value>
   </property>
   <property>
     <name>yarn.resourcemanager.admin.address</name>
-    <value>gaia-dev-bigdata1:8033</value>
+    <value>hadoop2:8033</value>
   </property>
   <property>
     <name>yarn.resourcemanager.scheduler.address</name>
-    <value>gaia-dev-bigdata1:8030</value>
+    <value>hadoop2:8030</value>
   </property>
   <property>
     <name>yarn.resourcemanager.resource-tracker.address</name>
-    <value>gaia-dev-bigdata1:8031</value>
+    <value>hadoop2:8031</value>
   </property>
   <property>
     <name>yarn.resourcemanager.webapp.address</name>
-    <value>gaia-dev-bigdata1:8088</value>
+    <value>hadoop2:8088</value>
   </property>
   <property>
     <name>yarn.resourcemanager.webapp.https.address</name>
-    <value>gaia-dev-bigdata1:8090</value>
+    <value>hadoop2:8090</value>
   </property>
   <property>
     <name>yarn.resourcemanager.client.thread-count</name>

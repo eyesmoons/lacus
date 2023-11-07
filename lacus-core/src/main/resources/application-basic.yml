@@ -127,19 +127,19 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 kafka:
-  bootstrapServers: gaia-dev-bigdata5:9092,gaia-dev-bigdata6:9092,gaia-dev-bigdata7:9092
+  bootstrapServers: hadoop1:9092,hadoop2:9092,hadoop3:9092
 
 yarn:
-  restapi-address: http://gaia-dev-bigdata1:8088/proxy/
-  node-address: http://gaia-dev-bigdata1:8088/cluster/nodes
+  restapi-address: http://hadoop2:8088/proxy/
+  node-address: http://hadoop2:8088/cluster/nodes
 
 flink:
-  conf-path: /flinkCDC/flink/conf/
-  job-jars-path: /flinkCDC/flink/jobs/
+  conf-path: /flink/conf/
+  job-jars-path: /flink/jobs/
   jar-name: flink-jobs.jar
-  lib-path: /flinkCDC/flink/libs
-  dist-jar-path: /flinkCDC/flink/libs/flink-dist_2.12-1.13.5.jar
+  lib-path: /flink/libs
+  dist-jar-path: /flink/libs/flink-dist_2.12-1.13.5.jar
 
 hdfs:
-  defaultFS: hdfs://gaia-dev-bigdata1:8020
+  defaultFS: hdfs://hadoop1:8020
   username: hdfs

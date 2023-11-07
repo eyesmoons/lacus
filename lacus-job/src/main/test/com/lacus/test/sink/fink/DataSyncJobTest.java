@@ -41,7 +41,7 @@ public class DataSyncJobTest {
             "            \"sinkType\": \"DORIS\"\n" +
             "        },\n" +
             "        \"source\": {\n" +
-            "            \"bootstrapServers\": \"gaia-dev-bigdata5:9092,gaia-dev-bigdata6:9092,gaia-dev-bigdata7:9092\",\n" +
+            "            \"bootstrapServers\": \"hadoop1:9092,hadoop2:9092,hadoop3:9092\",\n" +
             "            \"groupId\": \"data_sync_group_1674651282279800834\",\n" +
             "            \"topics\": [\n" +
             "                \"data_sync_topic_1674651282279800834\"\n" +

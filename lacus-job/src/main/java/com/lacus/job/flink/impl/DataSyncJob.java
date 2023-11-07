@@ -11,10 +11,16 @@ import com.lacus.job.flink.function.BinlogProcessWindowFunction;
 import com.lacus.job.flink.serialization.ConsumerRecordDeserializationSchema;
 import com.lacus.job.flink.warehouse.DorisExecutorSink;
 import com.lacus.job.model.*;
+import com.lacus.job.utils.KafkaUtil;
+import com.lacus.job.utils.PropertiesUtil;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.eventtime.WatermarkStrategy;
+import org.apache.flink.api.common.serialization.SimpleStringSchema;
+import org.apache.flink.connector.base.DeliveryGuarantee;
+import org.apache.flink.connector.kafka.sink.KafkaRecordSerializationSchema;
+import org.apache.flink.connector.kafka.sink.KafkaSink;
 import org.apache.flink.connector.kafka.source.KafkaSource;
 import org.apache.flink.connector.kafka.source.enumerator.initializer.OffsetsInitializer;
 import org.apache.flink.connector.kafka.source.reader.deserializer.KafkaRecordDeserializationSchema;
@@ -23,11 +29,9 @@ import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
+import org.apache.kafka.clients.producer.ProducerConfig;
 
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 
 /**
  * 数据同步任务
@@ -52,7 +56,9 @@ public class DataSyncJob extends BaseFlinkJob {
             FlinkTaskEngine engine = sink.getEngine();
             String sinkType = sink.getSinkType();
             String subJobName = flinkConf.getJobName();
+            String bootStrapServers = source.getBootStrapServers();
             String topic = source.getTopic();
+            KafkaUtil.createTopic(bootStrapServers, Collections.singletonList(topic), 1, (short) 1);
             StartupOptions startupOptions = getStartupOptions(source.getSyncType(), source.getTimeStamp());
             MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
                     .hostname(source.getHostname())
@@ -66,19 +72,25 @@ public class DataSyncJob extends BaseFlinkJob {
                     .startupOptions(startupOptions)
                     // 设置时间格式
                     .debeziumProperties(getDebeziumProperties())
-                    // 启用扫描新添加的表功能
-                    .scanNewlyAddedTableEnabled(true)
                     // 自定义序列化
                     .deserializer(new CustomerDeserializationSchemaMysql())
                     .build();
             SingleOutputStreamOperator<String> mysqlDS = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), subJobName);
             // 发往kafka
-            mysqlDS.addSink(kafkaSink(source.getBootStrapServers(), topic)).name("sink_" + subJobName);
+            KafkaSink<String> kafkaSink = KafkaSink.<String>builder()
+                    .setBootstrapServers(bootStrapServers)
+                    .setRecordSerializer(KafkaRecordSerializationSchema.builder()
+                            .setTopic(topic)
+                            .setValueSerializationSchema(new SimpleStringSchema()).build())
+                    .setKafkaProducerConfig(buildCommonKafkaProducerProps())
+                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                    .build();
+            mysqlDS.sinkTo(kafkaSink).name(jobName + "_kafka_sink");
 
             // kafka 到 doris
             KafkaSource<ConsumerRecord<String, String>> kafkaSource = KafkaSource.<ConsumerRecord<String, String>>builder()
                     // 设置bootstrapServers
-                    .setBootstrapServers(source.getBootStrapServers())
+                    .setBootstrapServers(bootStrapServers)
                     // 设置topics
                     .setTopics(Collections.singletonList(topic))
                     // 设置groupId
@@ -113,6 +125,11 @@ public class DataSyncJob extends BaseFlinkJob {
         env.execute(jobName);
     }
 
+    /**
+     * 设置启动方式
+     * @param syncType 同步类型
+     * @param timeStamp 时间戳
+     */
     private static StartupOptions getStartupOptions(String syncType, Long timeStamp) {
         StartupOptions startupOptions = null;
         switch (syncType) {
@@ -132,6 +149,9 @@ public class DataSyncJob extends BaseFlinkJob {
         return startupOptions;
     }
 
+    /**
+     * 设置时间格式化
+     */
     private static Properties getDebeziumProperties() {
         Properties properties = new Properties();
         properties.setProperty("converters", "dateConverters");
@@ -147,6 +167,20 @@ public class DataSyncJob extends BaseFlinkJob {
         properties.setProperty("include.schema.changes", "true");
         properties.setProperty("bigint.unsigned.handling.mode", "long");
         properties.setProperty("decimal.handling.mode", "double");
+        return properties;
+    }
+
+    /**
+     * 构建kafka公共生产者参数
+     */
+    public static Properties buildCommonKafkaProducerProps() {
+        Properties properties = new Properties();
+        properties.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, PropertiesUtil.getPropValue(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG));
+        properties.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, PropertiesUtil.getPropValue(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG));
+        properties.put(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG, PropertiesUtil.getPropValue(ProducerConfig.TRANSACTION_TIMEOUT_CONFIG));
+        properties.put(ProducerConfig.RETRIES_CONFIG, PropertiesUtil.getPropValue(ProducerConfig.RETRIES_CONFIG));
+        properties.put(ProducerConfig.MAX_REQUEST_SIZE_CONFIG, PropertiesUtil.getPropValue(ProducerConfig.MAX_REQUEST_SIZE_CONFIG));
+        properties.put(ProducerConfig.BUFFER_MEMORY_CONFIG, PropertiesUtil.getPropValue(ProducerConfig.BUFFER_MEMORY_CONFIG));
         return properties;
     }
 
