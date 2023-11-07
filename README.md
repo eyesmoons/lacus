@@ -85,12 +85,12 @@
 - 安装 kafka
 - 安装 hadoop
 #### 2. flink 资源准备
-- hdfs 中上传`flink 1.13.5 `所需的jar包，目录为：`flinkCDC/flink/libs`；
-- flink配置文件目录：`flinkCDC/flink/conf`；
-- flink 任务所需的 jar 包目录为：`flinkCDC/flink/jobs/flink-jobs.jar`，此 jar 包由`lacus-job`项目打包而来
+- hdfs 中上传`flink 1.16.2 `所需的jar包，目录为：`/flink/libs`；
+- flink配置文件目录：`/flink/conf`；
+- flink 任务所需的 jar 包目录为：`/flink/jobs/flink-jobs.jar`，此 jar 包由`lacus-job`项目打包而来
 目录结构如下所示。
 
-**如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.13.5 所有资源及配置文件放到了我的百度网盘中了。**
+**如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.16.2 所有资源及配置文件放到了我的百度网盘中了。**
 
 **微信关注"毛毛小妖的笔记"公众号，公众号回复关键字"lacus"，即可获得专属网盘链接和密码。**
 ![img.png](images/flink-hdfs.png)
@@ -120,7 +120,7 @@
 > 对于想要尝试全栈项目的前端人员，这边提供更简便的后端启动方式，无需配置 Mysql 和 Redis 直接启动
 #### 5. 无Mysql/Redis 后端启动
 ```
-- 找到agilboot-admin模块下的resource文件中的application.yml文件
+- 找到lacus-admin模块下的resource文件中的application.yml文件
 
 - 配置以下两个值
 spring.profiles.active: basic,dev
