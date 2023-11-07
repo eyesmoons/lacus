@@ -52,7 +52,7 @@ public class DruidConfig {
         return druidProperties.dataSource(dataSource);
     }
 
-    //@Bean(name = "dynamicDataSource")
+    @Bean(name = "dynamicDataSource")
     @Primary
     public DynamicDataSource dataSource(DataSource masterDataSource) {
         Map<Object, Object> targetDataSources = new HashMap<>();
