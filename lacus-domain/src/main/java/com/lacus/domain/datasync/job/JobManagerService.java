@@ -18,7 +18,10 @@ import com.lacus.domain.datasync.job.command.UpdateJobCommand;
 import com.lacus.domain.datasync.job.dto.*;
 import com.lacus.domain.datasync.job.model.DataSyncJobModel;
 import com.lacus.domain.datasync.job.model.DataSyncJobModelFactory;
-import com.lacus.domain.datasync.job.query.*;
+import com.lacus.domain.datasync.job.query.JobPageQuery;
+import com.lacus.domain.datasync.job.query.MappedColumnQuery;
+import com.lacus.domain.datasync.job.query.MappedTableColumnQuery;
+import com.lacus.domain.datasync.job.query.MappedTableQuery;
 import com.lacus.service.datasync.*;
 import com.lacus.service.metadata.IMetaColumnService;
 import com.lacus.service.metadata.IMetaDataSourceService;
@@ -547,28 +550,28 @@ public class JobManagerService {
         if (ObjectUtils.isNotEmpty(jobs)) {
             List<Long> jobIds = jobs.stream().map(DataSyncJobEntity::getJobId).collect(Collectors.toList());
             List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobIdsAndDbName(jobIds, dbName);
-            if (ObjectUtils.isNotEmpty(sourceTables)) {
-                return sourceTables.stream().map(entity -> {
-                    TableDTO tableDTO = new TableDTO();
-                    tableDTO.setDbName(entity.getSourceDbName());
-                    tableDTO.setTableName(entity.getSourceTableName());
-                    return tableDTO;
-                }).collect(Collectors.toList());
-            }
-        }
-        return null;
-    }
-
-    public List<TableDTO> listSavedSourceTableByJobId(Long jobId) {
-        List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobId(jobId);
-        if (ObjectUtils.isNotEmpty(sourceTables)) {
-            return sourceTables.stream().map(entity -> {
+            if (checkTablesIfEmpty(sourceTables)) return sourceTables.stream().map(entity -> {
                 TableDTO tableDTO = new TableDTO();
                 tableDTO.setDbName(entity.getSourceDbName());
                 tableDTO.setTableName(entity.getSourceTableName());
                 return tableDTO;
             }).collect(Collectors.toList());
         }
+        return null;
+    }
+
+    private boolean checkTablesIfEmpty(List<DataSyncSourceTableEntity> sourceTables) {
+        return ObjectUtils.isNotEmpty(sourceTables);
+    }
+
+    public List<TableDTO> listSavedSourceTableByJobId(Long jobId) {
+        List<DataSyncSourceTableEntity> sourceTables = sourceTableService.listByJobId(jobId);
+        if (checkTablesIfEmpty(sourceTables)) return sourceTables.stream().map(entity -> {
+            TableDTO tableDTO = new TableDTO();
+            tableDTO.setDbName(entity.getSourceDbName());
+            tableDTO.setTableName(entity.getSourceTableName());
+            return tableDTO;
+        }).collect(Collectors.toList());
         return null;
     }
 
