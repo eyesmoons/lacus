@@ -5,5 +5,5 @@ import com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity;
 import org.apache.ibatis.annotations.Param;
 
 public interface DataSyncJobInstanceMapper extends BaseMapper<DataSyncJobInstanceEntity> {
-    DataSyncJobInstanceEntity getLastInstanceByJobId(@Param("catalogId") String catalogId);
+    DataSyncJobInstanceEntity getLastInstanceByJobId(@Param("jobId") Long jobId);
 }

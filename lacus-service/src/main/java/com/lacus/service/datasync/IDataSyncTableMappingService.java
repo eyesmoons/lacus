@@ -10,5 +10,5 @@ import java.util.List;
 public interface IDataSyncTableMappingService extends IService<DataSyncTableMappingEntity> {
     LinkedList<DataSyncSavedTable> listSavedTables(DataSyncSavedTable query);
     LinkedList<DataSyncSavedTable> listSavedTables(List<DataSyncSavedTable> params);
-    void removeByJobId(String jobId);
+    void removeByJobId(Long jobId);
 }

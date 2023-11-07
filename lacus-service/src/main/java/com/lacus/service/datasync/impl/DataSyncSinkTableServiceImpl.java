@@ -12,14 +12,14 @@ import java.util.List;
 @Service
 public class DataSyncSinkTableServiceImpl extends ServiceImpl<DataSyncSinkTableMapper, DataSyncSinkTableEntity> implements IDataSyncSinkTableService {
     @Override
-    public void removeByJobId(String jobId) {
+    public void removeByJobId(Long jobId) {
         LambdaQueryWrapper<DataSyncSinkTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncSinkTableEntity::getJobId, jobId);
         this.remove(wrapper);
     }
 
     @Override
-    public List<DataSyncSinkTableEntity> listByJobId(String jobId) {
+    public List<DataSyncSinkTableEntity> listByJobId(Long jobId) {
         LambdaQueryWrapper<DataSyncSinkTableEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncSinkTableEntity::getJobId, jobId);
         return this.list(wrapper);

@@ -19,14 +19,14 @@ public class JobOperationController {
     @ApiOperation("启动任务")
     @PostMapping("/submitJob")
     public ResponseDTO<?> submitJob(@RequestBody JobSubmitDTO jobSubmitDTO) {
-        operationService.submitJob(jobSubmitDTO.getCatalogId(), jobSubmitDTO.getSyncType(), jobSubmitDTO.getTimeStamp());
+        operationService.submitJob(jobSubmitDTO.getJobId(), jobSubmitDTO.getSyncType(), jobSubmitDTO.getTimeStamp());
         return ResponseDTO.ok();
     }
 
     @ApiOperation("停止任务")
-    @GetMapping("/stopJob/{catalogId}")
-    public ResponseDTO<?> stopJob(@PathVariable("catalogId") String catalogId) {
-        operationService.stopJob(catalogId);
+    @GetMapping("/stopJob/{jobId}")
+    public ResponseDTO<?> stopJob(@PathVariable("jobId") Long jobId) {
+        operationService.stopJob(jobId);
         return ResponseDTO.ok();
     }
 }

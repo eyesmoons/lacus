@@ -25,12 +25,6 @@ public class JobManagerController {
     @Autowired
     private JobManagerService jobManagerService;
 
-    @ApiOperation("任务列表树")
-    @GetMapping("/jobListTree")
-    public ResponseDTO<?> jobListTree(JobQuery query) {
-        return ResponseDTO.ok(jobManagerService.jobListTree(query));
-    }
-
     @ApiOperation("任务列表")
     @PreAuthorize("@permission.has('datasync:job:list')")
     @GetMapping("/pageList")
@@ -88,13 +82,13 @@ public class JobManagerController {
 
     @ApiOperation("根据jobId查询已接入的表")
     @GetMapping("/listSavedTableByJobId/{jobId}")
-    public ResponseDTO<?> listSavedTableByJobId(@PathVariable("jobId") String jobId) {
+    public ResponseDTO<?> listSavedTableByJobId(@PathVariable("jobId") Long jobId) {
         return ResponseDTO.ok(jobManagerService.listSavedSourceTableByJobId(jobId));
     }
 
     @ApiOperation("任务详情")
     @GetMapping("/detail/{jobId}")
-    public ResponseDTO<?> detail(@PathVariable("jobId") String jobId) {
+    public ResponseDTO<?> detail(@PathVariable("jobId") Long jobId) {
         return ResponseDTO.ok(jobManagerService.detail(jobId));
     }
 
@@ -106,7 +100,7 @@ public class JobManagerController {
 
     @ApiOperation("根据catalogId获取作业运行信息")
     @GetMapping("/jobDetail")
-    public ResponseDTO<?> jobDetail(@RequestParam(value = "catalogId") String catalogId, @RequestParam("type") Integer type) {
-        return ResponseDTO.ok(jobManagerService.jobDetail(catalogId, type));
+    public ResponseDTO<?> jobDetail(@RequestParam(value = "jobId") Long jobId) {
+        return ResponseDTO.ok(jobManagerService.jobDetail(jobId));
     }
 }

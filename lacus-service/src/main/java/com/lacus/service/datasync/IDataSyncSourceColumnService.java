@@ -4,5 +4,5 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.lacus.dao.datasync.entity.DataSyncSourceColumnEntity;
 
 public interface IDataSyncSourceColumnService extends IService<DataSyncSourceColumnEntity> {
-    void removeByJobId(String jobId);
+    void removeByJobId(Long jobId);
 }

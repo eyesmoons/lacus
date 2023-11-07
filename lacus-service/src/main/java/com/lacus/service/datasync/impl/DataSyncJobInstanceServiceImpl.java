@@ -19,14 +19,14 @@ public class DataSyncJobInstanceServiceImpl extends ServiceImpl<DataSyncJobInsta
     private DataSyncJobInstanceMapper mapper;
 
     @Override
-    public DataSyncJobInstanceEntity getLastInstanceByJobId(String catalogId) {
-        return mapper.getLastInstanceByJobId(catalogId);
+    public DataSyncJobInstanceEntity getLastInstanceByJobId(Long jobId) {
+        return mapper.getLastInstanceByJobId(jobId);
     }
 
     @Override
-    public void saveInstance(String catalogId, String syncType, String applicationId, FlinkJobDetail jobDetail) {
+    public void saveInstance(Long jobId, String syncType, String applicationId, FlinkJobDetail jobDetail) {
         DataSyncJobInstanceEntity entity = new DataSyncJobInstanceEntity();
-        entity.setCatalogId(catalogId);
+        entity.setJobId(jobId);
         entity.setSyncType(syncType);
         entity.setSubmitTime(DateUtils.getDate(jobDetail.getStartTime()));
         entity.setStatus(jobDetail.getState());
@@ -39,9 +39,9 @@ public class DataSyncJobInstanceServiceImpl extends ServiceImpl<DataSyncJobInsta
     }
 
     @Override
-    public void failInstance(String catalogId, String syncType, String applicationId) {
+    public void failInstance(Long jobId, String syncType, String applicationId) {
         DataSyncJobInstanceEntity entity = new DataSyncJobInstanceEntity();
-        entity.setCatalogId(catalogId);
+        entity.setJobId(jobId);
         entity.setSyncType(syncType);
         entity.setApplicationId(applicationId);
         entity.setSubmitTime(new Date());

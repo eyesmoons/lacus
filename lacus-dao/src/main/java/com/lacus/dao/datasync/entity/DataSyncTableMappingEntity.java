@@ -20,7 +20,7 @@ public class DataSyncTableMappingEntity extends BaseEntity<DataSyncTableMappingE
 
     @ApiModelProperty("任务ID")
     @TableField("job_id")
-    private String jobId;
+    private Long jobId;
 
     @ApiModelProperty("输入源表ID")
     @TableField("source_table_id")

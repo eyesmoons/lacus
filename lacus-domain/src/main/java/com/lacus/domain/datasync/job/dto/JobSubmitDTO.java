@@ -4,7 +4,7 @@ import lombok.Data;
 
 @Data
 public class JobSubmitDTO {
-    private String catalogId;
+    private Long jobId;
     private String syncType;
     private String timeStamp;
 }

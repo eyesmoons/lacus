@@ -29,7 +29,7 @@ public class DataSyncTableMappingServiceImpl extends ServiceImpl<DataSyncTableMa
     }
 
     @Override
-    public void removeByJobId(String jobId) {
+    public void removeByJobId(Long jobId) {
         LambdaQueryWrapper<DataSyncTableMappingEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(DataSyncTableMappingEntity::getJobId, jobId);
         this.remove(wrapper);

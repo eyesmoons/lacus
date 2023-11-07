@@ -20,9 +20,9 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
     @TableId(value = "instance_id", type = IdType.AUTO)
     private Long instanceId;
 
-    @ApiModelProperty("任务分组ID")
-    @TableField("catalog_id")
-    private String catalogId;
+    @ApiModelProperty("任务ID")
+    @TableField("job_id")
+    private Long jobId;
 
     @ApiModelProperty("flink任务ID")
     @TableField("application_id")

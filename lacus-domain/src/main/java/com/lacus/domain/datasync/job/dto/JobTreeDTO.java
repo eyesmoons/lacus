@@ -16,7 +16,6 @@ public class JobTreeDTO {
             this.catalogId = entity.getCatalogId();
             this.jobName = entity.getJobName();
             this.syncType = entity.getSyncType();
-            this.appContainer = entity.getAppContainer();
             this.remark = entity.getRemark();
             this.sourceDatasourceName = entity.getSourceDatasourceName();
             this.sinkDatasourceName = entity.getSinkDatasourceName();
@@ -25,7 +24,7 @@ public class JobTreeDTO {
         }
     }
 
-    private String jobId;
+    private Long jobId;
     private String catalogId;
     private String jobName;
     private String syncType;

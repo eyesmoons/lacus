@@ -28,13 +28,11 @@ import java.util.*;
 @Service("monitorService")
 public class JobMonitorService {
 
-    @Value("${flink.conf-path}")
-    private String yarnConf;
-
     @Autowired
     private RestUtil restUtil;
 
-    private final String appType = "Apache Flink";
+    @Value("${flink.conf-path}")
+    private String yarnConf;
 
     @Value("${yarn.restapi-address}")
     private String flinkRestPrefix;
@@ -42,19 +40,21 @@ public class JobMonitorService {
     @Value("${yarn.node-address}")
     private String yarnNode;
 
-    @Autowired
-    private DataSyncJobInstanceMapper jobLogsMapper;
+    @Value("${hdfs.defaultFS}")
+    private String defaultHdfs;
 
-    @Autowired
-    private DataSyncJobMapper jobsMapper;
+    @Value("${hdfs.username}")
+    private String hadoopUserName;
+
+    private final static String appType = "Apache Flink";
 
     public List<ApplicationModel> listFlinkJob() {
-        return YarnUtil.listYarnRunningJob(yarnConf, appType);
+        return YarnUtil.listYarnRunningJob(defaultHdfs, hadoopUserName, yarnConf, appType);
     }
 
     public YarnMetrics clusterDetail() {
         YarnConfiguration conf = new YarnConfiguration();
-        ConfigUtil.initConfig(conf, yarnConf);
+        ConfigUtil.initConfig(defaultHdfs, hadoopUserName, conf, yarnConf);
         String host = conf.get("yarn.resourcemanager.webapp.address");
         JSONObject json = restUtil.getForJsonObject("http://" + host + "/ws/v1/cluster/metrics");
         log.debug("rest返回信息:{}", JSON.toJSONString(json));
@@ -72,8 +72,8 @@ public class JobMonitorService {
         return yarnMetrics;
     }
 
-    public ApplicationModel yarnJobDetail(String appId) {
-        return YarnUtil.yarnJobDetail(yarnConf, appId);
+    public ApplicationModel yarnJobDetail(String defaultHdfs, String hadoopUserName, String appId) {
+        return YarnUtil.yarnJobDetail(defaultHdfs, hadoopUserName, yarnConf, appId);
     }
 
     public Object flinkJobOverview(String applicationId) {
