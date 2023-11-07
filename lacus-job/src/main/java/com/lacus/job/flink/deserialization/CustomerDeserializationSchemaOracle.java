@@ -1,7 +1,7 @@
 package com.lacus.job.flink.deserialization;
 
 import com.alibaba.fastjson2.JSONObject;
-import com.alibaba.ververica.cdc.debezium.DebeziumDeserializationSchema;
+import com.ververica.cdc.debezium.DebeziumDeserializationSchema;
 import io.debezium.data.Envelope;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
@@ -13,6 +13,7 @@ import org.apache.kafka.connect.source.SourceRecord;
 import java.util.List;
 
 public class CustomerDeserializationSchemaOracle implements DebeziumDeserializationSchema<String> {
+    private static final long serialVersionUID = -4740844988163663712L;
 
     /**
      *{
