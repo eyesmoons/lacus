@@ -16,6 +16,11 @@
     </description>
 
     <dependencies>
+        <dependency>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-interpolation</artifactId>
+            <version>1.26</version>
+        </dependency>
         <!-- 核心模块-->
         <dependency>
             <groupId>com.lacus</groupId>

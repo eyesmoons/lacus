@@ -15,9 +15,10 @@ import java.util.List;
 @Data
 @TableName("data_sync_job")
 public class DataSyncJobEntity extends BaseEntity<DataSyncJobEntity> {
+    private static final long serialVersionUID = -7151946521794780667L;
 
     @ApiModelProperty("主键")
-    @TableId(value = "job_id", type = IdType.ASSIGN_ID)
+    @TableId(value = "job_id", type = IdType.AUTO)
     private Long jobId;
 
     @ApiModelProperty("任务名称")
