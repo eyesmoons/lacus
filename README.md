@@ -135,6 +135,19 @@ lacus.embedded.redis: true
 
 - 找到lacus-admin模块中的LacusApplication启动类，直接启动即可
 ```
+
+## 生产环境部署
+### 1. 打包项目
+```shell
+mvn clean package -Dmaven.test.skip=true
+```
+### 2. 上传jar包
+将打包之后的jar包上传至服务器：lacus-admin-1.0.0.jar
+### 3. 启动项目
+```shell
+nohup java -jar lacus-admin-1.0.0.jar > ./logs/lacus.log 2>&1 &
+```
+
 ## 系统功能
 
 | 功能     | 描述                 |
