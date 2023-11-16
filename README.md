@@ -24,9 +24,9 @@
 ### 一、系统截图
 - 登录界面
 ![img.png](images/lacus_login.png)
-- 系统管理，若依系统内置菜单
+- 系统管理
 ![img.png](images/system-setting.png)
-- 系统监控，若依系统内置菜单
+- 系统监控
 ![img.png](images/system-monitor.png)
 - 系统接口
 ![img.png](images/api.png)
