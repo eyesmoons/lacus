@@ -138,7 +138,7 @@ flink:
   job-jars-path: /flink/jobs/
   jar-name: flink-jobs.jar
   lib-path: /flink/libs
-  dist-jar-path: /flink/libs/flink-dist_2.12-1.13.5.jar
+  dist-jar-path: /flink/libs/flink-dist-1.16.2.jar
 
 hdfs:
   defaultFS: hdfs://hadoop1:8020

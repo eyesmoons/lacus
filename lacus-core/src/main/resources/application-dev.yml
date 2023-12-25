@@ -64,7 +64,7 @@ spring:
         # 数据库索引
         database: 13
         # 密码
-        password:
+        password: xwwl@33ooAA
         # 连接超时时间
         timeout: 10s
         lettuce:
