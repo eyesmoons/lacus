@@ -20,9 +20,7 @@
         <maven.compiler.target>18</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <flink-shaded.version>2.8.3-10.0</flink-shaded.version>
-        <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
         <fastjson2.version>2.0.26</fastjson2.version>
-        <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
         <flink-connector-mysql-cdc.version>2.3.0</flink-connector-mysql-cdc.version>
         <flink-connector-oracle-cdc.version>2.3.0</flink-connector-oracle-cdc.version>
         <lombok.version>1.18.26</lombok.version>

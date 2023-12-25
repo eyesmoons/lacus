@@ -41,10 +41,11 @@
         <fastjson2.version>2.0.26</fastjson2.version>
         <dbutils.version>1.7</dbutils.version>
         <hadoop.version>2.4.1</hadoop.version>
-        <flink.version>1.13.5</flink.version>
+        <flink.version>1.16.2</flink.version>
         <kafka.version>3.1.1</kafka.version>
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.25</slf4j.version>
+        <guava.version>27.0.1-jre</guava.version>
     </properties>
 
     <!-- 依赖声明 -->
@@ -306,8 +307,20 @@
         </dependency>
 
         <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.protobuf</groupId>
+            <artifactId>protobuf-java</artifactId>
+            <version>3.24.3</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.apache.flink</groupId>
-            <artifactId>flink-yarn_2.12</artifactId>
+            <artifactId>flink-yarn</artifactId>
             <version>${flink.version}</version>
         </dependency>
 
