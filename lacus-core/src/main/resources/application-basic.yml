@@ -141,5 +141,5 @@ flink:
   dist-jar-path: /flink/libs/flink-dist-1.16.2.jar
 
 hdfs:
-  defaultFS: hdfs://hadoop1:8020
-  username: hdfs
+  defaultFS: hdfs://hadoop1:9000
+  username: casey

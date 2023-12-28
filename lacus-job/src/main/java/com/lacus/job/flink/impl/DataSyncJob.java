@@ -47,80 +47,78 @@ public class DataSyncJob extends BaseFlinkJob {
     @Override
     public void handle() throws Throwable {
         log.info("jobName：{}", jobName);
-        List<DataSyncJobConf> dataSyncJobConfList = JSON.parseArray(jobConf, DataSyncJobConf.class);
-        log.info("任务配置：{}", JSON.toJSONString(dataSyncJobConfList));
-        for (DataSyncJobConf dataSyncJobConf : dataSyncJobConfList) {
-            FlinkJobSource source = dataSyncJobConf.getSource();
-            FlinkConf flinkConf = dataSyncJobConf.getFlinkConf();
-            FlinkTaskSink sink = dataSyncJobConf.getSink();
-            FlinkTaskEngine engine = sink.getEngine();
-            String sinkType = sink.getSinkType();
-            String subJobName = flinkConf.getJobName();
-            String bootStrapServers = source.getBootStrapServers();
-            String topic = source.getTopic();
-            KafkaUtil.createTopic(bootStrapServers, Collections.singletonList(topic), 1, (short) 1);
-            StartupOptions startupOptions = getStartupOptions(source.getSyncType(), source.getTimeStamp());
-            MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
-                    .hostname(source.getHostname())
-                    .port(source.getPort())
-                    .username(source.getUsername())
-                    .password(source.getPassword())
-                    .databaseList(source.getDatabaseList().toArray(new String[0]))
-                    // 可选配置项,如果不指定该参数,则会读取上一个配置下的所有表的数据，注意：指定的时候需要使用"db.table"的方式
-                    .tableList(source.getTableList().toArray(new String[0]))
-                    // 指定数据读取位置：initial，latest-offset，timestamp，specific-offset
-                    .startupOptions(startupOptions)
-                    // 设置时间格式
-                    .debeziumProperties(getDebeziumProperties())
-                    // 自定义序列化
-                    .deserializer(new CustomerDeserializationSchemaMysql())
-                    .build();
-            SingleOutputStreamOperator<String> mysqlDS = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), subJobName);
-            // 发往kafka
-            KafkaSink<String> kafkaSink = KafkaSink.<String>builder()
-                    .setBootstrapServers(bootStrapServers)
-                    .setRecordSerializer(KafkaRecordSerializationSchema.builder()
-                            .setTopic(topic)
-                            .setValueSerializationSchema(new SimpleStringSchema()).build())
-                    .setKafkaProducerConfig(buildCommonKafkaProducerProps())
-                    .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
-                    .build();
-            mysqlDS.sinkTo(kafkaSink).name(jobName + "_kafka_sink");
+        DataSyncJobConf dataSyncJobConf = JSON.parseObject(jobConf, DataSyncJobConf.class);
+        log.info("任务配置：{}", JSON.toJSONString(dataSyncJobConf));
+        FlinkJobSource source = dataSyncJobConf.getSource();
+        FlinkConf flinkConf = dataSyncJobConf.getFlinkConf();
+        FlinkTaskSink sink = dataSyncJobConf.getSink();
+        FlinkTaskEngine engine = sink.getEngine();
+        String sinkType = sink.getSinkType();
+        String subJobName = flinkConf.getJobName();
+        String bootStrapServers = source.getBootStrapServers();
+        String topic = source.getTopic();
+        KafkaUtil.createTopic(bootStrapServers, Collections.singletonList(topic), 1, (short) 1);
+        StartupOptions startupOptions = getStartupOptions(source.getSyncType(), source.getTimeStamp());
+        MySqlSource<String> mySqlSource = MySqlSource.<String>builder()
+                .hostname(source.getHostname())
+                .port(source.getPort())
+                .username(source.getUsername())
+                .password(source.getPassword())
+                .databaseList(source.getDatabaseList().toArray(new String[0]))
+                // 可选配置项,如果不指定该参数,则会读取上一个配置下的所有表的数据，注意：指定的时候需要使用"db.table"的方式
+                .tableList(source.getTableList().toArray(new String[0]))
+                // 指定数据读取位置：initial，latest-offset，timestamp，specific-offset
+                .startupOptions(startupOptions)
+                // 设置时间格式
+                .debeziumProperties(getDebeziumProperties())
+                // 自定义序列化
+                .deserializer(new CustomerDeserializationSchemaMysql())
+                .build();
+        SingleOutputStreamOperator<String> mysqlDS = env.fromSource(mySqlSource, WatermarkStrategy.noWatermarks(), subJobName);
+        // 发往kafka
+        KafkaSink<String> kafkaSink = KafkaSink.<String>builder()
+                .setBootstrapServers(bootStrapServers)
+                .setRecordSerializer(KafkaRecordSerializationSchema.builder()
+                        .setTopic(topic)
+                        .setValueSerializationSchema(new SimpleStringSchema()).build())
+                .setKafkaProducerConfig(buildCommonKafkaProducerProps())
+                .setDeliveryGuarantee(DeliveryGuarantee.AT_LEAST_ONCE)
+                .build();
+        mysqlDS.sinkTo(kafkaSink).name(jobName + "_kafka_sink");
 
-            // kafka 到 doris
-            KafkaSource<ConsumerRecord<String, String>> kafkaSource = KafkaSource.<ConsumerRecord<String, String>>builder()
-                    // 设置bootstrapServers
-                    .setBootstrapServers(bootStrapServers)
-                    // 设置topics
-                    .setTopics(Collections.singletonList(topic))
-                    // 设置groupId
-                    .setGroupId(source.getGroupId())
-                    // 设置从最新消息消费
-                    .setStartingOffsets(OffsetsInitializer.latest())
-                    // 自定义反序列化
-                    .setDeserializer(KafkaRecordDeserializationSchema.of(new ConsumerRecordDeserializationSchema()))
-                    .build();
-            DataStreamSource<ConsumerRecord<String, String>> kafkaSourceDs = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), subJobName + "_kafka_source");
-            SingleOutputStreamOperator<ConsumerRecord<String, String>> filterDs = kafkaSourceDs.filter(new BinlogFilterFunction());
-            SingleOutputStreamOperator<Map<String, String>> mapDs = filterDs.map(new BinlogMapFunction());
-            SingleOutputStreamOperator<Map<String, String>> triggerDs = mapDs
-                    .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(flinkConf.getMaxBatchInterval())))
-                    .trigger(new TaskTrigger<>(flinkConf.getMaxBatchSize(), flinkConf.getMaxBatchRows()))
-                    .apply(new BinlogProcessWindowFunction()).name(jobName + "_kafka_trigger");
-            SinkEnums sinkEnum = SinkEnums.getSinkEnums(sinkType);
-            if (sinkEnum == null) {
-                log.debug("Flink sink executor type not found");
-                return;
-            }
-            log.info("Initialize flink sink executor type : {} ", sinkEnum);
-            switch (sinkEnum) {
-                case DORIS:
-                    triggerDs.addSink(new DorisExecutorSink(engine));
-                    break;
-                case PRESTO:
-                case CLICKHOUSE:
-                    break;
-            }
+        // kafka 到 doris
+        KafkaSource<ConsumerRecord<String, String>> kafkaSource = KafkaSource.<ConsumerRecord<String, String>>builder()
+                // 设置bootstrapServers
+                .setBootstrapServers(bootStrapServers)
+                // 设置topics
+                .setTopics(Collections.singletonList(topic))
+                // 设置groupId
+                .setGroupId(source.getGroupId())
+                // 设置从最新消息消费
+                .setStartingOffsets(OffsetsInitializer.latest())
+                // 自定义反序列化
+                .setDeserializer(KafkaRecordDeserializationSchema.of(new ConsumerRecordDeserializationSchema()))
+                .build();
+        DataStreamSource<ConsumerRecord<String, String>> kafkaSourceDs = env.fromSource(kafkaSource, WatermarkStrategy.noWatermarks(), subJobName + "_kafka_source");
+        SingleOutputStreamOperator<ConsumerRecord<String, String>> filterDs = kafkaSourceDs.filter(new BinlogFilterFunction());
+        SingleOutputStreamOperator<Map<String, String>> mapDs = filterDs.map(new BinlogMapFunction());
+        SingleOutputStreamOperator<Map<String, String>> triggerDs = mapDs
+                .windowAll(TumblingProcessingTimeWindows.of(Time.seconds(flinkConf.getMaxBatchInterval())))
+                .trigger(new TaskTrigger<>(flinkConf.getMaxBatchSize(), flinkConf.getMaxBatchRows()))
+                .apply(new BinlogProcessWindowFunction()).name(jobName + "_kafka_trigger");
+        SinkEnums sinkEnum = SinkEnums.getSinkEnums(sinkType);
+        if (sinkEnum == null) {
+            log.debug("Flink sink executor type not found");
+            return;
+        }
+        log.info("Initialize flink sink executor type : {} ", sinkEnum);
+        switch (sinkEnum) {
+            case DORIS:
+                triggerDs.addSink(new DorisExecutorSink(engine));
+                break;
+            case PRESTO:
+            case CLICKHOUSE:
+                break;
         }
         env.execute(jobName);
     }
