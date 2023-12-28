@@ -117,12 +117,12 @@ state.backend: filesystem
 # Directory for checkpoints filesystem, when using any of the default bundled
 # state backends.
 #
-state.checkpoints.dir: hdfs://hadoop1:8020/flink/flink-checkpoints
+state.checkpoints.dir: hdfs://hadoop1:9000/flink/flink-checkpoints
 
 state.checkpoints.num-retained: 5
 # Default target directory for savepoints, optional.
 #
-state.savepoints.dir: hdfs://hadoop1:8020/flink/flink-savepoints
+state.savepoints.dir: hdfs://hadoop1:9000/flink/flink-savepoints
 
 # Flag to enable/disable incremental checkpoints for backends that
 # support incremental checkpoints (like the RocksDB state backend). 

@@ -99,7 +99,7 @@ public class DorisExecutorSink extends RichSinkFunction<Map<String, String>> imp
         for (Map<String, Object> backend : backends) {
             boolean alive = Boolean.parseBoolean(backend.get("Alive").toString());
             if (alive) {
-                String ip = backend.get("IP").toString();
+                String ip = backend.get("Host").toString();
                 String httpPort = backend.get("HttpPort").toString();
                 backendsList.add(ip + ":" + httpPort);
             }
