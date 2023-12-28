@@ -39,7 +39,7 @@ CREATE TABLE `data_sync_column_mapping` (
 -- ----------------------------
 DROP TABLE IF EXISTS `data_sync_job`;
 CREATE TABLE `data_sync_job` (
-  `job_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键',
+  `job_id` bigint COLLATE utf8mb4_general_ci NOT NULL AUTO_INCREMENT COMMENT '主键',
   `job_name` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '任务名称',
   `catalog_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '分组ID',
   `source_datasource_id` bigint NOT NULL COMMENT '输入源ID',
@@ -63,7 +63,7 @@ CREATE TABLE `data_sync_job` (
 -- ----------------------------
 DROP TABLE IF EXISTS `data_sync_job_catalog`;
 CREATE TABLE `data_sync_job_catalog` (
-  `catalog_id` varchar(64) COLLATE utf8mb4_general_ci NOT NULL COMMENT '主键',
+  `catalog_id` bigint COLLATE utf8mb4_general_ci NOT NULL AUTO_INCREMENT COMMENT '主键',
   `catalog_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_general_ci NOT NULL DEFAULT '' COMMENT '分组名称',
   `job_manager` bigint DEFAULT NULL COMMENT 'jobManager内存，单位为GB',
   `task_manager` bigint DEFAULT NULL COMMENT 'taskManager内存，单位为GB',
