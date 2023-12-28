@@ -74,9 +74,9 @@
 | `kafka`           | 用来做数据缓冲和解耦          | 2.1.1  |
 | `flink`           | flink项目必备           | 1.16.2 |
 | `mysql-flink-cdc` | mysql cdc connector | 2.3.0  |
-| `yarn`            | 资源调度框架              | 1.16.2 |
-| `hadoop`          | 主要提供hdfs存储          | 1.16.2 |
-| `apache doris`    | MPP数据库              | 1.2.6  |
+| `yarn`            | 资源调度框架              | 3.3.6  |
+| `hdfs`            | 主要提供hdfs存储          | 3.3.6  |
+| `apache doris`    | MPP数据库              | 2.0.2  |
 
 ### 四、启动说明
 
