@@ -24,4 +24,11 @@ public class DataSyncSinkTableServiceImpl extends ServiceImpl<DataSyncSinkTableM
         wrapper.eq(DataSyncSinkTableEntity::getJobId, jobId);
         return this.list(wrapper);
     }
+
+    @Override
+    public List<DataSyncSinkTableEntity> listByJobIds(List<Long> jobIds) {
+        LambdaQueryWrapper<DataSyncSinkTableEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.in(DataSyncSinkTableEntity::getJobId, jobIds);
+        return this.list(wrapper);
+    }
 }

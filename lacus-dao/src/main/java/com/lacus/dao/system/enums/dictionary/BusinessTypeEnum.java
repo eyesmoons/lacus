@@ -18,7 +18,9 @@ public enum BusinessTypeEnum implements DictionaryEnum<Integer> {
     EXPORT(5, "导出", CssTag.WARNING),
     IMPORT(6, "导入", CssTag.WARNING),
     FORCE_LOGOUT(7, "强退", CssTag.DANGER),
-    CLEAN(8, "清空", CssTag.DANGER);
+    CLEAN(8, "清空", CssTag.DANGER),
+    START(9, "启动", CssTag.DANGER),
+    STOP(10, "停止", CssTag.DANGER);
 
     private final int value;
     private final String description;

@@ -14,6 +14,8 @@ public class DataSyncJobModel extends DataSyncJobEntity {
     private String catalogName;
     private String sourceDatasourceName;
     private String sinkDatasourceName;
+    private String sourceDbName;
+    private String sinkDbName;
     private String status;
 
     public DataSyncJobModel(DataSyncJobEntity entity) {
