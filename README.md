@@ -108,8 +108,8 @@
 
 - 修改配置文件：application-dev.yml 
 在 lacus-core 模块下，找到 resource 目录下的 application-dev.yml 文件，
-配置数据库以及 Redis 的 地址、端口、账号密码；
-配置 flink、kafka 等信息。
+配置Mysql数据库以及 Redis 的 地址、端口、账号密码；
+在 application-basic.yml 文件中配置 yarn、hdfs 和 kafka 等信息。
 
 - 项目编译
 在根目录执行 mvn install
@@ -124,25 +124,6 @@
 - npm run dev
 ```
 
-> 对于想要尝试全栈项目的前端人员，这边提供更简便的后端启动方式，无需配置 Mysql 和 Redis 直接启动
-#### 5. 无Mysql/Redis 后端启动
-```
-- 找到lacus-admin模块下的resource文件中的application.yml文件
-
-- 配置以下两个值
-spring.profiles.active: basic,dev
-改为
-spring.profiles.active: basic,test
-
-lacus.embedded.mysql: false
-lacus.embedded.redis: false
-改为
-lacus.embedded.mysql: true
-lacus.embedded.redis: true
-
-- 找到lacus-admin模块中的LacusApplication启动类，直接启动即可
-```
-
 ## 生产环境部署
 ### 1. 打包项目
 ```shell
@@ -152,7 +133,7 @@ mvn clean package -Dmaven.test.skip=true
 将打包之后的jar包上传至服务器：lacus-admin-1.0.0.jar
 ### 3. 启动项目
 ```shell
-nohup java -jar lacus-admin-1.0.0.jar > ./logs/lacus.log 2>&1 &
+nohup java -jar lacus-admin-1.0.0.jar > ./lacus.log 2>&1 &
 ```
 
 ## 系统功能
