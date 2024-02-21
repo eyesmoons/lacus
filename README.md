@@ -108,8 +108,8 @@
 
 - 修改配置文件：application-dev.yml 
 在 lacus-core 模块下，找到 resource 目录下的 application-dev.yml 文件，
-配置数据库以及 Redis 的 地址、端口、账号密码；
-配置 flink、kafka 等信息。
+配置Mysql数据库以及 Redis 的 地址、端口、账号密码；
+在 application-basic.yml 文件中配置 yarn、hdfs 和 kafka 等信息。
 
 - 项目编译
 在根目录执行 mvn install
