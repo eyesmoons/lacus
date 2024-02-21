@@ -8,21 +8,44 @@ import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.common.utils.time.DateUtils;
 import com.lacus.common.utils.yarn.ApplicationModel;
 import com.lacus.common.utils.yarn.FlinkJobDetail;
-import com.lacus.dao.datasync.entity.*;
+import com.lacus.dao.datasync.entity.DataSyncColumnMappingEntity;
+import com.lacus.dao.datasync.entity.DataSyncJobCatalogEntity;
+import com.lacus.dao.datasync.entity.DataSyncJobEntity;
+import com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity;
+import com.lacus.dao.datasync.entity.DataSyncSavedColumn;
+import com.lacus.dao.datasync.entity.DataSyncSavedTable;
+import com.lacus.dao.datasync.entity.DataSyncSinkColumnEntity;
+import com.lacus.dao.datasync.entity.DataSyncSinkTableEntity;
+import com.lacus.dao.datasync.entity.DataSyncSourceColumnEntity;
+import com.lacus.dao.datasync.entity.DataSyncSourceTableEntity;
+import com.lacus.dao.datasync.entity.DataSyncTableMappingEntity;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaColumnEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDbTableEntity;
 import com.lacus.domain.datasync.job.command.AddJobCommand;
 import com.lacus.domain.datasync.job.command.UpdateJobCommand;
-import com.lacus.domain.datasync.job.dto.*;
+import com.lacus.domain.datasync.job.dto.ColumnDTO;
+import com.lacus.domain.datasync.job.dto.JobDTO;
+import com.lacus.domain.datasync.job.dto.MappedColumnDTO;
+import com.lacus.domain.datasync.job.dto.MappedTableDTO;
+import com.lacus.domain.datasync.job.dto.TableDTO;
+import com.lacus.domain.datasync.job.dto.TableMapping;
 import com.lacus.domain.datasync.job.model.DataSyncJobModel;
 import com.lacus.domain.datasync.job.model.DataSyncJobModelFactory;
 import com.lacus.domain.datasync.job.query.JobPageQuery;
 import com.lacus.domain.datasync.job.query.MappedColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableQuery;
-import com.lacus.service.datasync.*;
+import com.lacus.service.datasync.IDataSyncColumnMappingService;
+import com.lacus.service.datasync.IDataSyncJobCatalogService;
+import com.lacus.service.datasync.IDataSyncJobInstanceService;
+import com.lacus.service.datasync.IDataSyncJobService;
+import com.lacus.service.datasync.IDataSyncSinkColumnService;
+import com.lacus.service.datasync.IDataSyncSinkTableService;
+import com.lacus.service.datasync.IDataSyncSourceColumnService;
+import com.lacus.service.datasync.IDataSyncSourceTableService;
+import com.lacus.service.datasync.IDataSyncTableMappingService;
 import com.lacus.service.metadata.IMetaColumnService;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.metadata.IMetaTableService;
@@ -34,11 +57,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
-public class JobManagerService {
+public class JobDefinitionService {
 
     @Autowired
     private IDataSyncJobService dataSyncJobService;
@@ -94,14 +123,30 @@ public class JobManagerService {
         List<DataSyncJobEntity> records = page.getRecords();
         List<String> catalogIds = new ArrayList<>();
         List<Long> datasourceIds = new ArrayList<>();
+        List<Long> jobIds = new ArrayList<>();
         for (DataSyncJobEntity job : records) {
             catalogIds.add(job.getCatalogId());
             datasourceIds.add(job.getSourceDatasourceId());
             datasourceIds.add(job.getSinkDatasourceId());
+            jobIds.add(job.getJobId());
         }
 
         Map<String, String> catalogEntityMap = new HashMap<>();
         Map<Long, String> metaDatasourceEntityMap = new HashMap<>();
+        Map<Long, String> sourceTableMap = new HashMap<>();
+        Map<Long, String> sinkTableMap = new HashMap<>();
+        if (ObjectUtils.isNotEmpty(jobIds)) {
+            List<DataSyncSourceTableEntity> sourceTableEntities = sourceTableService.listByJobIds(jobIds);
+            if (ObjectUtils.isNotEmpty(sourceTableEntities)) {
+                sourceTableMap = sourceTableEntities.stream().collect(Collectors.toMap(DataSyncSourceTableEntity::getJobId, DataSyncSourceTableEntity::getSourceDbName, (k1, k2) -> k2));
+            }
+
+            List<DataSyncSinkTableEntity> sinkTableEntities = sinkTableService.listByJobIds(jobIds);
+            if (ObjectUtils.isNotEmpty(sinkTableEntities)) {
+                sinkTableMap = sinkTableEntities.stream().collect(Collectors.toMap(DataSyncSinkTableEntity::getJobId, DataSyncSinkTableEntity::getSinkDbName, (k1, k2) -> k1));
+            }
+        }
+
         if (ObjectUtils.isNotEmpty(catalogIds)) {
             List<DataSyncJobCatalogEntity> catalogEntityList = catalogService.listByIds(catalogIds);
             if (ObjectUtils.isNotEmpty(catalogEntityList)) {
@@ -114,11 +159,15 @@ public class JobManagerService {
         }
         Map<String, String> finalCatalogEntityMap = catalogEntityMap;
         Map<Long, String> finalMetaDatasourceEntityMap = metaDatasourceEntityMap;
+        Map<Long, String> finalSourceTableMap = sourceTableMap;
+        Map<Long, String> finalSinkTableMap = sinkTableMap;
         List<DataSyncJobModel> resultRecord = records.stream().map(entity -> {
             DataSyncJobModel model = new DataSyncJobModel(entity);
             model.setCatalogName(finalCatalogEntityMap.get(entity.getCatalogId()));
             model.setSourceDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSourceDatasourceId()));
             model.setSinkDatasourceName(finalMetaDatasourceEntityMap.get(entity.getSinkDatasourceId()));
+            model.setSourceDbName(finalSourceTableMap.get(entity.getJobId()));
+            model.setSinkDbName(finalSinkTableMap.get(entity.getJobId()));
             DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(entity.getJobId());
             if (ObjectUtils.isNotEmpty(lastInstance)) {
                 model.setStatus(lastInstance.getStatus());
@@ -209,6 +258,7 @@ public class JobManagerService {
 
     /**
      * 重置表及字段映射关系
+     *
      * @param jobId 任务ID
      */
     private void resetTableAndColumnMappings(Long jobId) {
@@ -222,6 +272,7 @@ public class JobManagerService {
 
     /**
      * 保存任务信息
+     *
      * @param addJobCommand 入参
      */
     private DataSyncJobModel saveJob(AddJobCommand addJobCommand) {
@@ -232,6 +283,7 @@ public class JobManagerService {
 
     /**
      * 更新任务信息
+     *
      * @param updateJobCommand 入参
      */
     private void modifyJob(UpdateJobCommand updateJobCommand) {
@@ -324,14 +376,14 @@ public class JobManagerService {
                 }
             } else { // 已保存和未保存的表合集（任务编辑页面）
                 Map<String, Object> mappedAndSourceMetaTablesMap = convertMappedAndSourceMetaTables(sourceTableNames, jobId, sourceDatasourceId);
-                List<DataSyncSavedTable> allMappedTables = (List<DataSyncSavedTable>)mappedAndSourceMetaTablesMap.get("allMappedTables");
-                List<MetaDbTableEntity> sourceMetaTables = (List<MetaDbTableEntity>)mappedAndSourceMetaTablesMap.get("sourceMetaTables");
+                List<DataSyncSavedTable> allMappedTables = (List<DataSyncSavedTable>) mappedAndSourceMetaTablesMap.get("allMappedTables");
+                List<MetaDbTableEntity> sourceMetaTables = (List<MetaDbTableEntity>) mappedAndSourceMetaTablesMap.get("sourceMetaTables");
                 for (String sourceDbTable : sourceTableNames) {
                     String[] sourceDbTableArr = sourceDbTable.split("\\.");
                     String sourceTableName = sourceDbTableArr[1];
                     List<DataSyncSavedTable> mappedTables = new ArrayList<>();
                     if (ObjectUtils.isNotEmpty(allMappedTables)) {
-                        mappedTables = (List<DataSyncSavedTable>)CollectionUtils.select(allMappedTables, item ->
+                        mappedTables = (List<DataSyncSavedTable>) CollectionUtils.select(allMappedTables, item ->
                                 item.getSourceDatasourceId().equals(sourceDatasourceId) &&
                                         item.getSourceDbName().equals(sourceDbName) &&
                                         item.getSourceTableName().equals(sourceTableName));
@@ -398,6 +450,7 @@ public class JobManagerService {
 
     /**
      * 批量查询输入和输出表元数据
+     *
      * @param mappedTables 已经保存的表
      */
     private Map<String, List<MetaDbTableEntity>> convertMetaTables(List<DataSyncSavedTable> mappedTables) {
@@ -433,15 +486,16 @@ public class JobManagerService {
 
     /**
      * 设置metaTableId
-     * @param datasourceId 数据源ID
-     * @param DbName 数据库名
+     *
+     * @param datasourceId        数据源ID
+     * @param DbName              数据库名
      * @param metaDbTableEntities 元数据库表
-     * @param tableName 表名
-     * @param tableDTO 映射表信息
+     * @param tableName           表名
+     * @param tableDTO            映射表信息
      */
     private void setMetaTableId(Long datasourceId, String DbName, List<MetaDbTableEntity> metaDbTableEntities, String tableName, TableDTO tableDTO) {
         List<MetaDbTableEntity> metaTables = (List<MetaDbTableEntity>) CollectionUtils.select(metaDbTableEntities, item ->
-                        item.getDatasourceId().equals(datasourceId) &&
+                item.getDatasourceId().equals(datasourceId) &&
                         item.getDbName().equals(DbName) &&
                         item.getTableName().equals(tableName));
         if (ObjectUtils.isNotEmpty(metaTables)) {
@@ -519,19 +573,20 @@ public class JobManagerService {
 
     /**
      * 填充元数据信息
-     * @param columnDTOs 已保存的字段列表
+     *
+     * @param columnDTOs   已保存的字段列表
      * @param datasourceId 数据源ID
-     * @param dbName 数据库名称
-     * @param tableName 数据表名称
-     * @param columnName 字段名
-     * @param metaColumn 元数据信息
+     * @param dbName       数据库名称
+     * @param tableName    数据表名称
+     * @param columnName   字段名
+     * @param metaColumn   元数据信息
      */
     private void fillMetaColumn(LinkedList<ColumnDTO> columnDTOs,
-                                            Long datasourceId,
-                                            String dbName,
-                                            String tableName,
-                                            String columnName,
-                                            MetaColumnEntity metaColumn) {
+                                Long datasourceId,
+                                String dbName,
+                                String tableName,
+                                String columnName,
+                                MetaColumnEntity metaColumn) {
         ColumnDTO columnDTO = new ColumnDTO();
         columnDTO.setDatasourceId(datasourceId);
         columnDTO.setDbName(dbName);
@@ -588,6 +643,16 @@ public class JobManagerService {
             }
             if (ObjectUtils.isNotEmpty(mappedTable.getMappedSinkTables())) {
                 jobDTO.setSinkDbName(mappedTable.getMappedSinkTables().get(0).getDbName());
+            }
+
+            MetaDatasourceEntity sourceDatasource = metaDataSourceService.getById(byId.getSourceDatasourceId());
+            if (ObjectUtils.isNotEmpty(sourceDatasource)) {
+                jobDTO.setSourceDatasourceName(sourceDatasource.getDatasourceName());
+            }
+
+            MetaDatasourceEntity sinkDatasource = metaDataSourceService.getById(byId.getSinkDatasourceId());
+            if (ObjectUtils.isNotEmpty(sinkDatasource)) {
+                jobDTO.setSinkDatasourceName(sinkDatasource.getDatasourceName());
             }
         }
         return jobDTO;

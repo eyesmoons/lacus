@@ -1,6 +1,9 @@
 package com.lacus.service.datasync;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lacus.common.core.page.PageDTO;
 import com.lacus.dao.datasync.entity.DataSyncJobEntity;
 
 import java.util.List;

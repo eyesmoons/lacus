@@ -9,4 +9,6 @@ public interface IDataSyncSinkTableService extends IService<DataSyncSinkTableEnt
     void removeByJobId(Long jobId);
 
     List<DataSyncSinkTableEntity> listByJobId(Long jobId);
+
+    List<DataSyncSinkTableEntity> listByJobIds(List<Long> jobIds);
 }
