@@ -24,6 +24,9 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
     @TableField("job_id")
     private Long jobId;
 
+    @TableField("instance_name")
+    private String instanceName;
+
     @ApiModelProperty("flink任务ID")
     @TableField("application_id")
     private String applicationId;
@@ -32,9 +35,15 @@ public class DataSyncJobInstanceEntity extends BaseEntity<DataSyncJobInstanceEnt
     @TableField("flink_job_id")
     private String flinkJobId;
 
+    @TableField("job_script")
+    private String jobScript;
+
     @ApiModelProperty("同步方式")
     @TableField("sync_type")
     private String syncType;
+
+    @TableField("time_stamp")
+    private String timeStamp;
 
     @ApiModelProperty("任务提交时间")
     @TableField("submit_time")

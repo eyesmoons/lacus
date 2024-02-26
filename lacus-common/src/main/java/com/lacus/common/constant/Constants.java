@@ -71,6 +71,12 @@ public class Constants {
 
     }
 
-
+    public static final String DEFAULT_HDFS = "hdfs.defaultFS";
+    public static final String HADOOP_USER_NAME = "HADOOP_USER_NAME";
+    public static final String HADOOP_USER = "hdfs";
+    public static final String HDFS_SITE_XML = "hdfs-site.xml";
+    public static final String CORE_SITE_XML = "core-site.xml";
+    public static final String YARN_SITE_XML = "yarn-site.xml";
+    public static final String FLINK_CONF_YAML = "flink-conf.yaml";
 
 }

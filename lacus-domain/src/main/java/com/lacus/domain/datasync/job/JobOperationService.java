@@ -3,20 +3,32 @@ package com.lacus.domain.datasync.job;
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.lacus.common.exception.ApiException;
+import com.lacus.common.exception.CustomException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.common.utils.hdfs.HdfsUtil;
 import com.lacus.common.utils.yarn.FlinkConf;
-import com.lacus.common.utils.yarn.FlinkJobDetail;
 import com.lacus.common.utils.yarn.FlinkParams;
 import com.lacus.common.utils.yarn.YarnUtil;
-import com.lacus.dao.datasync.entity.*;
+import com.lacus.dao.datasync.entity.DataSyncJobEntity;
+import com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity;
+import com.lacus.dao.datasync.entity.DataSyncSavedColumn;
+import com.lacus.dao.datasync.entity.DataSyncSavedTable;
+import com.lacus.dao.datasync.entity.DataSyncSinkTableEntity;
+import com.lacus.dao.datasync.entity.DataSyncSourceTableEntity;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
+import com.lacus.domain.common.dto.JobConf;
+import com.lacus.domain.common.utils.JobUtil;
+import com.lacus.domain.datasync.instance.JobInstanceService;
 import com.lacus.domain.datasync.job.model.DataSyncJobConf;
 import com.lacus.domain.datasync.job.model.FlinkJobSource;
 import com.lacus.domain.datasync.job.model.FlinkTaskEngine;
 import com.lacus.domain.datasync.job.model.FlinkTaskSink;
-import com.lacus.service.datasync.*;
+import com.lacus.service.datasync.IDataSyncColumnMappingService;
+import com.lacus.service.datasync.IDataSyncJobInstanceService;
+import com.lacus.service.datasync.IDataSyncJobService;
+import com.lacus.service.datasync.IDataSyncSinkTableService;
+import com.lacus.service.datasync.IDataSyncSourceTableService;
+import com.lacus.service.datasync.IDataSyncTableMappingService;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -24,7 +36,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -35,10 +53,10 @@ public class JobOperationService {
     private IDataSyncJobService jobService;
 
     @Autowired
-    private IDataSyncJobCatalogService catalogService;
+    private JobInstanceService instanceService;
 
     @Autowired
-    private IDataSyncJobInstanceService instanceService;
+    private IDataSyncJobInstanceService dataSyncJobInstanceService;
 
     @Autowired
     private IDataSyncSourceTableService sourceTableService;
@@ -57,6 +75,9 @@ public class JobOperationService {
 
     @Autowired
     private JobMonitorService monitorService;
+
+    @Autowired
+    private JobUtil jobUtil;
 
     private static final String JOB_MAIN_CLASS = "com.lacus.job.flink.impl.DataSyncJob";
 
@@ -87,7 +108,7 @@ public class JobOperationService {
     /**
      * 启动任务
      *
-     * @param jobId 任务ID
+     * @param jobId     任务ID
      * @param syncType  启动方式
      * @param timeStamp 指定时间戳
      */
@@ -104,47 +125,33 @@ public class JobOperationService {
         flinkParams.setJobName(jobName);
 
         // 构建任务json
-        DataSyncJobConf jobConf = buildJobConf(job, syncType, timeStamp);
+        JobConf jobConf = jobUtil.buildJobConf(job, syncType, timeStamp);
         log.info("jobConf：{}", JSON.toJSONString(jobConf));
-        String flinkJobPath = getJobJarPath(flinkJobJarName);
+        String flinkJobPath = jobUtil.getJobJarPath(flinkJobJarName, defaultHdfs);
         try {
-            String sourceAppId = YarnUtil.deployOnYarn(
-                    JOB_MAIN_CLASS,
-                    new String[]{jobName, JSON.toJSONString(jobConf)},
+            DataSyncJobInstanceEntity instance = instanceService.saveInstance(job, syncType, timeStamp, JSON.toJSONString(jobConf));
+            jobConf.getJobInfo().setInstanceId(instance.getInstanceId());
+            String applicationId = YarnUtil.deployOnYarn(JOB_MAIN_CLASS,
+                    new String[]{"mysql", jobName, JSON.toJSONString(jobConf)},
                     jobName,
                     flinkParams,
                     flinkJobPath,
                     flinkConfPath,
-                    "",
+                    jobConf.getSource().getSavePoints(),
                     defaultHdfs,
-                    hadoopUserName,
                     flinkLibs,
-                    flinkDistJar
-            );
-            if (Objects.nonNull(sourceAppId)) {
-                createInstance(jobId, sourceAppId, syncType);
+                    flinkDistJar);
+
+            if (Objects.nonNull(applicationId)) {
+                instanceService.updateInstance(instance, applicationId);
+            } else {
+                log.error("任务提交失败");
             }
         } catch (Exception e) {
             log.error("任务提交失败", e);
+            // 停止任务
+            jobUtil.doStop(jobId, 1);
         }
-    }
-
-    private void createInstance(Long jobId, String applicationId, String syncType) {
-        try {
-            FlinkJobDetail flinkJobDetail = monitorService.flinkJobDetail(applicationId);
-            instanceService.saveInstance(jobId, syncType, applicationId, flinkJobDetail);
-        } catch (Exception e) {
-            instanceService.failInstance(jobId, syncType, applicationId);
-        }
-    }
-
-    private String getJobJarPath(String jarName) {
-        String fsPrefix = ObjectUtils.isEmpty(defaultHdfs) ? HdfsUtil.DEFAULT_HDFS : defaultHdfs;
-        String hdfsJarPath = fsPrefix + jarHdfsPath + jarName;
-        if (!HdfsUtil.exists(defaultHdfs, hadoopUserName, hdfsJarPath)) {
-            throw new RuntimeException("找不到路径:" + hdfsJarPath);
-        }
-        return hdfsJarPath;
     }
 
     private DataSyncJobConf buildJobConf(DataSyncJobEntity job, String syncType, String timeStamp) {
@@ -236,63 +243,13 @@ public class JobOperationService {
     }
 
     public void stopJob(Long jobId) {
-        // 停止 flink job
-        doStop(jobId);
-    }
-
-    /**
-     * 停止 flink 任务
-     *
-     * @param jobId 任务ID
-     */
-    private void doStop(Long jobId) {
-        DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(jobId);
-        if (ObjectUtils.isNotEmpty(lastInstance)) {
-            // 状态为失败，直接停止
-            if (Objects.equals(FlinkStatusEnum.FAILED.getName(), lastInstance.getStatus())) {
+        try {
+            DataSyncJobInstanceEntity lastInstance = dataSyncJobInstanceService.getLastInstanceByJobId(jobId);
+            if (ObjectUtils.isNotEmpty(lastInstance)) {
                 doStopWithoutSavePoint(lastInstance);
-            } else {
-                doStopWithSavePoint(lastInstance);
             }
-        }
-    }
-
-    /**
-     * 正常停止任务，并保存save point
-     *
-     * @param instance 任务实例
-     */
-    private void doStopWithSavePoint(DataSyncJobInstanceEntity instance) {
-        String applicationId = instance.getApplicationId();
-        String flinkJobId = monitorService.getFlinkJobId(applicationId);
-        String savePoint = null;
-        for (int i = 0; i < 3; i++) {
-            try {
-                savePoint = YarnUtil.stopYarnJob(defaultHdfs, hadoopUserName, applicationId, flinkJobId, flinkConfPath);
-                log.info("savePoint：{}", savePoint);
-                if (ObjectUtils.isNotEmpty(savePoint)) {
-                    instance.setStatus(FlinkStatusEnum.STOP.getStatus());
-                    instance.setSavepoint(savePoint);
-                    instance.updateById();
-                    break;
-                }
-            } catch (Exception e) {
-                log.error("savePoint获取失败，重试第[{}]次", i + 1, e);
-            }
-        }
-        if (ObjectUtils.isEmpty(savePoint)) {
-            try {
-                log.info("savePoint获取失败，cancel任务：{}", applicationId);
-                YarnUtil.cancelYarnJob(defaultHdfs, hadoopUserName, applicationId, flinkJobId, flinkConfPath);
-                instance.setStatus(FlinkStatusEnum.STOP.getStatus());
-                instance.setSavepoint(null);
-                instance.updateById();
-            } catch (Exception e) {
-                log.error("cancel任务失败：{}", applicationId, e);
-                instance.setStatus(FlinkStatusEnum.STOP.getStatus());
-                instance.setSavepoint(null);
-                instance.updateById();
-            }
+        } catch (Exception e) {
+            log.error("任务停止失败：{}", e.getMessage());
         }
     }
 
@@ -304,25 +261,26 @@ public class JobOperationService {
     private void doStopWithoutSavePoint(DataSyncJobInstanceEntity instance) {
         DataSyncJobEntity job = jobService.getById(instance.getJobId());
         if (Objects.isNull(job)) {
-            throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "任务不存在");
+            throw new CustomException("任务不存在");
         }
         if (!FlinkStatusEnum.couldStop(instance.getStatus())) {
             log.warn("当前状态无法停止：{}", instance.getStatus());
-            instance.setStatus(FlinkStatusEnum.STOP.getStatus());
-            instance.updateById();
+            jobUtil.updateStopStatusForInstance(instance);
         } else {
             String applicationId = instance.getApplicationId();
-            String flinkJobId = monitorService.getFlinkJobId(applicationId);
+            String flinkJobId = monitorService.getFlinkJobIdWithRetry(applicationId);
             try {
-                // 停止 flink 任务
-                YarnUtil.cancelYarnJob(defaultHdfs, hadoopUserName, applicationId, flinkJobId, flinkConfPath);
+                for (int i = 0; i < 5; i++) {
+                    // 停止flink任务
+                    YarnUtil.cancelYarnJob(applicationId, flinkJobId, flinkConfPath, defaultHdfs);
+                }
                 // 修改任务状态
-                instance.setStatus(FlinkStatusEnum.STOP.getStatus());
-                instance.setFinishedTime(new Date());
-                instance.updateById();
+                jobUtil.updateStopStatusForInstance(instance);
             } catch (Exception e) {
-                log.error("flink 任务停止失败：", e);
-                throw new ApiException(ErrorCode.Internal.UNKNOWN_ERROR, "flink 任务停止失败");
+                log.error("flink任务停止失败：", e);
+                // 修改任务状态
+                jobUtil.updateStopStatusForInstance(instance);
+                throw new CustomException("flink任务停止失败");
             }
         }
     }
