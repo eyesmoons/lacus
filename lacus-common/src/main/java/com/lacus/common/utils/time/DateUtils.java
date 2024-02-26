@@ -32,6 +32,17 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             "yyyy/MM/dd", "yyyy/MM/dd HH:mm:ss", "yyyy/MM/dd HH:mm", "yyyy/MM",
             "yyyy.MM.dd", "yyyy.MM.dd HH:mm:ss", "yyyy.MM.dd HH:mm", "yyyy.MM"};
 
+    public static Long dateString2TimeStamp(String timeStamp) {
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        try {
+            Date parse = format.parse(timeStamp);
+            return parse.getTime();
+        } catch (ParseException e) {
+            log.error("转换错误：{}", e.getMessage());
+        }
+        return null;
+    }
+
     /**
      * 获取当前Date型日期
      *

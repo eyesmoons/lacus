@@ -49,12 +49,12 @@ public class JobMonitorService {
     private final static String appType = "Apache Flink";
 
     public List<ApplicationModel> listFlinkJob() {
-        return YarnUtil.listYarnRunningJob(defaultHdfs, hadoopUserName, yarnConf, appType);
+        return YarnUtil.listYarnRunningJob(yarnConf, appType, defaultHdfs);
     }
 
     public YarnMetrics clusterDetail() {
         YarnConfiguration conf = new YarnConfiguration();
-        ConfigUtil.initConfig(defaultHdfs, hadoopUserName, conf, yarnConf);
+        ConfigUtil.initConfig(conf, yarnConf, defaultHdfs);
         String host = conf.get("yarn.resourcemanager.webapp.address");
         JSONObject json = restUtil.getForJsonObject("http://" + host + "/ws/v1/cluster/metrics");
         log.debug("rest返回信息:{}", JSON.toJSONString(json));
@@ -72,8 +72,8 @@ public class JobMonitorService {
         return yarnMetrics;
     }
 
-    public ApplicationModel yarnJobDetail(String defaultHdfs, String hadoopUserName, String appId) {
-        return YarnUtil.yarnJobDetail(defaultHdfs, hadoopUserName, yarnConf, appId);
+    public ApplicationModel yarnJobDetail(String defaultHdfs, String appId) {
+        return YarnUtil.yarnJobDetail(yarnConf, appId, defaultHdfs);
     }
 
     public Object flinkJobOverview(String applicationId) {

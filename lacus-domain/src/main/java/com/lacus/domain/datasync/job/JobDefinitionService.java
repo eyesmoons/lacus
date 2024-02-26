@@ -114,9 +114,6 @@ public class JobDefinitionService {
     @Value("${hdfs.defaultFS}")
     private String defaultHdfs;
 
-    @Value("${hdfs.username}")
-    private String hadoopUserName;
-
     @SuppressWarnings({"unchecked", "rawtypes"})
     public PageDTO pageList(JobPageQuery query) {
         Page page = dataSyncJobService.page(query.toPage(), query.toQueryWrapper());
@@ -772,7 +769,7 @@ public class JobDefinitionService {
         ApplicationModel applicationModel = new ApplicationModel();
         if (FlinkStatusEnum.isRunning(instance.getStatus())) {
             FlinkJobDetail jobDetail = monitorService.flinkJobDetail(instance.getApplicationId());
-            applicationModel = monitorService.yarnJobDetail(defaultHdfs, hadoopUserName, instance.getApplicationId());
+            applicationModel = monitorService.yarnJobDetail(defaultHdfs, instance.getApplicationId());
             applicationModel.setDuration(DateUtils.convertNumber2DateString(jobDetail.getDuration()));
         } else {
             applicationModel.setApplicationId(instance.getApplicationId());
