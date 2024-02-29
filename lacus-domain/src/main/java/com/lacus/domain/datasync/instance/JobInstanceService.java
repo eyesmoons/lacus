@@ -75,6 +75,7 @@ public class JobInstanceService {
         entity.setSyncType(syncType);
         entity.setTimeStamp(timeStamp);
         entity.setJobScript(jobScript);
+        entity.setSubmitTime(new Date());
         entity.insert();
         return entity;
     }
@@ -92,7 +93,7 @@ public class JobInstanceService {
         }
         Map<Long, String> finalJobMap = jobMap;
         List<DataSyncJobInstanceModel> resultRecord = records.stream().map(entity -> {
-            DataSyncJobInstanceModel model = new DataSyncJobInstanceModel();
+            DataSyncJobInstanceModel model = new DataSyncJobInstanceModel(entity);
             model.setJobName(finalJobMap.get(entity.getJobId()));
             if (Objects.equals(FlinkStatusEnum.RUNNING.getStatus(), entity.getStatus())) {
                 model.setTrackingUrl(flinkRestPrefix + entity.getApplicationId() + "/#/overview");
