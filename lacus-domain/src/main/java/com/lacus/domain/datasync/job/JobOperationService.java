@@ -12,13 +12,8 @@ import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.domain.common.dto.JobConf;
 import com.lacus.domain.common.utils.JobUtil;
 import com.lacus.domain.datasync.instance.JobInstanceService;
-import com.lacus.service.datasync.IDataSyncColumnMappingService;
 import com.lacus.service.datasync.IDataSyncJobInstanceService;
 import com.lacus.service.datasync.IDataSyncJobService;
-import com.lacus.service.datasync.IDataSyncSinkTableService;
-import com.lacus.service.datasync.IDataSyncSourceTableService;
-import com.lacus.service.datasync.IDataSyncTableMappingService;
-import com.lacus.service.metadata.IMetaDataSourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,27 +36,12 @@ public class JobOperationService {
     private IDataSyncJobInstanceService dataSyncJobInstanceService;
 
     @Autowired
-    private IDataSyncSourceTableService sourceTableService;
-
-    @Autowired
-    private IDataSyncSinkTableService sinkTableService;
-
-    @Autowired
-    private IDataSyncTableMappingService tableMappingService;
-
-    @Autowired
-    private IDataSyncColumnMappingService columnMappingService;
-
-    @Autowired
-    private IMetaDataSourceService dataSourceService;
-
-    @Autowired
     private JobMonitorService monitorService;
 
     @Autowired
     private JobUtil jobUtil;
 
-    private static final String JOB_MAIN_CLASS = "com.lacus.job.flink.impl.DataSyncJob";
+    private static final String JOB_MAIN_CLASS = "com.lacus.app.DataCollectApp";
 
     @Value("${flink.jar-name}")
     private String flinkJobJarName;
