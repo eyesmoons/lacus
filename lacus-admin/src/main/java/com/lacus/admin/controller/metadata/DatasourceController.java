@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.constraints.NotNull;
 import java.util.List;
 
-@Api(value = "数据源管理", tags = {"数据源管理"})
+@Api(value = "数据源管理", tags = {"数据源定义"})
 @RestController
 @RequestMapping("/metadata/datasource")
 public class DatasourceController {

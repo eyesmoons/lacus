@@ -37,6 +37,7 @@ public class HdfsUtil {
         if (conf == null) {
             conf = new Configuration();
             conf.set(Constants.DEFAULT_HDFS, defaultHdfs);
+            conf.set("dfs.client.use.datanode.hostname", "true");
         }
     }
 

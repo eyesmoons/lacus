@@ -192,10 +192,14 @@ public class JobDefinitionService {
         List<DataSyncColumnMappingEntity> columnMappingEntities = new ArrayList<>();
         for (TableMapping tableMapping : tableMappings) {
             // save source table
+            String sourceTableName = tableMapping.getSourceTableName();
+            if (sourceTableName.contains(".")) {
+                sourceTableName = sourceTableName.split("\\.")[1];
+            }
             DataSyncSourceTableEntity sourceTableEntity = new DataSyncSourceTableEntity();
             sourceTableEntity.setJobId(jobId);
             sourceTableEntity.setSourceDbName(addJobCommand.getSourceDbName());
-            sourceTableEntity.setSourceTableName(tableMapping.getSourceTableName());
+            sourceTableEntity.setSourceTableName(sourceTableName);
             sourceTableEntity.insert();
 
             // save sink table
