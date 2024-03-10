@@ -11,6 +11,6 @@ public class SqlServerProcessor extends AbsJdbcProcessor {
 
     @Override
     protected String jdbcUrlConfig() {
-        return "jdbc:microsoft:sqlserver://%s:%s;DatabaseName=%s";
+        return "jdbc:sqlserver://%s:%s;databaseName=%s";
     }
 }
