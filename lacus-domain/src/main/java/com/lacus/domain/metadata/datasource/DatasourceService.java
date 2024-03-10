@@ -76,9 +76,25 @@ public class DatasourceService {
 
     public void updateDatasource(UpdateMetaDatasourceCommand updateCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromDb(updateCommand.getDatasourceId(), metadataSourceService);
-        model.loadUpdateCommand(updateCommand);
-        model.checkDatasourceNameUnique(metadataSourceService);
-        model.updateById();
+        IDatasourceProcessor processor = datasourceFactory.getProcessor(model.getType());
+        if (ObjectUtils.isEmpty(processor)) {
+            throw new CustomException("未找到合适的数据源适配器");
+        }
+        MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
+        MetaDatasource datasource = new MetaDatasource();
+        datasource.setIp(model.getIp());
+        datasource.setPort(model.getPort());
+        datasource.setDbName(model.getDefaultDbName());
+        datasource.setUser(model.getUsername());
+        datasource.setPassword(model.getPassword());
+        datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
+        if (processor.testDatasourceConnection(datasource)) {
+            model.loadUpdateCommand(updateCommand);
+            model.checkDatasourceNameUnique(metadataSourceService);
+            model.updateById();
+        } else {
+            throw new CustomException("数据源连接失败");
+        }
     }
 
     public void removeDatasource(List<Long> datasourceIds) {
