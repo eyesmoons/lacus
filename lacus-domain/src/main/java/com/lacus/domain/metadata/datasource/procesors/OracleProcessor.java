@@ -6,7 +6,7 @@ public class OracleProcessor extends AbsJdbcProcessor {
     }
 
     public String validSqlConfig() {
-        return "select 1";
+        return "SELECT 1 FROM dual";
     }
 
     @Override
