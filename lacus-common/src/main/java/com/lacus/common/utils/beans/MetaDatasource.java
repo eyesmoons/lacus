@@ -11,4 +11,6 @@ public class MetaDatasource implements Serializable {
     private String dbName;
     private String user;
     private String password;
+    private String driver;
+    private String jdbcUrl;
 }

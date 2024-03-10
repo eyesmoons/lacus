@@ -9,4 +9,5 @@ import java.util.List;
 public interface IMetaDataSourceTypeService extends IService<MetaDatasourceTypeEntity> {
     List<MetaDatasourceTypeEntity> listDatasourceType(String typeName);
     boolean isTypeNameDuplicated(Long typeId, String typeName);
+    MetaDatasourceTypeEntity getByDatasourceName(String datasourceName);
 }

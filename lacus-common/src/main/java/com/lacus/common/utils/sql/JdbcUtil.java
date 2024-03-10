@@ -4,10 +4,11 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.lacus.common.exception.CustomException;
-import com.lacus.common.utils.beans.MetaDatasource;
 import com.lacus.common.utils.beans.ExecutionResult;
+import com.lacus.common.utils.beans.MetaDatasource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.dbutils.DbUtils;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -21,23 +22,39 @@ public class JdbcUtil {
     private static final String CONNECTION_URL = "jdbc:mysql://%s:%s/%s";
 
     public static List<JSONObject> executeQuery(MetaDatasource datasource, String sql) {
-        return executeQuery(datasource.getIp(), datasource.getPort(), datasource.getDbName(), datasource.getUser(), datasource.getPassword(), sql);
+        return executeQuery(datasource.getDriver(),
+                datasource.getJdbcUrl(),
+                datasource.getIp(),
+                datasource.getPort(),
+                datasource.getDbName(),
+                datasource.getUser(),
+                datasource.getPassword(),
+                sql);
     }
+
     /**
      * 执行sql 语句（单次执行）
-     * @param ip 10.220.146.11
+     *
+     * @param ip   10.220.146.11
      * @param port 8040
-     * @param db ods
+     * @param db   ods
      * @param user userName
-     * @param sql select 1
+     * @param sql  select 1
      */
-    public static List<JSONObject> executeQuery(String ip, int port, String db, String user, String password, String sql) {
-        List<JSONObject> beJson = new ArrayList<>();
+    public static List<JSONObject> executeQuery(String driver, String jdbcUrl, String ip, int port, String db, String user, String password, String sql) {
+        List<JSONObject> beJson;
         Connection con = null;
         PreparedStatement ps = null;
         ResultSet rs = null;
         try {
-            con = getConnection(ip, port, db, user, password);
+            if (ObjectUtils.isNotEmpty(driver)) {
+                Class.forName(driver);
+            }
+            if (ObjectUtils.isNotEmpty(jdbcUrl)) {
+                con = getConnection(jdbcUrl, ip, port, db, user, password);
+            } else {
+                con = getConnection(ip, port, db, user, password);
+            }
             ps = con.prepareStatement(sql);
             long start = System.currentTimeMillis();
             rs = ps.executeQuery();
@@ -89,12 +106,13 @@ public class JdbcUtil {
 
     /**
      * 执行SQL
-     * @param ip 10.220.146.11
-     * @param port 8040
-     * @param db dbName
-     * @param user userName
+     *
+     * @param ip       10.220.146.11
+     * @param port     8040
+     * @param db       dbName
+     * @param user     userName
      * @param password password
-     * @param sql select 1
+     * @param sql      select 1
      */
     public static ExecutionResult execute(String ip, int port, String db, String user, String password, String sql, Boolean closeConnection) {
         ExecutionResult result = new ExecutionResult();
@@ -163,10 +181,11 @@ public class JdbcUtil {
 
     /**
      * 取消正在执行的sql
-     * @param ip 10.220.146.11
-     * @param port 8040
-     * @param db dbName
-     * @param user userName
+     *
+     * @param ip       10.220.146.11
+     * @param port     8040
+     * @param db       dbName
+     * @param user     userName
      * @param password password
      * @param threadId threadId
      */
@@ -193,6 +212,17 @@ public class JdbcUtil {
         } catch (SQLException e) {
             throw new CustomException(e.getMessage(), 500);
         }
+    }
+
+    public static Connection getConnection(String jdbcUrl, String ip, int port, String db, String user, String password) {
+        Connection conn;
+        try {
+            Class.forName(JDBC_DRIVER);
+            conn = DriverManager.getConnection(String.format(jdbcUrl, ip, port, db), user, password);
+        } catch (ClassNotFoundException | SQLException e) {
+            throw new CustomException(e.getMessage(), 500);
+        }
+        return conn;
     }
 
     public static Connection getConnection(String ip, int port, String db, String user, String password) {
