@@ -7,7 +7,7 @@ import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
-public interface SchemaMapper {
+public interface MysqlSchemaMapper {
     List<SchemaDbEntity> listAllSchemaDb();
     List<SchemaTableEntity> listSchemaTable(@Param("dbName") String dbName, @Param("tableName") String tableName);
     List<SchemaColumnEntity> listSchemaColumn(@Param("dbName") String dbName, @Param("tableName") String tableName);

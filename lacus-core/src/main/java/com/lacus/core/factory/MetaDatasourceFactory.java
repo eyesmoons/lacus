@@ -1,7 +1,7 @@
-package com.lacus.domain.metadata.datasource.factory;
+package com.lacus.core.factory;
 
-import com.lacus.domain.metadata.datasource.procesors.AbsDatasourceProcessor;
-import com.lacus.domain.metadata.datasource.procesors.IDatasourceProcessor;
+import com.lacus.core.processors.AbsDatasourceProcessor;
+import com.lacus.core.processors.IDatasourceProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;

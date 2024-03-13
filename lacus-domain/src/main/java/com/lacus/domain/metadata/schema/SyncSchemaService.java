@@ -1,22 +1,25 @@
 package com.lacus.domain.metadata.schema;
 
+import cn.hutool.extra.spring.SpringUtil;
 import com.lacus.common.exception.CustomException;
 import com.lacus.core.datasource.DynamicDataSourceContextHolder;
+import com.lacus.core.factory.MetaDatasourceFactory;
+import com.lacus.core.processors.IDatasourceProcessor;
 import com.lacus.dao.metadata.entity.*;
 import com.lacus.dao.metadata.mapper.MetaTableMapper;
-import com.lacus.dao.metadata.mapper.SchemaMapper;
+import com.lacus.dao.metadata.mapper.MysqlSchemaMapper;
 import com.lacus.domain.metadata.schema.dto.SchemaDbDTO;
 import com.lacus.domain.metadata.schema.dto.SchemaTableDTO;
 import com.lacus.domain.metadata.schema.model.SchemaDbTreeNode;
 import com.lacus.domain.metadata.table.dto.TableDTO;
 import com.lacus.service.metadata.IMetaColumnService;
+import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.metadata.IMetaDbService;
 import com.lacus.service.metadata.IMetaTableService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,24 +41,42 @@ public class SyncSchemaService {
     private IMetaColumnService metaColumnService;
 
     @Autowired
-    private SchemaMapper schemaMapper;
+    private MysqlSchemaMapper mysqlSchemaMapper;
 
     @Autowired
     private MetaTableMapper metaTableMapper;
+
+    @Autowired
+    private IMetaDataSourceService metaDataSourceService;
+
+    @Autowired
+    private MetaDatasourceFactory factory;
 
     /**
      * query schema databases by datasourceId
      * @param datasourceId datasourceId
      */
-    public List<SchemaDbDTO> getSchemaDbList(Long datasourceId) {
+    public List<SchemaDbDTO> getSchemaDbList2(Long datasourceId) {
         try {
             DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
-            List<SchemaDbEntity> schemaDbList = schemaMapper.listAllSchemaDb();
+            List<SchemaDbEntity> schemaDbList = mysqlSchemaMapper.listAllSchemaDb();
             return schemaDbList.stream().map(entity -> {
                 SchemaDbDTO schemaDbDTO = new SchemaDbDTO(entity);
                 schemaDbDTO.setDatasourceId(datasourceId);
                 return schemaDbDTO;
             }).collect(Collectors.toList());
+        } finally {
+            DynamicDataSourceContextHolder.clearDataSourceType();
+        }
+    }
+
+    public List<SchemaDbDTO> getSchemaDbList(Long datasourceId) {
+        MetaDatasourceEntity metaDatasource = metaDataSourceService.getById(datasourceId);
+        IDatasourceProcessor processor = factory.getProcessor(metaDatasource.getType().toUpperCase());
+        try {
+            DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
+            List<SchemaDbEntity> schemaDbList = processor.listAllSchemaDb(datasourceId);
+            return schemaDbList.stream().map(SchemaDbDTO::new).collect(Collectors.toList());
         } finally {
             DynamicDataSourceContextHolder.clearDataSourceType();
         }
@@ -70,7 +91,7 @@ public class SyncSchemaService {
     public List<SchemaTableDTO> getSchemaTableList(Long datasourceId, String dbName, String tableName) {
         try {
             DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
-            List<SchemaTableEntity> schemaTableList = schemaMapper.listSchemaTable(dbName, tableName);
+            List<SchemaTableEntity> schemaTableList = mysqlSchemaMapper.listSchemaTable(dbName, tableName);
             return schemaTableList.stream().map(SchemaTableDTO::new).collect(Collectors.toList());
         } finally {
             DynamicDataSourceContextHolder.clearDataSourceType();
@@ -115,7 +136,7 @@ public class SyncSchemaService {
             List<SchemaColumnEntity> columnList;
             try {
                 DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
-                columnList = schemaMapper.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
+                columnList = mysqlSchemaMapper.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
             } finally {
                 DynamicDataSourceContextHolder.clearDataSourceType();
             }

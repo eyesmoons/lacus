@@ -1,4 +1,4 @@
-package com.lacus.domain.metadata.datasource.procesors;
+package com.lacus.core.processors;
 
 import lombok.Getter;
 

@@ -1,6 +1,6 @@
 package com.lacus.admin;
 
-import com.lacus.domain.metadata.datasource.factory.MetaDatasourceFactory;
+import com.lacus.core.factory.MetaDatasourceFactory;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;

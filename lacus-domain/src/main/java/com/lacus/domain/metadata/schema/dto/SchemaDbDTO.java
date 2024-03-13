@@ -14,5 +14,6 @@ public class SchemaDbDTO {
         dbName = entity.getSchemaName();
         label = entity.getSchemaName();
         uniqueFlag = entity.getSchemaName();
+        datasourceId = entity.getDatasourceId();
     }
 }

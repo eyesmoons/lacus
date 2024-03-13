@@ -1,4 +1,4 @@
-package com.lacus.domain.metadata.datasource.procesors;
+package com.lacus.core.processors;
 
 import com.lacus.common.utils.beans.MetaDatasource;
 import com.lacus.common.utils.sql.JdbcUtil;
