@@ -1,5 +1,8 @@
 package com.lacus.domain.metadata.datasource.procesors;
 
+import lombok.Getter;
+
+@Getter
 public abstract class AbsDatasourceProcessor implements IDatasourceProcessor {
 
     protected String datasourceName;
@@ -8,7 +11,4 @@ public abstract class AbsDatasourceProcessor implements IDatasourceProcessor {
         this.datasourceName = datasourceName;
     }
 
-    public String getDatasourceName() {
-        return datasourceName;
-    }
 }

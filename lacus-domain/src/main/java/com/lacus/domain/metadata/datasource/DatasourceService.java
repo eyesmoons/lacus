@@ -11,7 +11,7 @@ import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
 import com.lacus.domain.metadata.datasource.command.AddMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.command.UpdateMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.dto.MetaDatasourceDTO;
-import com.lacus.domain.metadata.datasource.factory.DatasourceFactory;
+import com.lacus.domain.metadata.datasource.factory.MetaDatasourceFactory;
 import com.lacus.domain.metadata.datasource.model.MetaDatasourceModel;
 import com.lacus.domain.metadata.datasource.model.MetaDatasourceModelFactory;
 import com.lacus.domain.metadata.datasource.procesors.IDatasourceProcessor;
@@ -23,7 +23,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -38,13 +37,8 @@ public class DatasourceService {
     @Autowired
     private IMetaDataSourceTypeService dataSourceTypeService;
 
-    public DatasourceFactory datasourceFactory;
-
-    @PostConstruct
-    public void init() {
-        datasourceFactory = DatasourceFactory.getInstance();
-        datasourceFactory.register();
-    }
+    @Autowired
+    private MetaDatasourceFactory metaDatasourceFactory;
 
     public PageDTO pageList(DatasourceQuery query) {
         Page<MetaDatasourceEntity> page = metadataSourceService.page(query.toPage(), query.toQueryWrapper());
@@ -54,7 +48,7 @@ public class DatasourceService {
 
     public void addDatasource(AddMetaDatasourceCommand addCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromAddCommand(addCommand, new MetaDatasourceModel());
-        IDatasourceProcessor processor = datasourceFactory.getProcessor(model.getType());
+        IDatasourceProcessor processor = metaDatasourceFactory.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
@@ -76,7 +70,7 @@ public class DatasourceService {
 
     public void updateDatasource(UpdateMetaDatasourceCommand updateCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromDb(updateCommand.getDatasourceId(), metadataSourceService);
-        IDatasourceProcessor processor = datasourceFactory.getProcessor(model.getType());
+        IDatasourceProcessor processor = metaDatasourceFactory.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
@@ -119,7 +113,7 @@ public class DatasourceService {
         datasource.setUser(model.getUsername());
         datasource.setPassword(model.getPassword());
         datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
-        IDatasourceProcessor processor = datasourceFactory.getProcessor(model.getType());
+        IDatasourceProcessor processor = metaDatasourceFactory.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }

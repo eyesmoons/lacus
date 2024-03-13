@@ -1,5 +1,8 @@
 package com.lacus.domain.metadata.datasource.procesors;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(AbsDatasourceProcessor.class)
 public class MysqlProcessor extends AbsJdbcProcessor {
     public MysqlProcessor() {
         super("MYSQL");

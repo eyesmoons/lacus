@@ -1,5 +1,8 @@
 package com.lacus.domain.metadata.datasource.procesors;
 
+import com.google.auto.service.AutoService;
+
+@AutoService(AbsDatasourceProcessor.class)
 public class DorisProcessor extends AbsJdbcProcessor {
     public DorisProcessor() {
         super("DORIS");
