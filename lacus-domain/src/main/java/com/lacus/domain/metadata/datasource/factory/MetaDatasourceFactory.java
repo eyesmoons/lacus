@@ -15,8 +15,6 @@ public class MetaDatasourceFactory {
     private static final Logger logger = LoggerFactory.getLogger(MetaDatasourceFactory.class);
 
     private final Map<String, AbsDatasourceProcessor> context = new HashMap<>();
-    private static final MetaDatasourceFactory factory = new MetaDatasourceFactory();
-
     /**
      * 所有processor必须注册到Factory
      */
@@ -39,6 +37,5 @@ public class MetaDatasourceFactory {
         return context.get(name);
     }
 
-    private MetaDatasourceFactory() {
-    }
+    private MetaDatasourceFactory() {}
 }
