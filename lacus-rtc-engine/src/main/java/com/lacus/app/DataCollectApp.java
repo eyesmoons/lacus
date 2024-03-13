@@ -49,8 +49,9 @@ public class DataCollectApp {
         // Flink处理程序被cancel后，会保留Checkpoint数据
         env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
-        DataCollectFactory.getInstance().register();
-        IFlinkProcessor processor = DataCollectFactory.getInstance().getProcessor(processorName);
+        DataCollectFactory factory = DataCollectFactory.getInstance();
+        factory.register();
+        IFlinkProcessor processor = factory.getProcessor(processorName);
         if (Objects.isNull(processor)) {
             throw new CustomException("can not find processor " + processorName);
         }

@@ -2,13 +2,12 @@ package com.lacus.factory;
 
 import com.lacus.AbsFlinkProcessor;
 import com.lacus.IFlinkProcessor;
-import com.lacus.common.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 
 /**
  * 数据采集Factory，所有自定义的采集组件必须注册到Factory
@@ -24,15 +23,13 @@ public class DataCollectFactory {
     /**
      * 所有processor必须注册到Factory
      */
-    @SuppressWarnings("rawtypes")
     public void register() {
-        List<Class> classList = ClassUtil.getAllClassByInterface(AbsFlinkProcessor.class);
-        for (Class cls : classList) {
+        ServiceLoader<AbsFlinkProcessor> processors = ServiceLoader.load(AbsFlinkProcessor.class);
+        for (AbsFlinkProcessor processor : processors) {
             try {
-                AbsFlinkProcessor processor = (AbsFlinkProcessor) cls.newInstance();
                 register(processor);
             } catch (Exception e) {
-                logger.error("new instance " + cls.getName() + " error: ", e);
+                logger.error("new instance " + processor.getClass().getName() + " error: ", e);
             }
         }
     }

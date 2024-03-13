@@ -1,6 +1,7 @@
 package com.lacus.processors;
 
 import com.alibaba.fastjson2.JSON;
+import com.google.auto.service.AutoService;
 import com.lacus.AbsFlinkProcessor;
 import com.lacus.common.utils.PasswordUtil;
 import com.lacus.deserialization.CustomerDeserializationSchemaMysql;
@@ -36,6 +37,7 @@ import static com.lacus.common.constant.ProcessorConstants.PROCESSOR_MYSQL;
  * @created by shengyu on 2023/8/31 11:16
  */
 @Slf4j
+@AutoService(AbsFlinkProcessor.class)
 public class MysqlCollectProcessor extends AbsFlinkProcessor {
 
     public MysqlCollectProcessor() {

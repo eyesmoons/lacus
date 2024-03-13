@@ -13,6 +13,7 @@ import com.lacus.model.SinkDataSource;
 import com.lacus.model.StreamLoadProperty;
 import com.lacus.sink.DorisStreamLoad;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
+import lombok.Getter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.connector.base.DeliveryGuarantee;
@@ -35,6 +36,7 @@ import static com.lacus.common.constant.Constants.*;
  *
  * @created by shengyu on 2023/8/31 10:55
  */
+@Getter
 public abstract class AbsFlinkProcessor implements IFlinkProcessor {
 
     // 采集组件名称，比如：collect-mysql
@@ -42,10 +44,6 @@ public abstract class AbsFlinkProcessor implements IFlinkProcessor {
 
     public AbsFlinkProcessor(String name) {
         this.name = name;
-    }
-
-    public String getName() {
-        return name;
     }
 
     /**
