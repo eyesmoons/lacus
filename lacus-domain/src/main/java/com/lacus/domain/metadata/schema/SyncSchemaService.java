@@ -89,9 +89,11 @@ public class SyncSchemaService {
      * @param tableName tableName
      */
     public List<SchemaTableDTO> getSchemaTableList(Long datasourceId, String dbName, String tableName) {
+        MetaDatasourceEntity metaDatasource = metaDataSourceService.getById(datasourceId);
+        IDatasourceProcessor processor = factory.getProcessor(metaDatasource.getType().toUpperCase());
         try {
             DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
-            List<SchemaTableEntity> schemaTableList = mysqlSchemaMapper.listSchemaTable(dbName, tableName);
+            List<SchemaTableEntity> schemaTableList = processor.listSchemaTable(dbName, tableName);
             return schemaTableList.stream().map(SchemaTableDTO::new).collect(Collectors.toList());
         } finally {
             DynamicDataSourceContextHolder.clearDataSourceType();
@@ -134,9 +136,11 @@ public class SyncSchemaService {
             // remove old columns
             boolean remove = metaColumnService.removeColumnsByTableId(tableDTO.getTableId());
             List<SchemaColumnEntity> columnList;
+            MetaDatasourceEntity metaDatasource = metaDataSourceService.getById(datasourceId);
+            IDatasourceProcessor processor = factory.getProcessor(metaDatasource.getType().toUpperCase());
             try {
                 DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
-                columnList = mysqlSchemaMapper.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
+                columnList = processor.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());
             } finally {
                 DynamicDataSourceContextHolder.clearDataSourceType();
             }

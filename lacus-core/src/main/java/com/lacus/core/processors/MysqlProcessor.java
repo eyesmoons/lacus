@@ -2,7 +2,9 @@ package com.lacus.core.processors;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.google.auto.service.AutoService;
+import com.lacus.dao.metadata.entity.SchemaColumnEntity;
 import com.lacus.dao.metadata.entity.SchemaDbEntity;
+import com.lacus.dao.metadata.entity.SchemaTableEntity;
 import com.lacus.dao.metadata.mapper.MysqlSchemaMapper;
 
 import java.util.List;
@@ -29,5 +31,17 @@ public class MysqlProcessor extends AbsJdbcProcessor {
         MysqlSchemaMapper mysqlSchemaMapper = SpringUtil.getBean(MysqlSchemaMapper.class);
         List<SchemaDbEntity> schemaDbList = mysqlSchemaMapper.listAllSchemaDb();
         return schemaDbList.stream().peek(entity -> entity.setDatasourceId(datasourceId)).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<SchemaTableEntity> listSchemaTable(String dbName, String tableName) {
+        MysqlSchemaMapper mysqlSchemaMapper = SpringUtil.getBean(MysqlSchemaMapper.class);
+        return mysqlSchemaMapper.listSchemaTable(dbName, tableName);
+    }
+
+    @Override
+    public List<SchemaColumnEntity> listSchemaColumn(String dbName, String tableName) {
+        MysqlSchemaMapper mysqlSchemaMapper = SpringUtil.getBean(MysqlSchemaMapper.class);
+        return mysqlSchemaMapper.listSchemaColumn(dbName, tableName);
     }
 }

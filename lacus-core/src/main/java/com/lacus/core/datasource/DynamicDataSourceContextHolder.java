@@ -1,12 +1,15 @@
 package com.lacus.core.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lacus.common.exception.CustomException;
 import com.lacus.common.utils.spring.SpringUtils;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.dao.metadata.enums.DatasourceTypeEnum;
+import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
 import com.lacus.dao.metadata.mapper.MetaDatasourceMapper;
+import com.lacus.dao.metadata.mapper.MetaDatasourceTypeMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
@@ -37,6 +40,10 @@ public class DynamicDataSourceContextHolder {
         return String.format("jdbc:%s://%s:%s/", protocol, metaDatasource.getIp(), metaDatasource.getPort());
     }
 
+    private static String convertUrl(String jdbcUrl, MetaDatasourceEntity metaDatasource) {
+        return String.format(jdbcUrl, metaDatasource.getIp(), metaDatasource.getPort(), metaDatasource.getDefaultDbName());
+    }
+
     /**
      * 获得数据源的变量
      */
@@ -58,17 +65,20 @@ public class DynamicDataSourceContextHolder {
             throw new CustomException("无效数据源ID:" + datasourceId);
         }
         DruidDataSource druidDataSource = new DruidDataSource();
-        DatasourceTypeEnum datasourceTypeEnum = DatasourceTypeEnum.getByType(metaDatasource.getType());
-        if (Objects.nonNull(datasourceTypeEnum)) {
-            druidDataSource.setDriverClassName(datasourceTypeEnum.getDriverName());
-            druidDataSource.setUrl(convertUrl(metaDatasource, datasourceTypeEnum.getProtocol()));
+        MetaDatasourceTypeMapper metaDatasourceTypeMapper = SpringUtils.getBean(MetaDatasourceTypeMapper.class);
+        LambdaQueryWrapper<MetaDatasourceTypeEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(MetaDatasourceTypeEntity::getTypeName, metaDatasource.getType());
+        MetaDatasourceTypeEntity datasourceTypeEntity = metaDatasourceTypeMapper.selectOne(wrapper);
+        if (ObjectUtils.isNotEmpty(datasourceTypeEntity)) {
+            druidDataSource.setDriverClassName(datasourceTypeEntity.getDriverName());
+            druidDataSource.setUrl(convertUrl(datasourceTypeEntity.getJdbcUrl(), metaDatasource));
         }
         druidDataSource.setUsername(metaDatasource.getUsername());
         druidDataSource.setBreakAfterAcquireFailure(true);
         druidDataSource.setConnectionErrorRetryAttempts(1);
         druidDataSource.setMaxWait(2000);
         druidDataSource.setFailFast(true);
-        if(StringUtils.isNotEmpty(metaDatasource.getPassword())) {
+        if (StringUtils.isNotEmpty(metaDatasource.getPassword())) {
             druidDataSource.setPassword(metaDatasource.getPassword());
         }
 
