@@ -1,6 +1,5 @@
 package com.lacus.domain.metadata.schema;
 
-import cn.hutool.extra.spring.SpringUtil;
 import com.lacus.common.exception.CustomException;
 import com.lacus.core.datasource.DynamicDataSourceContextHolder;
 import com.lacus.core.factory.MetaDatasourceFactory;
