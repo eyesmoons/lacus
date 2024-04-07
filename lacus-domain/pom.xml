@@ -16,13 +16,11 @@
 
     <dependencies>
 
-        <!-- 通用工具-->
         <dependency>
             <groupId>com.lacus</groupId>
             <artifactId>lacus-common</artifactId>
         </dependency>
 
-        <!-- 通用工具-->
         <dependency>
             <groupId>com.lacus</groupId>
             <artifactId>lacus-service</artifactId>
@@ -48,12 +46,6 @@
                     <artifactId>junit-vintage-engine</artifactId>
                 </exclusion>
             </exclusions>
-        </dependency>
-        <dependency>
-            <groupId>com.lacus</groupId>
-            <artifactId>lacus-service</artifactId>
-            <version>1.0.0</version>
-            <scope>compile</scope>
         </dependency>
     </dependencies>
 </project>

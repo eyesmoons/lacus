@@ -46,6 +46,15 @@
         <log4j.version>1.2.17</log4j.version>
         <slf4j.version>1.7.25</slf4j.version>
         <guava.version>33.0.0-jre</guava.version>
+        <sqlserver.version>8.2.2.jre8</sqlserver.version>
+        <oracle.version>11.2.0.4</oracle.version>
+        <clickhouse.version>0.3.2</clickhouse.version>
+        <springframework.version>2.7.0</springframework.version>
+        <swagger-ui.version>1.1.3</swagger-ui.version>
+        <protobuf.version>3.24.3</protobuf.version>
+        <spi.version>1.1.1</spi.version>
+        <maven-compiler-plugin>3.1</maven-compiler-plugin>
+        <maven-surefire-plugin>2.5</maven-surefire-plugin>
     </properties>
 
     <!-- 依赖声明 -->
@@ -56,7 +65,7 @@
             <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-dependencies</artifactId>
-                <version>2.7.0</version>
+                <version>${springframework.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -275,7 +284,7 @@
         <dependency>
             <groupId>com.github.caspar-chen</groupId>
             <artifactId>swagger-ui-layer</artifactId>
-            <version>1.1.3</version>
+            <version>${swagger-ui.version}</version>
         </dependency>
 
         <dependency>
@@ -315,7 +324,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>3.24.3</version>
+            <version>${protobuf.version}</version>
         </dependency>
 
         <dependency>
@@ -351,25 +360,25 @@
         <dependency>
             <groupId>com.microsoft.sqlserver</groupId>
             <artifactId>mssql-jdbc</artifactId>
-            <version>8.2.2.jre8</version>
+            <version>${sqlserver.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.4</version>
+            <version>${oracle.version}</version>
         </dependency>
 
         <dependency>
             <groupId>ru.yandex.clickhouse</groupId>
             <artifactId>clickhouse-jdbc</artifactId>
-            <version>0.3.2</version>
+            <version>${clickhouse.version}</version>
         </dependency>
 
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service-annotations</artifactId>
-            <version>1.1.1</version>
+            <version>${spi.version}</version>
             <optional>true</optional>
             <scope>compile</scope>
         </dependency>
@@ -377,7 +386,7 @@
         <dependency>
             <groupId>com.google.auto.service</groupId>
             <artifactId>auto-service</artifactId>
-            <version>1.1.1</version>
+            <version>${spi.version}</version>
             <optional>true</optional>
             <scope>compile</scope>
         </dependency>
@@ -388,7 +397,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.1</version>
+                <version>${maven-compiler-plugin.version}</version>
                 <configuration>
                     <source>${java.version}</source>
                     <target>${java.version}</target>
@@ -398,7 +407,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.5</version>
+                <version>${maven-surefire-plugin.version}</version>
                 <!-- 想跑test的话  设置成false  -->
                 <configuration>
                     <skipTests>true</skipTests>
