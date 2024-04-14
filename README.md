@@ -125,12 +125,12 @@ application-basic.yml：修改 yarn、hdfs 和 kafka 等信息。
 ```
 
 ## 打包部署
-### 1. 打包项目
+### 1. 打包
 ```shell
 mvn clean package -Dmaven.test.skip=true
 ```
 打包完生成的文件为：lacus-dist/target/lacus-dist-1.0.0-all.tar.gz
-### 2. 上传jar包
+### 2. 上传
 将打包之后的jar包上传至服务器：lacus-dist-1.0.0-all.tar.gz
 ### 3. 解压
 ```
@@ -149,7 +149,7 @@ lacus-dist-1.0.0
 ```
 ### 4. 修改配置文件
 修改解压完的conf目录下的配置文件，可根据需要修改
-### 5. 启动项目
+### 5. 启动
 ```shell
 cd lacus-dist-1.0.0/bin
 sh lacus-admin.sh start
