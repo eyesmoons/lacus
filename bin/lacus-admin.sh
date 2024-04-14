@@ -1,6 +1,6 @@
 #!/bin/sh
-# ./ag-admin.sh start 启动 stop 停止 restart 重启 status 状态
-AppName=lacus-admin.jar
+# ./lacus-admin.sh start 启动 stop 停止 restart 重启 status 状态
+AppName=lacus-admin-1.0.0.jar
 
 # JVM参数
 JVM_OPTS="-Dname=$AppName  -Duser.timezone=Asia/Shanghai -Xms512m -Xmx1024m -XX:MetaspaceSize=128m -XX:MaxMetaspaceSize=512m -XX:+HeapDumpOnOutOfMemoryError -XX:+PrintGCDateStamps  -XX:+PrintGCDetails -XX:NewRatio=1 -XX:SurvivorRatio=30 -XX:+UseParallelGC -XX:+UseParallelOldGC"
@@ -21,12 +21,13 @@ fi
 
 function start()
 {
-    PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
+  echo 当前路径：$APP_HOME
+  PID=`ps -ef |grep java|grep $AppName|grep -v grep|awk '{print $2}'`
 
 	if [ x"$PID" != x"" ]; then
 	    echo "$AppName is running..."
 	else
-		nohup java $JVM_OPTS -jar $AppName > /dev/null 2>&1 &
+		nohup java $JVM_OPTS -jar boot/$AppName > $LOG_PATH 2>&1 &
 		echo "Start $AppName success..."
 	fi
 }

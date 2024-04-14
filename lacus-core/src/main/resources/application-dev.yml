@@ -6,9 +6,9 @@ spring:
         druid:
             # 主库数据源
             master:
-                url: jdbc:mysql://localhost:3306/lacus?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
-                username: shengyu
-                password: 123456
+                url: jdbc:mysql://120.46.65.219:3306/lacus?useUnicode=true&characterEncoding=utf8&zeroDateTimeBehavior=convertToNull&useSSL=true&serverTimezone=GMT%2B8
+                username: lacus
+                password: S!JZ&*1m
             # 从库数据源
             slave:
                 # 从数据源开关/默认关闭
@@ -64,7 +64,7 @@ spring:
         # 数据库索引
         database: 13
         # 密码
-        password:
+        password: xwwl@33ooAA
         # 连接超时时间
         timeout: 10s
         lettuce:

@@ -12,13 +12,15 @@
     <description>lacus</description>
 
     <properties>
-        <jar_home>/Users/casey/workspace/lacus/lacus-dist</jar_home>
-        <!--依赖输出目录-->
+        <jar_home>../lacus-dist/origin</jar_home>
+        <!-- 依赖输出目录 -->
         <output.dependence.file.path>lib/</output.dependence.file.path>
-        <!--jar输出目录-->
-        <output.jar.file.path>bin/</output.jar.file.path>
-        <!--配置文件输出目录-->
+        <!-- 项目jar包输出目录 -->
+        <output.jar.file.path>jars/</output.jar.file.path>
+        <!-- 配置文件输出目录 -->
         <output.resource.file.path>conf/</output.resource.file.path>
+        <!-- 启动脚本输出目录 -->
+        <output.bin.file.path>bin/</output.bin.file.path>
         <lacus.version>1.0.0</lacus.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
@@ -284,6 +286,7 @@
         <module>lacus-core</module>
         <module>lacus-dao</module>
         <module>lacus-service</module>
+        <module>lacus-dist</module>
     </modules>
     <packaging>pom</packaging>
 
@@ -399,29 +402,6 @@
         </dependency>
     </dependencies>
 
-<!--    <build>-->
-<!--        <plugins>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-compiler-plugin</artifactId>-->
-<!--                <version>${maven-compiler-plugin.version}</version>-->
-<!--                <configuration>-->
-<!--                    <source>${java.version}</source>-->
-<!--                    <target>${java.version}</target>-->
-<!--                    <encoding>${project.build.sourceEncoding}</encoding>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--            <plugin>-->
-<!--                <groupId>org.apache.maven.plugins</groupId>-->
-<!--                <artifactId>maven-surefire-plugin</artifactId>-->
-<!--                <version>${maven-surefire-plugin.version}</version>-->
-<!--                &lt;!&ndash; 想跑test的话  设置成false  &ndash;&gt;-->
-<!--                <configuration>-->
-<!--                    <skipTests>true</skipTests>-->
-<!--                </configuration>-->
-<!--            </plugin>-->
-<!--        </plugins>-->
-<!--    </build>-->
     <build>
         <plugins>
             <!-- 打JAR包，不包含依赖文件；显式剔除配置文件 -->
@@ -507,11 +487,14 @@
                                 <resource>
                                     <directory>src/main/resources</directory>
                                     <includes>
-                                        <!--将如下格式配置文件拷贝-->
-                                        <exclude>*.properties</exclude>
-                                        <exclude>*.yml</exclude>
+                                        <exclude>application.yml</exclude>
+                                        <exclude>application-basic.yml</exclude>
+                                        <exclude>application-dev.yml</exclude>
                                         <exclude>*.xml</exclude>
                                         <exclude>*.txt</exclude>
+                                        <exclude>*.properties</exclude>
+                                        <exclude>*.yaml</exclude>
+                                        <exclude>*.xdb</exclude>
                                     </includes>
                                 </resource>
                             </resources>

@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly>
+    <!-- 可自定义，这里指定的是项目环境 -->
+    <id>all</id>
+
+    <!-- 打包的类型，如果有N个，将会打N个类型的包 -->
+    <formats>
+        <format>tar.gz</format>
+    </formats>
+
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+    <fileSets>
+        <!-- 将src/bin目录下的所有文件输出到打包后的bin目录中 -->
+        <fileSet>
+            <directory>../bin</directory>
+            <outputDirectory>/bin</outputDirectory>
+            <includes>
+                <include>*.sh</include>
+                <include>*.bat</include>
+            </includes>
+        </fileSet>
+
+        <!-- 指定输出target/classes中的配置文件到config目录中 -->
+        <fileSet>
+            <directory>${jar_home}/${output.resource.file.path}</directory>
+            <outputDirectory>/conf</outputDirectory>
+            <fileMode>0644</fileMode>
+        </fileSet>
+
+        <!-- 将第三方依赖打包到lib目录中 -->
+        <fileSet>
+            <directory>${jar_home}/${output.dependence.file.path}</directory>
+            <outputDirectory>/lib</outputDirectory>
+        </fileSet>
+
+        <!-- 将项目启动jar打包到boot目录中 -->
+        <fileSet>
+            <directory>${jar_home}/${output.jar.file.path}</directory>
+            <outputDirectory>/boot</outputDirectory>
+            <includes>
+                <include>lacus-admin-1.0.0.jar</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../doc</directory>
+            <outputDirectory>/doc</outputDirectory>
+            <includes>
+                <include>*.md</include>
+                <include>*.MD</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../sql</directory>
+            <outputDirectory>/sql</outputDirectory>
+            <includes>
+                <include>*.sql</include>
+                <include>*.SQL</include>
+            </includes>
+        </fileSet>
+    </fileSets>
+</assembly>

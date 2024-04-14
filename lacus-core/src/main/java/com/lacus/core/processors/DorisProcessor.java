@@ -2,7 +2,6 @@ package com.lacus.core.processors;
 
 import cn.hutool.extra.spring.SpringUtil;
 import com.google.auto.service.AutoService;
-import com.lacus.core.datasource.DynamicDataSourceContextHolder;
 import com.lacus.dao.metadata.entity.SchemaColumnEntity;
 import com.lacus.dao.metadata.entity.SchemaDbEntity;
 import com.lacus.dao.metadata.entity.SchemaTableEntity;

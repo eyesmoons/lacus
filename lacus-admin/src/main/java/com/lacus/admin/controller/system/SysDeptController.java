@@ -75,7 +75,7 @@ public class SysDeptController extends BaseController {
      * 获取部门下拉树列表
      */
     @GetMapping("/dropdownList")
-    public ResponseDTO<List> dropdownList() {
+    public ResponseDTO<?> dropdownList() {
         List<Tree<Long>> deptTree = deptApplicationService.getDeptTree();
         return ResponseDTO.ok(deptTree);
     }
