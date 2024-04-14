@@ -24,35 +24,35 @@
 ## 如何使用
 ### 一、系统截图
 - 登录界面
-![img.png](../images/lacus_login.png)
+![img.png](images/lacus_login.png)
 - 系统管理
-![img.png](../images/system-setting.png)
+![img.png](images/system-setting.png)
 - 系统监控
-![img.png](../images/system-monitor.png)
+![img.png](images/system-monitor.png)
 - 系统接口
-![img.png](../images/api.png)
+![img.png](images/api.png)
 - 元数据管理-数据源管理列表
-![img.png](../images/datasource.png)
+![img.png](images/datasource.png)
 - 元数据管理-新增数据源
-![img.png](../images/datasource_add.png)
+![img.png](images/datasource_add.png)
 - 元数据管理-数据表查询列表
-![img.png](../images/table-query.png)
+![img.png](images/table-query.png)
 - 元数据管理-数据表详情
-![img.png](../images/table-detail.png)
+![img.png](images/table-detail.png)
 - 数据同步-任务分组管理列表
-![img.png](../images/job-catalog.png)
+![img.png](images/job-catalog.png)
 - 数据同步-任务管理列表
-![img.png](../images/job-list.png)
+![img.png](images/job-list.png)
 - 数据同步-接入任务启动
-![img.png](../images/job-start.png)
+![img.png](images/job-start.png)
 - 数据同步-输入源配置
-![img.png](../images/job-source-conf.png)
+![img.png](images/job-source-conf.png)
 - 数据同步-表映射关系配置
-![img.png](../images/job-mappings.png)
+![img.png](images/job-mappings.png)
 - 数据同步-字段映射关系配置
-![img.png](../images/job-mapping-columns.png)
+![img.png](images/job-mapping-columns.png)
 - 数据同步-任务参数配置
-![img.png](../images/job-params.png)
+![img.png](images/job-params.png)
 ### 二、开发环境
 
 - JDK
@@ -100,7 +100,7 @@
 **如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.16.2 所有资源及配置文件放到了我的百度网盘中了。**
 
 **微信关注"毛毛小妖的笔记"公众号，公众号回复关键字"lacus"，即可获得专属网盘链接和密码。**
-![img.png](../images/flink-hdfs.png)
+![img.png](images/flink-hdfs.png)
 #### 3. 后端启动
 ```
 - 生成所需的数据库表
@@ -178,4 +178,4 @@ lacus
   - 填入数据库地址，账号密码，库名。然后填入所需的表名执行代码即可。
 
 欢迎关注以下公众号，留言或公众号回复"交流"加入技术交流群，一起学习。
-![img.png](../images/communicate.png)
+![img.png](images/communicate.png)

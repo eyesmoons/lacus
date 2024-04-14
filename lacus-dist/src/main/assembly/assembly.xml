@@ -44,11 +44,10 @@
         </fileSet>
 
         <fileSet>
-            <directory>../doc</directory>
+            <directory>../</directory>
             <outputDirectory>/doc</outputDirectory>
             <includes>
                 <include>*.md</include>
-                <include>*.MD</include>
             </includes>
         </fileSet>
 
@@ -58,6 +57,14 @@
             <includes>
                 <include>*.sql</include>
                 <include>*.SQL</include>
+            </includes>
+        </fileSet>
+
+        <fileSet>
+            <directory>../docker</directory>
+            <outputDirectory>/docker</outputDirectory>
+            <includes>
+                <include>*.md</include>
             </includes>
         </fileSet>
     </fileSets>
