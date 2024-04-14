@@ -11,10 +11,10 @@
 
 ## 平台简介
 
-- Lacus是一个开源大数据平台项目，致力于让数据采集变得更简单、好用。基础框架使用的是若依，感谢若依及其他开源作者。
-- 如果你厌烦了每天大量的数据采集工作，不想把大把的时间放在数据采集中，那么这个项目很可能值得你去花点时间研究一下。
+- Lacus是一个开源大数据平台项目，主要解决大数据采集、存储、分析与计算问题，主要包括元数据、数据采集、数据服务、数据开发。
+- 如果你正在调研一款轻量级的大数据平台，那么这个项目很可能值得你去花点时间研究一下。
 - 如果你热爱开源，喜欢折腾，并且对大数据感兴趣，欢迎加入这个项目，或者联系作者加入相关讨论群，交流大数据架构及开发技术。
-- 如果觉得对你有帮助，别忘了顺手点个star哦！！！
+- 如果觉得对你有帮助，别忘了顺手点个 **⭐️star⭐️** 哦，你的认可对我们非常重要！！！
 ## 演示地址
 [http://120.46.65.219:8080](http://120.46.65.219:8080)
 
@@ -78,7 +78,7 @@
 | `hdfs`            | 主要提供hdfs存储          | 3.3.6  |
 | `apache doris`    | MPP数据库              | 2.0.2  |
 
-### 四、启动说明
+### 四、快速开始
 
 #### 1. 前置准备
 
@@ -94,7 +94,7 @@
 #### 2. flink 资源准备
 - hdfs 中上传`flink 1.16.2 `所需的jar包，目录为：`/flink/libs`；
 - flink配置文件目录：`/flink/conf`；
-- flink 任务所需的 jar 包目录为：`/flink/jobs/flink-jobs.jar`，此 jar 包由`lacus-job`项目打包而来
+- flink 任务所需的 jar 包目录为：`/flink/jobs/flink-jobs.jar`，此 jar 包由`lacus-rtc-engine`项目打包而来
 目录结构如下所示。
 
 **如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.16.2 所有资源及配置文件放到了我的百度网盘中了。**
@@ -106,10 +106,9 @@
 - 生成所需的数据库表
 找到后端项目根目录下的 sql 目录中的 lacus.sql 脚本文件，导入到你新建的数据库中。
 
-- 修改配置文件：application-dev.yml 
-在 lacus-core 模块下，找到 resource 目录下的 application-dev.yml 文件，
-配置Mysql数据库以及 Redis 的 地址、端口、账号密码；
-在 application-basic.yml 文件中配置 yarn、hdfs 和 kafka 等信息。
+- 修改配置文件：lacus-core
+application-dev.yml：修改 Mysql 数据库以及 Redis 信息。
+application-basic.yml：修改 yarn、hdfs 和 kafka 等信息。
 
 - 项目编译
 在根目录执行 mvn install
@@ -120,60 +119,76 @@
 ```
 #### 4. 前端启动
 ```
+- cd lacus-ui
 - npm install
 - npm run dev
 ```
 
-## 生产环境部署
+## 打包部署
 ### 1. 打包项目
 ```shell
 mvn clean package -Dmaven.test.skip=true
 ```
+打包完生成的文件为：lacus-dist/target/lacus-dist-1.0.0-all.tar.gz
 ### 2. 上传jar包
-将打包之后的jar包上传至服务器：lacus-admin-1.0.0.jar
-### 3. 启动项目
-```shell
-nohup java -jar lacus-admin-1.0.0.jar > ./lacus.log 2>&1 &
+将打包之后的jar包上传至服务器：lacus-dist-1.0.0-all.tar.gz
+### 3. 解压
 ```
-
+tar -zxvf lacus-dist-1.0.0-all.tar.gz
+```
+解压完的目录为：
+```
+lacus-dist-1.0.0
+├── bin -- 启动脚本
+├── boot -- 启动jar包
+├── conf -- 配置文件
+├── doc -- 文档
+├── docker -- docker相关文档
+├── lib -- 依赖jar包
+└── sql -- 项目用到的sql脚本
+```
+### 4. 修改配置文件
+修改解压完的conf目录下的配置文件，可根据需要修改
+### 5. 启动项目
+```shell
+cd lacus-dist-1.0.0/bin
+sh lacus-admin.sh start
+```
+### 6. 其他命令
+```shell
+# 查看启动状态
+sh lacus-admin.sh status
+# 停止
+sh lacus-admin.sh stop
+# 重启
+sh lacus-admin.sh restart
+```
 ## 系统功能
 
-| 功能     | 描述                 |
-|--------|--------------------|
-| 元数据模块  | 根据源库表管理所有元数据信息     |
-| 数据服务模块 | 通过API接口,对外提供获取数据能力 |
-| 数据同步模块 | 通过可视化配置，一键部署接入任务   |
-| 数据质量模块 | 敬请期待...            |
+| 功能    | 描述                        | 状态    |
+|-------|---------------------------|-------|
+| 元数据管理 | 根据源库表管理所有元数据信息            | 已完成   |
+| 数据服务  | 通过API接口,对外提供获取数据能力        | 前端待开发 |
+| 数据同步  | 通过可视化配置，一键部署采集任务          | 前端待完善 |
+| 数据开发  | 通过可视化配置，在线提交flink和spark任务 | 开发中   |
 
 ## 项目结构
 
-``` 
+``` shell
 lacus
-├── lacus-admin -- 管理后台接口模块
-│
+├── lacus-admin  -- api接口模块
 ├── lacus-common -- 公共模块
-│
-├── lacus-core -- 核心基础模块
-│
-├── lacus-domain -- 业务模块
-├    ├── user -- 用户模块（举例）
-├         ├── command -- 命令参数接收模型（命令）
-├         ├── dto -- 返回数据类
-├         ├── model -- 领域模型类
-├         ├── query -- 查询参数模型（查询）
-│         ├────── UserApplicationService -- 应用服务（事务层，操作领域模型类完成业务逻辑）
-├── lacus-job -- flink任务中心，单独模块
-├── lacus-dao -- 数据映射模块（仅包含数据相关逻辑）
-├    ├── entiy -- 实体类
-├    ├── enums -- 数据相关枚举
-├    ├── mapper -- DAO
-├    ├── query -- 封装查询对象
-├    ├── result -- 封装多表查询对象
-└──  └── service -- 服务层
+├── lacus-core  -- 核心基础模块
+├── lacus-dao  -- 数据库交互模块
+├── lacus-dist  -- 打包模块
+├── lacus-domain  -- 业务领域模块
+├── lacus-service  -- 服务层
+├── lacus-rtc-engine  -- 实时采集引擎
+└── sql  -- sql脚本
 ```
 
 ## 注意事项
-- IDEA会自动将.properties文件的编码设置为ISO-8859-1,请在Settings > Editor > File Encodings > Properties Files > 设置为UTF-8
+- idea会自动将.properties文件的编码设置为ISO-8859-1,请在Settings > Editor > File Encodings > Properties Files > 设置为UTF-8
 - 如需要生成新的表，请使用CodeGenerator类进行生成。
   - 填入数据库地址，账号密码，库名。然后填入所需的表名执行代码即可。
 
