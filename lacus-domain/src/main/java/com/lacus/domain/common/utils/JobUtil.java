@@ -173,6 +173,7 @@ public class JobUtil {
         JobConf jobConf = new JobConf();
         SourceV2 source = new SourceV2();
         source.setHostname(sourceJobConf.getHostname());
+        source.setDatasourceType(sourceJobConf.getDatasourceType());
         source.setPort(sourceJobConf.getPort());
         source.setUsername(sourceJobConf.getUsername());
         source.setPassword(sourceJobConf.getPassword());
@@ -317,6 +318,7 @@ public class JobUtil {
             sourceJobConf.setBootStrapServer(bootstrapServers);
             sourceJobConf.setTopic(buildTopic(job.getJobId()));
             sourceJobConf.setSourceName(metaDatasource.getDatasourceName());
+            sourceJobConf.setDatasourceType(metaDatasource.getType().toLowerCase());
             sourceJobConf.setHostname(metaDatasource.getIp());
             sourceJobConf.setPort(String.valueOf(metaDatasource.getPort()));
             sourceJobConf.setUsername(metaDatasource.getUsername());

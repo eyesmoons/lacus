@@ -80,12 +80,13 @@ public class JobOperationService {
         // 构建任务json
         JobConf jobConf = jobUtil.buildJobConf(job, syncType, timeStamp);
         log.info("jobConf：{}", JSON.toJSONString(jobConf));
+        String datasourceType = jobConf.getSource().getDatasourceType();
         try {
             DataSyncJobInstanceEntity instance = instanceService.saveInstance(job, syncType, timeStamp, JSON.toJSONString(jobConf));
             jobConf.getJobInfo().setInstanceId(instance.getInstanceId());
             String flinkJobPath = jobUtil.getJobJarPath(flinkJobJarName, defaultHdfs);
             String applicationId = YarnUtil.deployOnYarn(JOB_MAIN_CLASS,
-                    new String[]{"mysql", jobName, JSON.toJSONString(jobConf)},
+                    new String[]{datasourceType, jobName, JSON.toJSONString(jobConf)},
                     jobName,
                     flinkParams,
                     flinkJobPath,

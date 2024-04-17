@@ -21,4 +21,5 @@ public class SourceJobConf {
     private String syncType;
     private Long timeStamp;
     private String sourceName;
+    private String datasourceType;
 }

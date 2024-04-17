@@ -12,6 +12,7 @@ import java.util.List;
 public class SourceV2 implements Serializable {
     private static final long serialVersionUID = 7830490112239790483L;
     private String sourceName;
+    private String datasourceType;
     private String hostname;
     private String port;
     private String username;
