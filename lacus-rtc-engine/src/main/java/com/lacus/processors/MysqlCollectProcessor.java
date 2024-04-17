@@ -8,7 +8,6 @@ import com.lacus.deserialization.CustomerDeserializationSchemaMysql;
 import com.lacus.function.BinlogFilterFunction;
 import com.lacus.function.BinlogMapFunction;
 import com.lacus.function.BinlogProcessWindowFunction;
-import com.lacus.function.ETLFunction;
 import com.lacus.handler.FailExecutionHandler;
 import com.lacus.model.*;
 import com.lacus.sink.DorisSink;
@@ -27,7 +26,6 @@ import org.apache.kafka.clients.consumer.ConsumerRecord;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.lacus.common.constant.ProcessorConstants.PROCESSOR_MYSQL;
 
@@ -103,9 +101,9 @@ public class MysqlCollectProcessor extends AbsFlinkProcessor {
         // 构建doris stream load配置
         Map<String, DorisStreamLoad> dorisStreamLoadMap = buildDorisStreamConfig(sink);
         // 应用动态清洗代码
-        if (Objects.nonNull(dynamicETL)) {
-            mapDs = mapDs.map(new ETLFunction(dynamicETL, failExecutionHandler, jobId, jobInfo.getInstanceId(), convertTopics(bootStrapServers, topics), sink.getSinkDataSource().getDataSourceName(), dorisStreamLoadMap)).name(PROCESSOR_MYSQL + "_kafka_etl");
-        }
+//        if (Objects.nonNull(dynamicETL)) {
+//            mapDs = mapDs.map(new ETLFunction(dynamicETL, failExecutionHandler, jobId, jobInfo.getInstanceId(), convertTopics(bootStrapServers, topics), sink.getSinkDataSource().getDataSourceName(), dorisStreamLoadMap)).name(PROCESSOR_MYSQL + "_kafka_etl");
+//        }
         // 应用开窗函数，主要起限流作用
         SingleOutputStreamOperator<Map<String, String>> triggerDs = mapDs.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(flinkConf.getMaxBatchInterval())))
                 .trigger(new CountAndSizeTrigger<>(flinkConf.getMaxBatchRows(), flinkConf.getMaxBatchSize()))

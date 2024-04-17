@@ -342,7 +342,7 @@
     <dependency>
       <groupId>com.mysql</groupId>
       <artifactId>mysql-connector-j</artifactId>
-      <version>8.0.33</version>
+      <version>8.2.0</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -410,7 +410,7 @@
     <dependency>
       <groupId>cn.hutool</groupId>
       <artifactId>hutool-all</artifactId>
-      <version>5.8.22</version>
+      <version>5.8.25</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -473,21 +473,22 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <mysql-connector-j.version>8.0.33</mysql-connector-j.version>
+    <auto-service.version>1.1.1</auto-service.version>
+    <mysql-connector-j.version>8.2.0</mysql-connector-j.version>
     <lombok.version>1.18.26</lombok.version>
     <protobuf-java.version>3.24.2</protobuf-java.version>
     <scope.setting>provided</scope.setting>
     <commons-collections4.version>4.4</commons-collections4.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <druid.version>1.2.18</druid.version>
-    <maven.compiler.source>18</maven.compiler.source>
+    <maven.compiler.source>8</maven.compiler.source>
     <kafka-clients.version>3.5.1</kafka-clients.version>
     <jackson-databind.version>2.15.2</jackson-databind.version>
     <java.version>1.8</java.version>
     <slf4j.version>2.0.7</slf4j.version>
     <http.version>4.5.14</http.version>
     <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
-    <hutool.version>5.8.22</hutool.version>
+    <hutool.version>5.8.25</hutool.version>
     <commons-lang3.version>3.12.0</commons-lang3.version>
     <guava.version>31.1-jre</guava.version>
     <maven.compiler.target>8</maven.compiler.target>

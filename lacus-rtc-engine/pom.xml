@@ -33,7 +33,7 @@
         <commons-collections4.version>4.4</commons-collections4.version>
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <druid.version>1.2.18</druid.version>
-        <dynamic-etl.version>1.0-SNAPSHOT</dynamic-etl.version>
+<!--        <dynamic-etl.version>1.0-SNAPSHOT</dynamic-etl.version>-->
         <hutool.version>5.8.25</hutool.version>
         <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
         <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
@@ -293,12 +293,12 @@
         </dependency>
 
         <!-- 动态代码清洗 -->
-        <dependency>
-            <groupId>com.qtone</groupId>
-            <artifactId>dynamic-etl</artifactId>
-            <version>${dynamic-etl.version}</version>
-            <scope>${scope.setting}</scope>
-        </dependency>
+<!--        <dependency>-->
+<!--            <groupId>com.qtone</groupId>-->
+<!--            <artifactId>dynamic-etl</artifactId>-->
+<!--            <version>${dynamic-etl.version}</version>-->
+<!--            <scope>${scope.setting}</scope>-->
+<!--        </dependency>-->
 
         <dependency>
             <groupId>cn.hutool</groupId>

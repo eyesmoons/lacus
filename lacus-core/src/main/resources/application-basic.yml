@@ -126,7 +126,7 @@ xss:
   urlPatterns: /system/*,/monitor/*,/tool/*
 
 kafka:
-  bootstrapServers: hadoop1:9092,hadoop2:9092,hadoop3:9092
+  bootstrapServers: 123.99.199.177:9092,123.99.199.215:9092,123.99.199.226:9092
 
 yarn:
   restapi-address: http://hadoop2:8088/proxy/
