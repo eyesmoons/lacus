@@ -21,13 +21,11 @@ public class DorisSink extends RichSinkFunction<Map<String, String>> {
     private static final long serialVersionUID = -3872752300519439640L;
 
     private final Map<String, DorisStreamLoad> dorisStreamLoadMap;
-    private final FailExecutionHandler failExecutionHandler;
     private final static Integer RETRY_COUNT = 5;
     private final static Long RETRY_SLEEP_MILLS = 5000L;
 
-    public DorisSink(Map<String, DorisStreamLoad> dorisStreamLoadMap, FailExecutionHandler failExecutionHandler) {
+    public DorisSink(Map<String, DorisStreamLoad> dorisStreamLoadMap) {
         this.dorisStreamLoadMap = dorisStreamLoadMap;
-        this.failExecutionHandler = failExecutionHandler;
     }
 
     @Override
@@ -59,24 +57,7 @@ public class DorisSink extends RichSinkFunction<Map<String, String>> {
                 return;
             } catch (StreamLoadException e1) {
                 if (i >= RETRY_COUNT) {
-                    if (failExecutionHandler != null) {
-                        log.warn("重试失败,发送至错误消息队列");
-                        String stackTrace = ExceptionUtils.getStackTrace(e1);
-                        RespContent resp = e1.getRespContent();
-                        try {
-                            failExecutionHandler.failExecution(entry.getKey(), data, dorisStreamLoad.getDb(), dorisStreamLoad.getTbl(), resp, stackTrace, STREAM_LOAD_ERROR.getCode());
-                        } catch (Exception e2) {
-                            log.error("kafka消息发送失败：{}", e1.getMessage());
-                        }
-                        long totalRows = resp.getNumberTotalRows();
-                        if (totalRows == 0) {
-                            JSONArray dataArr = JSON.parseArray(data);
-                            resp.setNumberTotalRows(dataArr.size());
-                        }
-                        return;
-                    } else {
-                        log.warn("未配置失败策略，丢弃数据:{}", data);
-                    }
+                    log.error("重试失败，请查看日志");
                 }
                 try {
                     Thread.sleep(RETRY_SLEEP_MILLS);

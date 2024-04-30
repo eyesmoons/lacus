@@ -6,30 +6,12 @@ import com.lacus.common.utils.hdfs.HdfsUtil;
 import com.lacus.common.utils.time.DateUtils;
 import com.lacus.common.utils.yarn.FlinkConf;
 import com.lacus.common.utils.yarn.YarnUtil;
-import com.lacus.dao.datasync.entity.DataSyncJobEntity;
-import com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity;
-import com.lacus.dao.datasync.entity.DataSyncSavedColumn;
-import com.lacus.dao.datasync.entity.DataSyncSavedTable;
-import com.lacus.dao.datasync.entity.DataSyncSinkTableEntity;
-import com.lacus.dao.datasync.entity.DataSyncSourceTableEntity;
+import com.lacus.dao.datasync.entity.*;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.domain.common.dto.JobConf;
-import com.lacus.domain.common.dto.JobInfo;
-import com.lacus.domain.common.dto.Sink;
-import com.lacus.domain.common.dto.SinkDataSource;
-import com.lacus.domain.common.dto.SinkJobConf;
-import com.lacus.domain.common.dto.Source;
-import com.lacus.domain.common.dto.SourceJobConf;
-import com.lacus.domain.common.dto.SourceV2;
-import com.lacus.domain.common.dto.StreamLoadProperty;
+import com.lacus.domain.common.dto.*;
 import com.lacus.domain.datasync.job.JobMonitorService;
-import com.lacus.service.datasync.IDataSyncColumnMappingService;
-import com.lacus.service.datasync.IDataSyncJobInstanceService;
-import com.lacus.service.datasync.IDataSyncJobService;
-import com.lacus.service.datasync.IDataSyncSinkTableService;
-import com.lacus.service.datasync.IDataSyncSourceTableService;
-import com.lacus.service.datasync.IDataSyncTableMappingService;
+import com.lacus.service.datasync.*;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -39,14 +21,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -92,86 +67,10 @@ public class JobUtil {
     @Autowired
     private JobMonitorService monitorService;
 
-    /**
-     * 构建sink任务json
-     *
-     * @param job 任务对象
-     */
-    public SinkJobConf buildSinkJobConf(DataSyncJobEntity job) {
-        SinkJobConf sinkJobConf = new SinkJobConf();
-        Source source = new Source();
-        source.setBootstrapServers(bootstrapServers);
-        source.setGroupId(buildGroupId(job.getJobId()));
-        source.setTopics(Collections.singletonList("rtc_topic_" + job.getJobId()));
-
-        Sink sink = new Sink();
-        MetaDatasourceEntity sinkMetaDatasource = dataSourceService.getById(job.getSinkDatasourceId());
-        List<DataSyncSinkTableEntity> sinkTables = sinkTableService.listByJobId(job.getJobId());
-
-        // 设置sink数据源
-        if (ObjectUtils.isNotEmpty(sinkMetaDatasource)) {
-            SinkDataSource sinkDataSource = new SinkDataSource();
-            sinkDataSource.setDataSourceName(sinkMetaDatasource.getDatasourceName());
-            sinkDataSource.setIp(sinkMetaDatasource.getIp());
-            sinkDataSource.setPort(sinkMetaDatasource.getPort());
-            sinkDataSource.setUserName(sinkMetaDatasource.getUsername());
-            sinkDataSource.setPassword(sinkMetaDatasource.getPassword());
-            if (ObjectUtils.isNotEmpty(sinkTables)) {
-                sinkDataSource.setDbName(sinkTables.get(0).getSinkDbName());
-            }
-            sink.setSinkDataSource(sinkDataSource);
-        }
-
-        // 设置stream load属性
-        DataSyncSavedTable savedTableQuery = new DataSyncSavedTable();
-        savedTableQuery.setJobId(job.getJobId());
-        LinkedList<DataSyncSavedTable> savedTables = tableMappingService.listSavedTables(savedTableQuery);
-        if (ObjectUtils.isNotEmpty(savedTables)) {
-            Map<String, StreamLoadProperty> streamLoadPropertyMap = new HashMap<>();
-            for (DataSyncSavedTable savedTable : savedTables) {
-                DataSyncSavedColumn savedColumnQuery = convertSavedColumnParams(job, savedTable);
-                List<DataSyncSavedColumn> savedColumns = columnMappingService.querySavedColumns(savedColumnQuery);
-                List<String> columns = new ArrayList<>();
-                List<String> jsonPaths = new ArrayList<>();
-                for (DataSyncSavedColumn savedColumn : savedColumns) {
-                    columns.add("`" + savedColumn.getSinkColumnName() + "`");
-                    jsonPaths.add("\"$." + savedColumn.getSourceColumnName() + "\"");
-                }
-
-                StreamLoadProperty streamLoadProperty = new StreamLoadProperty();
-                String sourceTable = savedTable.getSourceDbName() + "." + savedTable.getSourceTableName();
-                streamLoadProperty.setSinkTable(savedTable.getSinkTableName());
-                streamLoadProperty.setColumns(String.join(",", columns));
-                streamLoadProperty.setJsonpaths("[" + String.join(",", jsonPaths) + "]");
-                streamLoadPropertyMap.put(sourceTable, streamLoadProperty);
-            }
-            sink.setStreamLoadPropertyMap(streamLoadPropertyMap);
-        }
-
-        JobInfo jobInfo = new JobInfo();
-        jobInfo.setJobId(job.getJobId());
-        jobInfo.setJobName(job.getJobName());
-
-        FlinkConf flinkConf = new FlinkConf();
-        flinkConf.setMaxBatchInterval(job.getWindowSize());
-        flinkConf.setMaxBatchSize(job.getMaxSize() * 1024 * 1024);
-        flinkConf.setMaxBatchRows(job.getMaxCount() * 10000);
-
-        // 设置job信息
-        sinkJobConf.setJobInfo(jobInfo);
-        // 设置flinkConf
-        sinkJobConf.setFlinkConf(flinkConf);
-        // 设置source
-        sinkJobConf.setSource(source);
-        // 设置sink
-        sinkJobConf.setSink(sink);
-        return sinkJobConf;
-    }
-
     public JobConf buildJobConf(DataSyncJobEntity job, String syncType, String timeStamp) {
         SourceJobConf sourceJobConf = buildSourceJobConf(job, syncType, timeStamp);
         JobConf jobConf = new JobConf();
-        SourceV2 source = new SourceV2();
+        Source source = new Source();
         source.setHostname(sourceJobConf.getHostname());
         source.setDatasourceType(sourceJobConf.getDatasourceType());
         source.setPort(sourceJobConf.getPort());
@@ -204,6 +103,7 @@ public class JobUtil {
         // 设置sink数据源
         if (ObjectUtils.isNotEmpty(sinkMetaDatasource)) {
             SinkDataSource sinkDataSource = new SinkDataSource();
+            sinkDataSource.setDataSourceType(sinkMetaDatasource.getType());
             sinkDataSource.setDataSourceName(sinkMetaDatasource.getDatasourceName());
             sinkDataSource.setIp(sinkMetaDatasource.getIp());
             sinkDataSource.setPort(sinkMetaDatasource.getPort());
@@ -372,16 +272,14 @@ public class JobUtil {
         return jobName + "_" + System.currentTimeMillis();
     }
 
-    public Boolean doStop(Long jobId, Integer type) {
+    public void doStop(Long jobId, Integer type) {
         try {
             DataSyncJobInstanceEntity lastInstance = instanceService.getLastInstanceByJobId(jobId);
             if (ObjectUtils.isNotEmpty(lastInstance)) {
                 doStopWithoutSavePoint(lastInstance);
             }
-            return true;
         } catch (Exception e) {
             log.error("任务停止失败：{}", e.getMessage());
-            return false;
         }
     }
 

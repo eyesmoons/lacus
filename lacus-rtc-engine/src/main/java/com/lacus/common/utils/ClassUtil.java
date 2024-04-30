@@ -1,7 +1,7 @@
 package com.lacus.common.utils;
 
-import com.lacus.AbsFlinkProcessor;
-import com.lacus.factory.DataCollectFactory;
+import com.lacus.reader.BaseReader;
+import com.lacus.factory.DataCollectReaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,11 +23,11 @@ import java.util.jar.JarFile;
  * @author casey
  */
 public class ClassUtil {
-    private static final Logger logger = LoggerFactory.getLogger(DataCollectFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataCollectReaderFactory.class);
 
     @SuppressWarnings({"rawtypes"})
     public static void main(String[] args) throws Exception {
-        List<Class> classes = ClassUtil.getAllClassByInterface(Class.forName(AbsFlinkProcessor.class.getName()));
+        List<Class> classes = ClassUtil.getAllClassByInterface(Class.forName(BaseReader.class.getName()));
         for (Class clas : classes) {
             System.out.println(clas.getName());
         }

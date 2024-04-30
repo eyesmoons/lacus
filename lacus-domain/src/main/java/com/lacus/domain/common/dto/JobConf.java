@@ -11,5 +11,5 @@ public class JobConf {
     private JobInfo jobInfo;
     private FlinkConf flinkConf;
     private Sink sink;
-    private SourceV2 source;
+    private Source source;
 }

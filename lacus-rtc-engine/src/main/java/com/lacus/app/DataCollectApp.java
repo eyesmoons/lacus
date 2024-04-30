@@ -1,8 +1,14 @@
 package com.lacus.app;
 
-import com.lacus.IFlinkProcessor;
+import com.alibaba.fastjson2.JSON;
+import com.lacus.IReader;
+import com.lacus.IWriter;
 import com.lacus.common.exception.CustomException;
-import com.lacus.factory.DataCollectFactory;
+import com.lacus.factory.DataCollectReaderFactory;
+import com.lacus.factory.DataCollectWriterFactory;
+import com.lacus.model.JobConf;
+import com.lacus.model.SourceV2;
+import com.lacus.utils.KafkaUtil;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -17,20 +23,19 @@ import java.util.Objects;
  * @created by shengyu on 2024/1/21 20:14
  */
 public class DataCollectApp {
-    // 任务名称
     protected static String jobName;
-    // 任务配置json
-    protected static String jobConf;
-    // 处理器名称，比如：mysql
-    protected static String processorName;
+    protected static String jobParams;
+    protected static String readerName;
+    protected static String writerName;
 
     public static void main(String[] args) throws Exception {
         if (ObjectUtils.isEmpty(args) || args.length < 3) {
             throw new CustomException("参数错误");
         }
-        processorName = args[0];
-        jobName = args[1];
-        jobConf = args[2];
+        readerName = args[0];
+        writerName = args[1];
+        jobName = args[2];
+        jobParams = args[3];
 
         // 获取flink上下文环境
         StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
@@ -49,15 +54,24 @@ public class DataCollectApp {
         // Flink处理程序被cancel后，会保留Checkpoint数据
         env.getCheckpointConfig().setExternalizedCheckpointCleanup(CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION);
 
-        DataCollectFactory factory = DataCollectFactory.getInstance();
-        factory.register();
-        IFlinkProcessor processor = factory.getProcessor(processorName);
-        if (Objects.isNull(processor)) {
-            throw new CustomException("can not find processor " + processorName);
+        DataCollectReaderFactory readerFactory = DataCollectReaderFactory.getInstance();
+        readerFactory.register();
+        IReader reader = readerFactory.getReader(readerName);
+        if (Objects.isNull(reader)) {
+            throw new CustomException("can not find reader " + readerName);
         }
-        DataStreamSource<String> reader = processor.reader(env, jobName, jobConf);
-        processor.transform(reader);
-        processor.writer(env, jobName, jobConf);
+        DataStreamSource<String> sourceReader = reader.read(env, jobName, jobParams);
+        JobConf jobConf = JSON.parseObject(jobParams, JobConf.class);
+        SourceV2 source = jobConf.getSource();
+        sourceReader.sinkTo(KafkaUtil.getKafkaSink(source.getBootStrapServers(), source.getTopics())).name("_kafka_channel");
+
+        DataCollectWriterFactory writerFactory = DataCollectWriterFactory.getInstance();
+        writerFactory.register();
+        IWriter writer = writerFactory.getWriter(writerName);
+        if (Objects.isNull(writer)) {
+            throw new CustomException("can not find writer " + writerName);
+        }
+        writer.write(env, jobConf);
         env.execute(jobName);
     }
 }

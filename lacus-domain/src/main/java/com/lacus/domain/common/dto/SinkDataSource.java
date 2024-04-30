@@ -7,6 +7,7 @@ import lombok.Data;
  */
 @Data
 public class SinkDataSource {
+    private String dataSourceType;
     private String dataSourceName;
     private String ip;
     private Integer port;
