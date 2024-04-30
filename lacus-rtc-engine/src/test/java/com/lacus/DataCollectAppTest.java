@@ -8,10 +8,11 @@ import com.lacus.app.DataCollectApp;
  */
 public class DataCollectAppTest {
     public static void main(String[] args) throws Exception {
-        args = new String[3];
-        args[0] = "mysql";
-        args[1] = "demo";
-        args[2] = "{\n" +
+        args = new String[4];
+        args[0] = "mysql"; // reader type
+        args[1] = "doris"; // writer type
+        args[2] = "demo"; // job name
+        args[3] = "{\n" +
                 "    \"flinkConf\": {\n" +
                 "        \"maxBatchInterval\": 5,\n" +
                 "        \"maxBatchRows\": 20000,\n" +
