@@ -372,7 +372,7 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava</artifactId>
-      <version>31.1-jre</version>
+      <version>33.1.0-jre</version>
       <scope>provided</scope>
       <exclusions>
         <exclusion>
@@ -382,10 +382,6 @@
         <exclusion>
           <artifactId>listenablefuture</artifactId>
           <groupId>com.google.guava</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>checker-qual</artifactId>
-          <groupId>org.checkerframework</groupId>
         </exclusion>
         <exclusion>
           <artifactId>error_prone_annotations</artifactId>
@@ -400,12 +396,6 @@
           <groupId>com.google.code.findbugs</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.qtone</groupId>
-      <artifactId>dynamic-etl</artifactId>
-      <version>1.0-SNAPSHOT</version>
-      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>cn.hutool</groupId>
@@ -447,6 +437,12 @@
         <scope>${scope.setting}</scope>
       </dependency>
       <dependency>
+        <groupId>org.eclipse.jetty</groupId>
+        <artifactId>jetty-servlets</artifactId>
+        <version>${jetty-servlets.version}</version>
+        <scope>${scope.setting}</scope>
+      </dependency>
+      <dependency>
         <groupId>com.google.protobuf</groupId>
         <artifactId>protobuf-java</artifactId>
         <version>${protobuf-java.version}</version>
@@ -470,41 +466,105 @@
         <version>${connect-runtime.version}</version>
         <scope>${scope.setting}</scope>
       </dependency>
+      <dependency>
+        <groupId>org.bitbucket.b_c</groupId>
+        <artifactId>jose4j</artifactId>
+        <version>${jose4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.xerial.snappy</groupId>
+        <artifactId>snappy-java</artifactId>
+        <version>${snappy-java.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-codec</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>${postgresql.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-common</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.netty</groupId>
+        <artifactId>netty-handler</artifactId>
+        <version>${netty.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-credential</artifactId>
+        <version>${wildfly.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-mechanism-scram</artifactId>
+        <version>${wildfly.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-password-impl</artifactId>
+        <version>${wildfly.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.security</groupId>
+        <artifactId>wildfly-elytron-x500</artifactId>
+        <version>${wildfly.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.avro</groupId>
+        <artifactId>avro</artifactId>
+        <version>${avro.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
   <properties>
-    <auto-service.version>1.1.1</auto-service.version>
-    <mysql-connector-j.version>8.2.0</mysql-connector-j.version>
-    <lombok.version>1.18.26</lombok.version>
+    <netty.version>4.1.109.Final</netty.version>
     <protobuf-java.version>3.24.2</protobuf-java.version>
-    <scope.setting>provided</scope.setting>
-    <commons-collections4.version>4.4</commons-collections4.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <druid.version>1.2.18</druid.version>
-    <maven.compiler.source>8</maven.compiler.source>
-    <kafka-clients.version>3.5.1</kafka-clients.version>
-    <jackson-databind.version>2.15.2</jackson-databind.version>
-    <java.version>1.8</java.version>
-    <slf4j.version>2.0.7</slf4j.version>
-    <http.version>4.5.14</http.version>
-    <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
+    <auto-service.version>1.1.1</auto-service.version>
+    <flink-connector-postgres-cdc.version>3.0.1</flink-connector-postgres-cdc.version>
     <hutool.version>5.8.25</hutool.version>
-    <commons-lang3.version>3.12.0</commons-lang3.version>
-    <guava.version>31.1-jre</guava.version>
-    <maven.compiler.target>8</maven.compiler.target>
-    <jetty.version>11.0.15</jetty.version>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <dynamic-etl.version>1.0-SNAPSHOT</dynamic-etl.version>
-    <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
-    <connect-runtime.version>3.5.1</connect-runtime.version>
-    <flink-connector-mysql-cdc.version>2.4.2</flink-connector-mysql-cdc.version>
-    <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
-    <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
-    <flink-shaded.version>2.8.3-10.0</flink-shaded.version>
-    <flink-connector-oracle-cdc.version>2.3.0</flink-connector-oracle-cdc.version>
-    <commons-codec.version>1.16.0</commons-codec.version>
     <fastjson2.version>2.0.26</fastjson2.version>
+    <jetty.version>12.0.8</jetty.version>
+    <mysql-connector-j.version>8.2.0</mysql-connector-j.version>
+    <guava.version>33.1.0-jre</guava.version>
+    <flink-connector-mongo-cdc.version>3.0.1</flink-connector-mongo-cdc.version>
     <flink.version>1.16.2</flink.version>
+    <flink-connector-mysql-cdc.version>3.0.1</flink-connector-mysql-cdc.version>
+    <wildfly.version>1.15.24.Final</wildfly.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <flink-shaded.version>2.8.3-10.0</flink-shaded.version>
+    <connect-runtime.version>3.5.1</connect-runtime.version>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <commons-lang3.version>3.12.0</commons-lang3.version>
+    <scope.setting>provided</scope.setting>
+    <kafka-clients.version>3.5.1</kafka-clients.version>
+    <avro.version>1.11.3</avro.version>
+    <commons-codec.version>1.16.0</commons-codec.version>
+    <flink-connector-sqlserver-cdc.version>3.0.1</flink-connector-sqlserver-cdc.version>
+    <flink-connector-oracle-cdc.version>3.0.1</flink-connector-oracle-cdc.version>
+    <commons-collections4.version>4.4</commons-collections4.version>
+    <http.version>4.5.14</http.version>
+    <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
+    <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
+    <java.version>1.8</java.version>
+    <maven.compiler.source>8</maven.compiler.source>
+    <jetty-servlets.version>9.4.54.v20240208</jetty-servlets.version>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <snappy-java.version>1.1.10.5</snappy-java.version>
+    <jose4j.version>0.9.4</jose4j.version>
+    <lombok.version>1.18.26</lombok.version>
+    <jackson-databind.version>2.15.2</jackson-databind.version>
+    <maven.compiler.target>8</maven.compiler.target>
+    <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
+    <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
+    <postgresql.version>42.7.3</postgresql.version>
+    <druid.version>1.2.18</druid.version>
   </properties>
 </project>
 
