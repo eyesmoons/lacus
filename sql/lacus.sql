@@ -703,4 +703,20 @@ INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, 
 INSERT INTO `sys_user` (`user_id`, `post_id`, `role_id`, `dept_id`, `username`, `nick_name`, `user_type`, `email`, `phone_number`, `sex`, `avatar`, `password`, `status`, `login_ip`, `login_date`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (109, 1, 2, 4, 'demo', '游客', 0, '', '', 1, '', '$2a$10$0JB.QbSCyuhRBGT/ePFtOuqcTmX2xFOLGzVDuGO4026YqugtdzIHK', 1, '113.54.246.76', '2024-04-14 15:58:39', 1, '2023-12-14 13:44:26', 1, '2024-04-14 15:58:39', NULL, 0);
 COMMIT;
 
+-- ----------------------------
+-- Table structure for system_env
+-- ----------------------------
+DROP TABLE IF EXISTS `system_env`;
+CREATE TABLE `system_env` (
+      `env_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+      `name` varchar(100) NOT NULL COMMENT '环境名称',
+      `config` longtext NOT NULL COMMENT '环境配置',
+      `remark` varchar(500) DEFAULT NULL COMMENT '环境描述',
+      `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+      `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+      `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+      `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+      `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+      PRIMARY KEY (`env_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='环境管理';
 SET FOREIGN_KEY_CHECKS = 1;

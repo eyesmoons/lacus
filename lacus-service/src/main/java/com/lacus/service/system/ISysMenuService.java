@@ -49,5 +49,5 @@ public interface ISysMenuService extends IService<SysMenuEntity> {
     boolean isMenuAssignToRoles(Long menuId);
 
 
-
+    List<SysMenuEntity> queryAllMenus();
 }

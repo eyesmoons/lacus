@@ -41,7 +41,7 @@
         <jwt.version>0.9.1</jwt.version>
         <hutool.version>5.8.25</hutool.version>
         <junit.version>4.13.1</junit.version>
-        <lombok.version>1.18.2</lombok.version>
+        <lombok.version>1.18.20</lombok.version>
         <mybatis-plus.version>3.5.2</mybatis-plus.version>
         <mybatis-plus-generator.version>3.5.1</mybatis-plus-generator.version>
         <mockito.version>1.10.19</mockito.version>

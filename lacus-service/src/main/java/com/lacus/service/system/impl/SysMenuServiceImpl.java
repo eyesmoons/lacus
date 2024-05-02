@@ -7,6 +7,8 @@ import com.lacus.dao.system.mapper.SysMenuMapper;
 import com.lacus.dao.system.mapper.SysRoleMenuMapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+
+import java.util.Collections;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,6 +65,10 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuEntity
         return roleMenuMapper.exists(queryWrapper);
     }
 
+    @Override
+    public List<SysMenuEntity> queryAllMenus() {
+        return baseMapper.queryAllMenus();
+    }
 
 
     @Override

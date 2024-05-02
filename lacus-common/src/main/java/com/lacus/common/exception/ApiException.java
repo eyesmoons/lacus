@@ -43,7 +43,7 @@ public class ApiException extends RuntimeException{
         try {
             this.i18nFormattedMessage = MessageUtils.message(errorCode.i18nKey(), args);
         } catch (Exception e) {
-            log.error("could not found i18nMessage entry for key: " + errorCode.i18nKey());
+            log.error("could not found i18nMessage entry for key: {}", errorCode.i18nKey());
         }
 
     }

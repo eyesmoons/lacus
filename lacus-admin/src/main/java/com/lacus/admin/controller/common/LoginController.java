@@ -109,10 +109,8 @@ public class LoginController {
         return ResponseDTO.ok(routerTree);
     }
 
-
     @PostMapping("/register")
     public ResponseDTO<?> register(@RequestBody AddUserCommand command) {
         return ResponseDTO.fail(Business.UNSUPPORTED_OPERATION);
     }
-
 }

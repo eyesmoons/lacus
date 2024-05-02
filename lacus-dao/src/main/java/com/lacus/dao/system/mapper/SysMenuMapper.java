@@ -42,4 +42,6 @@ public interface SysMenuMapper extends BaseMapper<SysMenuEntity> {
         + "GROUP BY m.menu_id ")
     List<Long> selectMenuIdsByRoleId(@Param("roleId") Long roleId);
 
+    @Select("select * from sys_menu where deleted = 0 order by parent_id, order_num")
+    List<SysMenuEntity> queryAllMenus();
 }

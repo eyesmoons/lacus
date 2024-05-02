@@ -114,7 +114,7 @@ public class MenuApplicationService {
     public List<Tree<Long>> buildMenuEntityTree(Long userId) {
         List<SysMenuEntity> allMenus;
         if (LoginUser.isAdmin(userId)) {
-            allMenus = menuService.list();
+            allMenus = menuService.queryAllMenus();
         } else {
             allMenus = menuService.getMenuListByUserId(userId);
         }
