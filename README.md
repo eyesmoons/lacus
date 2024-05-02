@@ -23,36 +23,34 @@
 密码：123456
 ## 如何使用
 ### 一、系统截图
-- 登录界面
-![img.png](images/lacus_login.png)
-- 系统管理
-![img.png](images/system-setting.png)
-- 系统监控
-![img.png](images/system-monitor.png)
-- 系统接口
-![img.png](images/api.png)
-- 元数据管理-数据源管理列表
-![img.png](images/datasource.png)
-- 元数据管理-新增数据源
-![img.png](images/datasource_add.png)
-- 元数据管理-数据表查询列表
-![img.png](images/table-query.png)
-- 元数据管理-数据表详情
-![img.png](images/table-detail.png)
-- 数据同步-任务分组管理列表
-![img.png](images/job-catalog.png)
-- 数据同步-任务管理列表
-![img.png](images/job-list.png)
-- 数据同步-接入任务启动
-![img.png](images/job-start.png)
+- 登录
+![登录](images/lacus_login.png)
+- 元数据-数据源类型
+![元数据-数据源类型](images/datasourceType.png)
+- 元数据-数据源定义列表
+![元数据-数据源定义列表](images/datasource.png)
+- 元数据-新增数据源
+![元数据-新增数据源](images/datasource_add.png)
+- 元数据-数据表查询列表
+![元数据-数据表查询列表](images/datasource_table-query.png)
+- 元数据-数据表详情
+![元数据-数据表详情](images/datasource_table-detail.png)
+- 数据同步-任务分组列表
+![数据同步-任务分组列表](images/job-catalog.png)
+- 数据同步-任务定义列表
+![数据同步-任务定义列表](images/job-list.png)
+- 数据同步-启动任务
+![数据同步-启动任务](images/job-start.png)
 - 数据同步-输入源配置
-![img.png](images/job-source-conf.png)
+![数据同步-输入源配置](images/job-source.png)
 - 数据同步-表映射关系配置
-![img.png](images/job-mappings.png)
+![数据同步-表映射关系配置](images/job-table-mappings.png)
 - 数据同步-字段映射关系配置
-![img.png](images/job-mapping-columns.png)
+![数据同步-字段映射关系配置](images/job-mapping-columns.png)
 - 数据同步-任务参数配置
-![img.png](images/job-params.png)
+![数据同步-任务参数配置](images/job-params.png)
+- 配置中心-环境管理
+![配置中心-环境管理](system-env-config.png)
 ### 二、开发环境
 
 - JDK
