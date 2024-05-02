@@ -1,7 +1,7 @@
 package com.lacus.service.system;
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.lacus.dao.system.entity.SystemEnvEntity;
+import com.lacus.dao.system.entity.SysEnvEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.lacus.dao.system.entity.SystemEnvEntity;
  * @author lacus
  * @since 2024-04-30
  */
-public interface ISystemEnvService extends IService<SystemEnvEntity> {
+public interface ISysEnvService extends IService<SysEnvEntity> {
 
 }

@@ -3,14 +3,14 @@ package com.lacus.domain.system.env.model;
 import cn.hutool.core.bean.BeanUtil;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.dao.system.entity.SystemEnvEntity;
+import com.lacus.dao.system.entity.SysEnvEntity;
 import com.lacus.domain.system.env.command.EnvAddCommand;
-import com.lacus.service.system.ISystemEnvService;
+import com.lacus.service.system.ISysEnvService;
 
 public class EnvModelFactory {
 
-    public static EnvModel loadFromDb(Long noticeId, ISystemEnvService envService) {
-        SystemEnvEntity byId = envService.getById(noticeId);
+    public static EnvModel loadFromDb(Long noticeId, ISysEnvService envService) {
+        SysEnvEntity byId = envService.getById(noticeId);
 
         if (byId == null) {
             throw new ApiException(ErrorCode.Business.OBJECT_NOT_FOUND, noticeId, "环境变量管理");

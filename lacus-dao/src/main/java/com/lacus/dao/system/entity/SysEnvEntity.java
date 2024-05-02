@@ -21,9 +21,9 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-@TableName("system_env")
-@ApiModel(value = "SystemEnvEntity对象", description = "环境管理")
-public class SystemEnvEntity extends BaseEntity<SystemEnvEntity> {
+@TableName("sys_env")
+@ApiModel(value = "SysEnvEntity对象", description = "环境管理")
+public class SysEnvEntity extends BaseEntity<SysEnvEntity> {
 
     private static final long serialVersionUID = 1L;
 

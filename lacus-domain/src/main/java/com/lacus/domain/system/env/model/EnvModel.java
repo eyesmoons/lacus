@@ -1,7 +1,7 @@
 package com.lacus.domain.system.env.model;
 
 import cn.hutool.core.bean.BeanUtil;
-import com.lacus.dao.system.entity.SystemEnvEntity;
+import com.lacus.dao.system.entity.SysEnvEntity;
 import com.lacus.domain.system.env.command.EnvAddCommand;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
  */
 @Data
 @NoArgsConstructor
-public class EnvModel extends SystemEnvEntity {
+public class EnvModel extends SysEnvEntity {
 
-    public EnvModel(SystemEnvEntity entity) {
+    public EnvModel(SysEnvEntity entity) {
         if (entity != null) {
             BeanUtil.copyProperties(entity, this);
         }

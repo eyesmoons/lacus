@@ -1,6 +1,6 @@
 package com.lacus.domain.system.env.dto;
 
-import com.lacus.dao.system.entity.SystemEnvEntity;
+import com.lacus.dao.system.entity.SysEnvEntity;
 import lombok.Data;
 
 import java.util.Date;
@@ -17,7 +17,7 @@ public class EnvDTO {
     private String remark;
     private Date createTime;
 
-    public EnvDTO(SystemEnvEntity entity) {
+    public EnvDTO(SysEnvEntity entity) {
         this.envId = entity.getEnvId();
         this.name = entity.getName();
         this.config = entity.getConfig();

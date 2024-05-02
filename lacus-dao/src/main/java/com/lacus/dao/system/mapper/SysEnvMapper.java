@@ -1,7 +1,7 @@
 package com.lacus.dao.system.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
-import com.lacus.dao.system.entity.SystemEnvEntity;
+import com.lacus.dao.system.entity.SysEnvEntity;
 
 /**
  * <p>
@@ -11,6 +11,6 @@ import com.lacus.dao.system.entity.SystemEnvEntity;
  * @author lacus
  * @since 2024-04-30
  */
-public interface SystemEnvMapper extends BaseMapper<SystemEnvEntity> {
+public interface SysEnvMapper extends BaseMapper<SysEnvEntity> {
 
 }

@@ -29,7 +29,7 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/system/env")
-public class SystemEnvController extends BaseController {
+public class SysEnvController extends BaseController {
 
     @Autowired
     private EnvService envService;
