@@ -25,6 +25,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -76,11 +77,15 @@ public class DatasourceService {
         }
         MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
         MetaDatasource datasource = new MetaDatasource();
-        datasource.setIp(model.getIp());
-        datasource.setPort(model.getPort());
-        datasource.setDbName(model.getDefaultDbName());
-        datasource.setUser(model.getUsername());
-        datasource.setPassword(model.getPassword());
+        datasource.setIp(updateCommand.getIp());
+        datasource.setPort(updateCommand.getPort());
+        datasource.setDbName(updateCommand.getDefaultDbName());
+        datasource.setUser(updateCommand.getUsername());
+        if (Objects.nonNull(updateCommand.getPassword())) {
+            datasource.setPassword(updateCommand.getPassword());
+        } else {
+            datasource.setPassword(model.getPassword());
+        }
         datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
         if (processor.testDatasourceConnection(datasource)) {
             model.loadUpdateCommand(updateCommand);
