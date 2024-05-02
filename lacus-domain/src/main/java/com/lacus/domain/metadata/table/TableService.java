@@ -99,10 +99,10 @@ public class TableService {
 
     public List<MetaTableEntity> listTable(TableQuery query) {
         Long metaDatasourceId = query.getDatasourceId();
-        List<String> dbNames = new ArrayList<>();
+        List<String> dbNames;
         if (ObjectUtils.isNotEmpty(query.getDbName())) {
             dbNames = Collections.singletonList(query.getDbName());
-        } else if (ObjectUtils.isNotEmpty(query.getDbName())){
+        } else if (ObjectUtils.isNotEmpty(query.getDbNames())){
             dbNames = query.getDbNames();
         } else {
             throw new ApiException(ErrorCode.Internal.INVALID_PARAMETER, "dbName或dbNames参数为空");
