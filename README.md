@@ -50,7 +50,7 @@
 - 数据同步-任务参数配置
 ![数据同步-任务参数配置](images/job-params.png)
 - 配置中心-环境管理
-![配置中心-环境管理](system-env-config.png)
+![配置中心-环境管理](images/system-env-config.png)
 ### 二、开发环境
 
 - JDK
