@@ -29,6 +29,7 @@ public class TableQuery extends AbstractPageQuery {
         wrapper.eq(ObjectUtils.isNotEmpty(dbId), "db_id", dbId);
         wrapper.in(ObjectUtils.isNotEmpty(dbIds), "db_id", dbIds);
         wrapper.like(ObjectUtils.isNotEmpty(tableName), "table_name", tableName);
+        wrapper.orderBy(true, false, "table_id");
         return wrapper;
     }
 }
