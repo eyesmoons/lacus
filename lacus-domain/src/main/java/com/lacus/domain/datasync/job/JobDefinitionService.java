@@ -8,44 +8,21 @@ import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.common.utils.time.DateUtils;
 import com.lacus.common.utils.yarn.ApplicationModel;
 import com.lacus.common.utils.yarn.FlinkJobDetail;
-import com.lacus.dao.datasync.entity.DataSyncColumnMappingEntity;
-import com.lacus.dao.datasync.entity.DataSyncJobCatalogEntity;
-import com.lacus.dao.datasync.entity.DataSyncJobEntity;
-import com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity;
-import com.lacus.dao.datasync.entity.DataSyncSavedColumn;
-import com.lacus.dao.datasync.entity.DataSyncSavedTable;
-import com.lacus.dao.datasync.entity.DataSyncSinkColumnEntity;
-import com.lacus.dao.datasync.entity.DataSyncSinkTableEntity;
-import com.lacus.dao.datasync.entity.DataSyncSourceColumnEntity;
-import com.lacus.dao.datasync.entity.DataSyncSourceTableEntity;
-import com.lacus.dao.datasync.entity.DataSyncTableMappingEntity;
+import com.lacus.dao.datasync.entity.*;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaColumnEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDbTableEntity;
 import com.lacus.domain.datasync.job.command.AddJobCommand;
 import com.lacus.domain.datasync.job.command.UpdateJobCommand;
-import com.lacus.domain.datasync.job.dto.ColumnDTO;
-import com.lacus.domain.datasync.job.dto.JobDTO;
-import com.lacus.domain.datasync.job.dto.MappedColumnDTO;
-import com.lacus.domain.datasync.job.dto.MappedTableDTO;
-import com.lacus.domain.datasync.job.dto.TableDTO;
-import com.lacus.domain.datasync.job.dto.TableMapping;
+import com.lacus.domain.datasync.job.dto.*;
 import com.lacus.domain.datasync.job.model.DataSyncJobModel;
 import com.lacus.domain.datasync.job.model.DataSyncJobModelFactory;
 import com.lacus.domain.datasync.job.query.JobPageQuery;
 import com.lacus.domain.datasync.job.query.MappedColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableColumnQuery;
 import com.lacus.domain.datasync.job.query.MappedTableQuery;
-import com.lacus.service.datasync.IDataSyncColumnMappingService;
-import com.lacus.service.datasync.IDataSyncJobCatalogService;
-import com.lacus.service.datasync.IDataSyncJobInstanceService;
-import com.lacus.service.datasync.IDataSyncJobService;
-import com.lacus.service.datasync.IDataSyncSinkColumnService;
-import com.lacus.service.datasync.IDataSyncSinkTableService;
-import com.lacus.service.datasync.IDataSyncSourceColumnService;
-import com.lacus.service.datasync.IDataSyncSourceTableService;
-import com.lacus.service.datasync.IDataSyncTableMappingService;
+import com.lacus.service.datasync.*;
 import com.lacus.service.metadata.IMetaColumnService;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.metadata.IMetaTableService;
@@ -57,13 +34,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -278,6 +249,7 @@ public class JobDefinitionService {
      */
     private DataSyncJobModel saveJob(AddJobCommand addJobCommand) {
         DataSyncJobModel model = DataSyncJobModelFactory.loadFromAddCommand(addJobCommand, new DataSyncJobModel());
+        model.checkJobNameUnique(dataSyncJobService);
         model.insert();
         return model;
     }
@@ -289,6 +261,7 @@ public class JobDefinitionService {
      */
     private void modifyJob(UpdateJobCommand updateJobCommand) {
         DataSyncJobModel model = DataSyncJobModelFactory.loadFromUpdateCommand(updateJobCommand, new DataSyncJobModel());
+        model.checkJobNameUnique(dataSyncJobService);
         model.updateById();
     }
 
@@ -505,10 +478,8 @@ public class JobDefinitionService {
     }
 
     public MappedColumnDTO listMappedColumn(MappedColumnQuery query) {
-        String sourceTableNameStr = query.getSourceTableName();
+        String sourceTableName = query.getSourceTableName();
         Long jobId = query.getJobId();
-        String[] sourceTableNameArr = sourceTableNameStr.split("\\.");
-        String sourceTableName = sourceTableNameArr[1];
         MappedColumnDTO result = new MappedColumnDTO();
         LinkedList<ColumnDTO> sourceColumns = new LinkedList<>();
         LinkedList<ColumnDTO> sinkColumns = new LinkedList<>();
@@ -691,7 +662,7 @@ public class JobDefinitionService {
         }));
 
         DataSyncSavedColumn savedColumn0 = savedColumns.get(0);
-        String sourceTableName = savedColumn0.getSourceTableName().split("\\.")[1];
+        String sourceTableName = savedColumn0.getSourceTableName();
         List<MetaColumnEntity> sourceMetaColumns = metaColumnService.getColumnsByTableName(savedColumn0.getSourceDatasourceId(), savedColumn0.getSourceDbName(), sourceTableName);
         List<MetaColumnEntity> sinkMetaColumns = metaColumnService.getColumnsByTableName(savedColumn0.getSinkDatasourceId(), savedColumn0.getSinkDbName(), savedColumn0.getSinkTableName());
 
@@ -757,7 +728,7 @@ public class JobDefinitionService {
         return result;
     }
 
-    public void remove(String jobId) {
+    public void remove(Long jobId) {
         DataSyncJobEntity byId = dataSyncJobService.getById(jobId);
         if (ObjectUtils.isEmpty(byId)) {
             throw new ApiException(ErrorCode.Internal.DB_INTERNAL_ERROR, "记录为空");

@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lacus.dao.datasync.entity.DataSyncJobEntity;
 import com.lacus.dao.datasync.mapper.DataSyncJobMapper;
+import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.service.datasync.IDataSyncJobService;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
@@ -41,5 +42,13 @@ DataSyncJobServiceImpl extends ServiceImpl<DataSyncJobMapper, DataSyncJobEntity>
         wrapper.like(ObjectUtils.isNotEmpty(query.getJobName()), DataSyncJobEntity::getJobName, query.getJobName());
         wrapper.in(ObjectUtils.isNotEmpty(query.getCatalogIds()), DataSyncJobEntity::getCatalogId, query.getCatalogIds());
         return this.list(wrapper);
+    }
+
+    @Override
+    public boolean isJobNameDuplicated(Long jobId, String jobName) {
+        LambdaQueryWrapper<DataSyncJobEntity> queryWrapper = new LambdaQueryWrapper<>();
+        queryWrapper.ne(jobId != null, DataSyncJobEntity::getJobId, jobId);
+        queryWrapper.eq(DataSyncJobEntity::getJobName, jobName);
+        return this.baseMapper.exists(queryWrapper);
     }
 }

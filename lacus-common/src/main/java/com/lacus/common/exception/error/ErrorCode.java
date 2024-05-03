@@ -174,6 +174,7 @@ public enum ErrorCode implements ErrorCodeInterface {
         // ----------------------------- metadata -----------------------------------
         DATASOURCE_NAME_IS_NOT_UNIQUE(Module.METADATA, 16, "数据源名称：{}, 已存在"),
 
+        JOB_NAME_IS_NOT_UNIQUE(Module.METADATA, 16, "任务名称：{}, 已存在"),
 
         //------------------------------dataServer------------------------------------
 

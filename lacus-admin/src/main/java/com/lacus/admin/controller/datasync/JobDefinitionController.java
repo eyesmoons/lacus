@@ -52,8 +52,8 @@ public class JobDefinitionController {
     }
 
     @ApiOperation("更新任务定义")
-    @PreAuthorize("@permission.has('datasync:job:add')")
-    @AccessLog(title = "任务管理", businessType = BusinessTypeEnum.ADD)
+    @PreAuthorize("@permission.has('datasync:job:update')")
+    @AccessLog(title = "任务管理", businessType = BusinessTypeEnum.MODIFY)
     @PostMapping("/modify")
     public ResponseDTO<?> modify(@Valid @RequestBody UpdateJobCommand command) {
         jobDefinitionService.updateJob(command);
@@ -64,7 +64,7 @@ public class JobDefinitionController {
     @PreAuthorize("@permission.has('datasync:job:remove')")
     @AccessLog(title = "任务管理", businessType = BusinessTypeEnum.DELETE)
     @GetMapping("/remove/{jobId}")
-    public ResponseDTO<?> remove(@PathVariable("jobId") String jobId) {
+    public ResponseDTO<?> remove(@PathVariable("jobId") Long jobId) {
         jobDefinitionService.remove(jobId);
         return ResponseDTO.ok();
     }
