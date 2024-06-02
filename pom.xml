@@ -32,7 +32,7 @@
         <kaptcha.version>2.3.2</kaptcha.version>
         <mybatis-spring-boot.version>2.2.2</mybatis-spring-boot.version>
         <pagehelper.boot.version>1.4.1</pagehelper.boot.version>
-        <oshi.version>6.1.6</oshi.version>
+        <oshi.version>6.6.0</oshi.version>
         <commons.io.version>2.11.0</commons.io.version>
         <commons.fileupload.version>1.4</commons.fileupload.version>
         <commons.collections.version>3.2.2</commons.collections.version>
@@ -69,6 +69,12 @@
     <!-- 依赖声明 -->
     <dependencyManagement>
         <dependencies>
+
+            <dependency>
+                <groupId>com.github.oshi</groupId>
+                <artifactId>oshi-core</artifactId>
+                <version>${oshi.version}</version>
+            </dependency>
 
             <!-- SpringBoot的依赖配置-->
             <dependency>
@@ -119,13 +125,6 @@
                 <groupId>com.github.pagehelper</groupId>
                 <artifactId>pagehelper-spring-boot-starter</artifactId>
                 <version>${pagehelper.boot.version}</version>
-            </dependency>
-
-            <!-- 获取系统信息 -->
-            <dependency>
-                <groupId>com.github.oshi</groupId>
-                <artifactId>oshi-core</artifactId>
-                <version>${oshi.version}</version>
             </dependency>
 
             <!-- Swagger3依赖 -->
@@ -291,6 +290,12 @@
     <packaging>pom</packaging>
 
     <dependencies>
+        <dependency>
+            <groupId>com.github.oshi</groupId>
+            <artifactId>oshi-core</artifactId>
+            <version>${oshi.version}</version>
+        </dependency>
+
         <dependency>
             <groupId>com.github.caspar-chen</groupId>
             <artifactId>swagger-ui-layer</artifactId>

@@ -1,6 +1,6 @@
 package com.lacus.domain.datasync.job.model;
 
-import com.lacus.common.utils.yarn.FlinkConf;
+import com.lacus.utils.yarn.FlinkConf;
 import lombok.Data;
 
 @Data

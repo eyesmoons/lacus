@@ -3,7 +3,7 @@ package com.lacus.core.datasource;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lacus.common.exception.CustomException;
-import com.lacus.common.utils.spring.SpringUtils;
+import com.lacus.utils.spring.SpringUtils;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
 import com.lacus.dao.metadata.mapper.MetaDatasourceMapper;

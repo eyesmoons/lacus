@@ -8,7 +8,7 @@ import com.alibaba.druid.sql.ast.statement.SQLSelectStatement;
 import com.alibaba.druid.sql.dialect.mysql.ast.statement.MySqlSelectQueryBlock;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.common.utils.strings.StringUtil;
+import com.lacus.utils.strings.StringUtil;
 
 import java.util.HashSet;
 import java.util.List;

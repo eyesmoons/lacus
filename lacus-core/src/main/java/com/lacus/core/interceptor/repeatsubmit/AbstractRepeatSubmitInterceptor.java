@@ -3,7 +3,7 @@ package com.lacus.core.interceptor.repeatsubmit;
 import cn.hutool.json.JSONUtil;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.exception.error.ErrorCode.Client;
-import com.lacus.common.utils.ServletHolderUtil;
+import com.lacus.utils.ServletHolderUtil;
 import com.lacus.core.annotations.RepeatSubmit;
 import java.lang.reflect.Method;
 import javax.servlet.http.HttpServletRequest;

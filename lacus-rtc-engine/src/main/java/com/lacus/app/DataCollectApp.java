@@ -1,14 +1,14 @@
 package com.lacus.app;
 
 import com.alibaba.fastjson2.JSON;
-import com.lacus.IReader;
-import com.lacus.IWriter;
-import com.lacus.common.exception.CustomException;
+import com.lacus.exception.CustomException;
 import com.lacus.factory.DataCollectReaderFactory;
 import com.lacus.factory.DataCollectWriterFactory;
 import com.lacus.model.JobConf;
-import com.lacus.model.SourceV2;
+import com.lacus.model.Source;
+import com.lacus.reader.IReader;
 import com.lacus.utils.KafkaUtil;
+import com.lacus.writer.IWriter;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.datastream.DataStreamSource;
@@ -18,7 +18,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import java.util.Objects;
 
 /**
- * 数据采集引擎统一入口，用户只需要编写自己采集程序，注册到DataCollectFactory即可
+ * 数据采集引擎统一入口，用户只需要编写自己的 Reader 和 Writer 即可
  *
  * @created by shengyu on 2024/1/21 20:14
  */
@@ -30,7 +30,7 @@ public class DataCollectApp {
 
     public static void main(String[] args) throws Exception {
         if (ObjectUtils.isEmpty(args) || args.length < 3) {
-            throw new CustomException("参数错误");
+            throw new CustomException("illegal arguments");
         }
         readerName = args[0];
         writerName = args[1];
@@ -62,7 +62,7 @@ public class DataCollectApp {
         }
         DataStreamSource<String> sourceReader = reader.read(env, jobName, jobParams);
         JobConf jobConf = JSON.parseObject(jobParams, JobConf.class);
-        SourceV2 source = jobConf.getSource();
+        Source source = jobConf.getSource();
         sourceReader.sinkTo(KafkaUtil.getKafkaSink(source.getBootStrapServers(), source.getTopics())).name("_kafka_channel");
 
         DataCollectWriterFactory writerFactory = DataCollectWriterFactory.getInstance();

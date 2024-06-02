@@ -2,7 +2,7 @@ package com.lacus.domain.dataserver.query;
 
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
-import com.lacus.common.utils.strings.StringUtil;
+import com.lacus.utils.strings.StringUtil;
 import com.lacus.dao.dataserver.entity.DataServerEntity;
 import com.lacus.dao.system.query.AbstractPageQuery;
 import io.swagger.annotations.ApiModelProperty;

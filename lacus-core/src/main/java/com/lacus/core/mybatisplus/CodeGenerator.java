@@ -45,10 +45,10 @@ public class CodeGenerator {
             .databaseUrl("jdbc:mysql://120.46.65.219:3306/lacus")
             .username("lacus")
             .password("S!JZ&*1m")
-            .author("lacus")
+            .author("casey")
             .module("/lacus-dao/target/generated-code")
             .parentPackage("com.lacus")
-            .tableName("system_env")
+            .tableName("sys_resources")
             // 决定是否继承基类
             .isExtendsFromBaseEntity(true)
             .build();
@@ -94,7 +94,7 @@ public class CodeGenerator {
                 // generate swagger annotations.
                 .enableSwagger()
                 // 注释日期的格式
-                .commentDate("yyyy-MM-dd")
+//                .commentDate("yyyy-MM-dd")
                 .build());
     }
 
@@ -103,7 +103,7 @@ public class CodeGenerator {
         generator.packageConfig(builder -> builder
             // parent package name
             .parent(parentPackage)
-            .moduleName("orm")
+            .moduleName("dao")
             .entity("entity")
             .service("service")
             .serviceImpl("service.impl")

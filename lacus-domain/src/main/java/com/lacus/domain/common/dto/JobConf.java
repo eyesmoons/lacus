@@ -1,6 +1,6 @@
 package com.lacus.domain.common.dto;
 
-import com.lacus.common.utils.yarn.FlinkConf;
+import com.lacus.utils.yarn.FlinkConf;
 import lombok.Data;
 
 /**

@@ -2,7 +2,7 @@ package com.lacus.common.exception;
 
 import cn.hutool.core.util.StrUtil;
 import com.lacus.common.exception.error.ErrorCodeInterface;
-import com.lacus.common.utils.i18n.MessageUtils;
+import com.lacus.utils.i18n.MessageUtils;
 import lombok.extern.slf4j.Slf4j;
 
 /**

@@ -2,7 +2,7 @@ package com.lacus.core.interceptor.repeatsubmit;
 
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
-import com.lacus.common.utils.jackson.JacksonUtil;
+import com.lacus.utils.jackson.JacksonUtil;
 import com.lacus.core.cache.redis.RedisCacheService;
 import com.lacus.core.annotations.RepeatSubmit;
 import com.lacus.core.filter.RepeatedlyRequestWrapper;

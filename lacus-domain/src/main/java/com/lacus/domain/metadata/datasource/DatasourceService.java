@@ -7,7 +7,7 @@ import com.lacus.common.exception.CustomException;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.core.factory.MetaDatasourceFactory;
 import com.lacus.core.processors.IDatasourceProcessor;
-import com.lacus.common.utils.beans.MetaDatasource;
+import com.lacus.utils.beans.MetaDatasource;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
 import com.lacus.domain.metadata.datasource.command.AddMetaDatasourceCommand;

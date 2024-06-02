@@ -35,7 +35,7 @@ public class BinlogProcessWindowFunction implements AllWindowFunction<Map<String
         }
         Map<String, String> result = new HashMap<>();
         if (cnt > 0) {
-            log.info("本次处理数据量：{}", cnt);
+            log.info("load data count：{}", cnt);
             resultMap.forEach((key, value) -> result.put(key, JSON.toJSONString(value, JSONWriter.Feature.LargeObject)));
         }
         collector.collect(result);

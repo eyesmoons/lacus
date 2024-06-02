@@ -5,7 +5,7 @@ import cn.hutool.core.util.EnumUtil;
 import cn.hutool.core.util.StrUtil;
 import cn.hutool.extra.servlet.ServletUtil;
 import cn.hutool.json.JSONUtil;
-import com.lacus.common.utils.ServletHolderUtil;
+import com.lacus.utils.ServletHolderUtil;
 import com.lacus.core.security.AuthenticationUtils;
 import com.lacus.core.thread.AsyncTaskFactory;
 import com.lacus.core.thread.ThreadPoolManager;

@@ -1,7 +1,7 @@
 package com.lacus.core.processors;
 
 
-import com.lacus.common.utils.beans.MetaDatasource;
+import com.lacus.utils.beans.MetaDatasource;
 import com.lacus.dao.metadata.entity.SchemaColumnEntity;
 import com.lacus.dao.metadata.entity.SchemaDbEntity;
 import com.lacus.dao.metadata.entity.SchemaTableEntity;

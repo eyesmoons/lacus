@@ -13,5 +13,5 @@ public class JobConf implements Serializable {
     private JobInfo jobInfo;
     private FlinkConf flinkConf;
     private Sink sink;
-    private SourceV2 source;
+    private Source source;
 }

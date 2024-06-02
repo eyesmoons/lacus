@@ -1,7 +1,7 @@
 package com.lacus.factory;
 
-import com.lacus.reader.BaseReader;
-import com.lacus.IReader;
+import com.lacus.reader.impl.BaseReader;
+import com.lacus.reader.IReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

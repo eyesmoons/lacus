@@ -3,6 +3,7 @@ package com.lacus.domain.system.env.model;
 import cn.hutool.core.bean.BeanUtil;
 import com.lacus.dao.system.entity.SysEnvEntity;
 import com.lacus.domain.system.env.command.EnvAddCommand;
+import com.lacus.domain.system.env.command.EnvUpdateCommand;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -20,7 +21,7 @@ public class EnvModel extends SysEnvEntity {
         }
     }
 
-    public void loadUpdateCommand(EnvAddCommand command) {
+    public void loadUpdateCommand(EnvUpdateCommand command) {
         if (command != null) {
             BeanUtil.copyProperties(command, this);
         }

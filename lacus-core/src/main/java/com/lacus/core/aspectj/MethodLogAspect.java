@@ -1,7 +1,7 @@
 package com.lacus.core.aspectj;
 
 import cn.hutool.json.JSONUtil;
-import com.lacus.common.utils.jackson.JacksonUtil;
+import com.lacus.utils.jackson.JacksonUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.ProceedingJoinPoint;

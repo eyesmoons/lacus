@@ -4,7 +4,7 @@ import cn.hutool.core.convert.Convert;
 import cn.hutool.core.util.ArrayUtil;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.common.exception.error.ErrorCodeInterface;
-import com.lacus.common.utils.i18n.MessageUtils;
+import com.lacus.utils.i18n.MessageUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;

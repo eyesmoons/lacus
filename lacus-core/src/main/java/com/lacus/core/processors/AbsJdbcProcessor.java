@@ -1,7 +1,7 @@
 package com.lacus.core.processors;
 
-import com.lacus.common.utils.beans.MetaDatasource;
-import com.lacus.common.utils.sql.JdbcUtil;
+import com.lacus.utils.beans.MetaDatasource;
+import com.lacus.utils.sql.JdbcUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j

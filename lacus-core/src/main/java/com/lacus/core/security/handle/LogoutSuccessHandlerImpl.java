@@ -2,7 +2,7 @@ package com.lacus.core.security.handle;
 
 import cn.hutool.json.JSONUtil;
 import com.lacus.common.core.dto.ResponseDTO;
-import com.lacus.common.utils.ServletHolderUtil;
+import com.lacus.utils.ServletHolderUtil;
 import com.lacus.core.thread.AsyncTaskFactory;
 import com.lacus.core.thread.ThreadPoolManager;
 import com.lacus.core.web.domain.login.LoginUser;

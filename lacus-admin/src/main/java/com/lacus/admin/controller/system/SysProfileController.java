@@ -5,7 +5,7 @@ import com.lacus.common.core.base.BaseController;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.common.utils.file.FileUploadUtils;
+import com.lacus.utils.file.FileUploadUtils;
 import com.lacus.domain.common.dto.UploadFileDTO;
 import com.lacus.domain.system.user.UserApplicationService;
 import com.lacus.domain.system.user.dto.UserProfileDTO;

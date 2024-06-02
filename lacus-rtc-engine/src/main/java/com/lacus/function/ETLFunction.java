@@ -9,7 +9,7 @@
 //import com.lacus.script.FsClassLoader;
 //import com.lacus.script.JavaSourceFromString;
 //import com.lacus.script.ScriptFileManager;
-//import com.lacus.sink.DorisStreamLoad;
+//import com.lacus.function.DorisStreamLoad;
 //import com.lacus.model.DynamicETL;
 //import com.lacus.model.ErrorMsgModel;
 //import lombok.extern.slf4j.Slf4j;

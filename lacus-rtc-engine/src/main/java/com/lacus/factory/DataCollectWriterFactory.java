@@ -1,7 +1,7 @@
 package com.lacus.factory;
 
-import com.lacus.IWriter;
-import com.lacus.writer.BaseWriter;
+import com.lacus.writer.IWriter;
+import com.lacus.writer.impl.BaseWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.lacus.common.constant.Constants.*;
+import static com.lacus.constant.CommonContext.*;
 
 /**
  * @created by shengyu on 2023/9/7 16:24

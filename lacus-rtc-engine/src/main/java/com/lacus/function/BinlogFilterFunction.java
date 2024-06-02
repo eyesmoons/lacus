@@ -6,7 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
-import static com.lacus.common.constant.Constants.OPERATION_TYPES;
+import static com.lacus.constant.CommonContext.OPERATION_TYPES;
 
 /**
  * @created by shengyu on 2023/9/7 16:33
@@ -25,7 +25,6 @@ public class BinlogFilterFunction implements FilterFunction<ConsumerRecord<Strin
                 return true;
             }
         } catch (Exception e) {
-            log.error("过滤掉不合法的数据：{}", e.getMessage());
             return false;
         }
         return false;

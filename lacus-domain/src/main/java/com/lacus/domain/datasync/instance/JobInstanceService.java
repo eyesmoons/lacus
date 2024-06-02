@@ -2,8 +2,8 @@ package com.lacus.domain.datasync.instance;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.lacus.common.core.page.PageDTO;
-import com.lacus.common.utils.time.DateUtils;
-import com.lacus.common.utils.yarn.FlinkJobDetail;
+import com.lacus.utils.time.DateUtils;
+import com.lacus.utils.yarn.FlinkJobDetail;
 import com.lacus.dao.datasync.entity.DataSyncJobEntity;
 import com.lacus.dao.datasync.entity.DataSyncJobInstanceEntity;
 import com.lacus.dao.datasync.enums.FlinkStatusEnum;

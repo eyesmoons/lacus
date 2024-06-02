@@ -6,7 +6,7 @@ import com.lacus.core.security.AuthenticationUtils;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.common.utils.ServletHolderUtil;
+import com.lacus.utils.ServletHolderUtil;
 import com.lacus.core.annotations.RateLimiter;
 
 import java.lang.reflect.Method;
