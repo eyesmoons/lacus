@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.metadata.mapper.SqlServerSchemaMapper">
+    <resultMap id="schemaDbMap" type="com.lacus.dao.metadata.entity.SchemaDbEntity">
+        <result column="schema_name" property="schemaName"/>
+    </resultMap>
+
+    <resultMap id="schemaTableMap" type="com.lacus.dao.metadata.entity.SchemaTableEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="table_type" property="tableType"/>
+        <result column="engine" property="engine"/>
+        <result column="table_rows" property="tableRows"/>
+        <result column="data_length" property="dataLength"/>
+        <result column="create_time" property="createTime"/>
+        <result column="table_comment" property="tableComment"/>
+    </resultMap>
+
+    <resultMap id="schemaColumnMap" type="com.lacus.dao.metadata.entity.SchemaColumnEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="column_name" property="columnName"/>
+        <result column="column_default" property="columnDefault"/>
+        <result column="is_nullable" property="isNullable"/>
+        <result column="data_type" property="dataType"/>
+        <result column="column_type" property="columnType"/>
+        <result column="character_octet_length" property="characterOctetLength"/>
+        <result column="numeric_precision" property="numericPrecision"/>
+        <result column="numeric_scale" property="numericScale"/>
+        <result column="column_comment" property="columnComment"/>
+    </resultMap>
+
+    <select id="listAllSchemaDb" resultMap="schemaDbMap">
+        SELECT
+            name as schema_name
+        FROM sys.databases
+    </select>
+
+    <select id="listSchemaTable" resultMap="schemaTableMap">
+        SELECT
+            #{dbName} as table_schema,
+            a.name as table_name,
+            a.xtype as table_type,
+            '' as engine,
+            b.rows as table_rows,
+            0 as data_length,
+            a.crdate as create_time,
+            f.value as table_comment
+        FROM
+        ${dbName}.sys.sysobjects AS a
+        INNER JOIN ${dbName}.sys.sysindexes AS b ON a.id = b.id
+        LEFT JOIN ${dbName}.sys.extended_properties f ON (a.id= f.major_id AND f.minor_id= 0)
+        <where>
+            (b.indid IN (0, 1)) AND (a.type = 'u')
+            <if test="tableName != null and tableName != ''">
+                AND a.name = #{tableName}
+            </if>
+        </where>
+    </select>
+
+    <select id="listSchemaColumn" resultMap="schemaColumnMap">
+        SELECT
+            table_catalog as table_schema,
+            table_name,
+            column_name,
+            column_default,
+            is_nullable,
+            data_type,
+            data_type as column_type,
+            character_octet_length,
+            numeric_precision,
+            numeric_scale,
+            '' as column_comment
+        FROM INFORMATION_SCHEMA.COLUMNS
+        <where>
+            <if test="dbName != null and dbName != ''">
+                AND table_catalog = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                AND table_name = #{tableName}
+            </if>
+        </where>
+    </select>
+</mapper>
