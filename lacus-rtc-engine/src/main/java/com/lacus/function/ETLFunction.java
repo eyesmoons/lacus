@@ -10,8 +10,8 @@
 //import com.lacus.script.JavaSourceFromString;
 //import com.lacus.script.ScriptFileManager;
 //import com.lacus.function.DorisStreamLoad;
-//import com.lacus.model.DynamicETL;
-//import com.lacus.model.ErrorMsgModel;
+//import com.lacus.dto.DynamicETL;
+//import com.lacus.dto.ErrorMsgModel;
 //import lombok.extern.slf4j.Slf4j;
 //import org.apache.commons.lang.exception.ExceptionUtils;
 //import org.apache.commons.lang3.ObjectUtils;

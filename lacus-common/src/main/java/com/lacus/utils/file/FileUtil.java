@@ -129,14 +129,7 @@ public class FileUtil {
         return PropertyUtils.getString(Constants.RESOURCE_VIEW_SUFFIXES, Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE);
     }
 
-    /**
-     * write content to file ,if parent path not exists, it will do one's utmost to mkdir
-     *
-     * @param content  content
-     * @param filePath target file path
-     * @return true if write success
-     */
-    public static boolean writeContent2File(String content, String filePath) {
+    public static boolean writeToFile(String content, String filePath) {
         FileOutputStream fos = null;
         try {
             File distFile = new File(filePath);

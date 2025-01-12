@@ -1,33 +1,18 @@
-package com.lacus.service.flink.model;
+package com.lacus.service.flink.dto;
 
 import lombok.Data;
 
 @Data
-public class AppTO {
+public class YarnApplicationDTO {
 
-    /**
-     * yarn appid
-     */
     private String id;
 
-    /**
-     * 运行用户 如 hadoop
-     */
     private String user;
 
-    /**
-     * 运行的任务名称
-     */
     private String name;
 
-    /**
-     * 队列名称
-     */
     private String queue;
 
-    /**
-     * 运行状态
-     */
     private String state;
 
     private String finalStatus;
@@ -36,29 +21,14 @@ public class AppTO {
 
     private String trackingUI;
 
-    /**
-     * 连接地址
-     */
     private String trackingUrl;
 
-
-    /**
-     * 应用类型
-     */
     private String applicationType;
 
-
-    /**
-     * 运行开始时间
-     */
     private Long startedTime;
-
 
     private Long finishedTime;
 
-    /**
-     * AM 容器地址
-     */
     private String amContainerLogs;
 
 }

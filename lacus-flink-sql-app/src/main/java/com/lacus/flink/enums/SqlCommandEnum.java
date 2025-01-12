@@ -7,7 +7,7 @@ import java.util.function.Function;
 import java.util.regex.Pattern;
 
 @Getter
-public enum SqlCommand {
+public enum SqlCommandEnum {
     INSERT_INTO(
             "(INSERT\\s+INTO.*)",
             (operands) -> Optional.of(new String[]{operands[0]})),
@@ -114,7 +114,7 @@ public enum SqlCommand {
 
     private final Function<String[], Optional<String[]>> operandConverter;
 
-    SqlCommand(String matchingRegex, Function<String[], Optional<String[]>> operandConverter) {
+    SqlCommandEnum(String matchingRegex, Function<String[], Optional<String[]>> operandConverter) {
         this.pattern = Pattern.compile(matchingRegex, Pattern.CASE_INSENSITIVE | Pattern.DOTALL);
         this.operandConverter = operandConverter;
     }

@@ -8,7 +8,6 @@ import java.util.Date;
 
 public interface IFlinkJobService extends IService<FlinkJobEntity> {
     boolean isJobNameDuplicated(Long jobId, String jobName);
-
     void updateStatus(Long jobId, FlinkStatusEnum flinkStatusEnum);
 }
 

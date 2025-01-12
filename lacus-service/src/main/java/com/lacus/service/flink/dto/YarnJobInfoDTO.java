@@ -1,11 +1,9 @@
-package com.lacus.service.flink.model;
+package com.lacus.service.flink.dto;
 
 import lombok.Data;
 
 @Data
-public class YarnJobInfo {
-
+public class YarnJobInfoDTO {
   private String id;
-
   private String status;
 }

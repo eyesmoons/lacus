@@ -4,9 +4,7 @@ import com.alibaba.fastjson2.JSON;
 import com.lacus.common.exception.CustomException;
 import com.lacus.enums.FlinkDeployModeEnum;
 import com.lacus.enums.FlinkStatusEnum;
-import com.lacus.service.flink.IStandaloneRpcService;
-import com.lacus.service.flink.model.StandaloneFlinkJobInfo;
-import com.lacus.service.system.ISysConfigService;
+import com.lacus.service.flink.dto.StandaloneFlinkJobInfo;
 import com.lacus.utils.PropertyUtils;
 import com.lacus.utils.RestUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -15,38 +13,27 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.ResourceAccessException;
-
-import java.net.ConnectException;
-import java.net.SocketTimeoutException;
 
 import static com.lacus.common.constant.Constants.FLINK_HTTP_ADDRESS;
 import static com.lacus.common.constant.Constants.FLINK_REST_HA_HTTP_ADDRESS;
 
 @Slf4j
 @Service
-public class StandaloneRpcServiceImpl implements IStandaloneRpcService {
-
-    @Autowired
-    private ISysConfigService configService;
+public class StandaloneRestService {
 
     @Autowired
     private RestUtil restUtil;
 
-    /**
-     * Standalone 模式下获取状态
-     */
-    public StandaloneFlinkJobInfo getJobInfoForStandaloneByAppId(String appId, FlinkDeployModeEnum flinkDeployModeEnum) {
+    public StandaloneFlinkJobInfo getJobInfoByAppId(String appId, FlinkDeployModeEnum flinkDeployModeEnum) {
         if (ObjectUtils.isEmpty(appId)) {
             throw new CustomException("appId不能为空");
         }
         String res = null;
-        StandaloneFlinkJobInfo standaloneFlinkJobInfo = null;
+        StandaloneFlinkJobInfo standaloneFlinkJobInfo;
         String url = "";
         try {
-            String flinkHttpAddress = getFlinkHttpAddress(flinkDeployModeEnum);
+            String flinkHttpAddress = getFlinkRestAddress(flinkDeployModeEnum);
             url = flinkHttpAddress + "/jobs/" + appId;
             res = restUtil.getForString(url);
             log.info("获取flink任务信息：appId：{}, url：{}, result：{}", appId, url, res);
@@ -64,28 +51,22 @@ public class StandaloneRpcServiceImpl implements IStandaloneRpcService {
         return standaloneFlinkJobInfo;
     }
 
-    /**
-     * 基于flink rest API取消任务
-     */
-    public void cancelJobForFlinkByAppId(String jobId, FlinkDeployModeEnum flinkDeployModeEnum) {
+    public void cancelJobByAppId(String jobId, FlinkDeployModeEnum flinkDeployModeEnum) {
         if (ObjectUtils.isEmpty(jobId)) {
             throw new CustomException("jobId不能为空");
         }
-        String flinkHttpAddress = getFlinkHttpAddress(flinkDeployModeEnum);
+        String flinkHttpAddress = getFlinkRestAddress(flinkDeployModeEnum);
         String url = flinkHttpAddress + "/jobs/" + jobId + "/yarn-cancel";
         String res = restUtil.getForString(url);
         log.info("取消任务：jobId：{}, url：{}, result：{}", jobId, url, res);
     }
 
-    /**
-     * 获取savepoint路径
-     */
-    public String savepointPath(String jobId, FlinkDeployModeEnum flinkDeployModeEnum) {
+    public String getSavepointPath(String jobId, FlinkDeployModeEnum flinkDeployModeEnum) {
         if (ObjectUtils.isEmpty(jobId)) {
             throw new CustomException("jobId为空");
         }
         try {
-            String flinkHttpAddress = getFlinkHttpAddress(flinkDeployModeEnum);
+            String flinkHttpAddress = getFlinkRestAddress(flinkDeployModeEnum);
             String url = flinkHttpAddress + "jobs/" + jobId + "/checkpoints";
             String res = restUtil.getForString(url);
             if (ObjectUtils.isEmpty(res)) {
@@ -98,22 +79,21 @@ public class StandaloneRpcServiceImpl implements IStandaloneRpcService {
         return null;
     }
 
-    @Override
-    public String getFlinkHttpAddress(FlinkDeployModeEnum flinkDeployModeEnum) {
+    public String getFlinkRestAddress(FlinkDeployModeEnum flinkDeployModeEnum) {
         switch (flinkDeployModeEnum) {
             case LOCAL:
                 String urlLocal = PropertyUtils.getString(FLINK_HTTP_ADDRESS);
                 if (StringUtils.isEmpty(urlLocal)) {
-                    throw new CustomException("flink Rest web 地址为空");
+                    throw new CustomException("请配置" + FLINK_HTTP_ADDRESS);
                 }
                 if (checkUrlConnect(urlLocal)) {
                     return urlLocal.trim();
                 }
-                throw new CustomException("网络异常 url：" + urlLocal);
+                throw new CustomException("连接异常,url: " + urlLocal);
             case STANDALONE:
                 String urlHA = PropertyUtils.getString(FLINK_REST_HA_HTTP_ADDRESS);
-                if (StringUtils.isEmpty(urlHA)) {
-                    throw new CustomException(FLINK_REST_HA_HTTP_ADDRESS + "为空");
+                if (ObjectUtils.isEmpty(urlHA)) {
+                    throw new CustomException("请配置" + FLINK_REST_HA_HTTP_ADDRESS);
                 }
                 String[] urls = urlHA.split(";");
                 for (String http : urls) {
@@ -121,7 +101,7 @@ public class StandaloneRpcServiceImpl implements IStandaloneRpcService {
                         return http.trim();
                     }
                 }
-                throw new CustomException("网络异常 url：" + urlHA);
+                throw new CustomException("连接异常, url: " + urlHA);
             default:
                 throw new CustomException("不支持的部署模式");
         }
@@ -129,21 +109,12 @@ public class StandaloneRpcServiceImpl implements IStandaloneRpcService {
 
     public boolean checkUrlConnect(String url) {
         try {
-            log.info("connect url：{}", url);
-            ResponseEntity<String> response = restUtil.exchangeGet(url, new HttpHeaders(), String.class, new HttpEntity<String>(null, new HttpHeaders()));
-            log.info("connect url 请求结果：{}", response);
-        } catch (ResourceAccessException e) {
-            if (e.getCause() instanceof ConnectException || e.getCause() instanceof SocketTimeoutException) {
-                log.error("网络异常或者超时 url：{}", url, e);
-            } else {
-                log.warn("检查URL出错： {}", e.getMessage());
-            }
-            return false;
+            restUtil.exchangeGet(url, new HttpHeaders(), String.class, new HttpEntity<String>(null, new HttpHeaders()));
         } catch (Exception e) {
-            log.error("检查URL出错： {}", e.getMessage());
+            log.error("连接出错： {}", url, e);
             return false;
         }
-        log.info("网络检查成功 url：{}", url);
+        log.info("连接成功，url：{}", url);
         return true;
     }
 }

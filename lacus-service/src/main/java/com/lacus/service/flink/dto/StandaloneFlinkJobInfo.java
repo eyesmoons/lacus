@@ -1,4 +1,4 @@
-package com.lacus.service.flink.model;
+package com.lacus.service.flink.dto;
 
 import lombok.Data;
 

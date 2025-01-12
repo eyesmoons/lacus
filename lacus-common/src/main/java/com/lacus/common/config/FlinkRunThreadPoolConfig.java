@@ -1,4 +1,4 @@
-package com.lacus.utils;
+package com.lacus.common.config;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -8,7 +8,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
-public final class JobExecuteThreadPoolUtil {
+public final class FlinkRunThreadPoolConfig {
 
     private static final int corePoolSize = 10;
 
@@ -18,26 +18,25 @@ public final class JobExecuteThreadPoolUtil {
 
     private static ThreadPoolExecutor threadPoolExecutor;
 
-    private static JobExecuteThreadPoolUtil asyncThreadPool;
+    private static FlinkRunThreadPoolConfig alarmPoolConfig;
 
-    private JobExecuteThreadPoolUtil() {
+    private FlinkRunThreadPoolConfig() {
         BlockingQueue<Runnable> workQueue = new ArrayBlockingQueue<>(100, true);
-        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MINUTES, workQueue);
+        threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maximumPoolSize, keepAliveTime, TimeUnit.MINUTES, workQueue, new ThreadPoolExecutor.AbortPolicy());
     }
 
-    public static synchronized JobExecuteThreadPoolUtil getInstance() {
-        if (null == asyncThreadPool) {
-            synchronized (JobExecuteThreadPoolUtil.class) {
-                if (null == asyncThreadPool) {
-                    asyncThreadPool = new JobExecuteThreadPoolUtil();
+    public static synchronized FlinkRunThreadPoolConfig getInstance() {
+        if (null == alarmPoolConfig) {
+            synchronized (FlinkRunThreadPoolConfig.class) {
+                if (null == alarmPoolConfig) {
+                    alarmPoolConfig = new FlinkRunThreadPoolConfig();
                 }
             }
         }
-        return asyncThreadPool;
+        return alarmPoolConfig;
     }
 
     public synchronized ThreadPoolExecutor getThreadPoolExecutor() {
         return threadPoolExecutor;
     }
-
 }

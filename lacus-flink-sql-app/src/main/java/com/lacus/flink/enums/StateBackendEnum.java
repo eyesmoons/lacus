@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 public enum StateBackendEnum {
     MEMORY("0"), FILE("1"), ROCKSDB("2");
 
-    private String type;
+    private final String type;
 
     StateBackendEnum(String type) {
         this.type = type;
@@ -22,8 +22,7 @@ public enum StateBackendEnum {
             if (stateBackendEnum.getType().equalsIgnoreCase(stateBackendType.trim())) {
                 return stateBackendEnum;
             }
-
         }
-        throw new RuntimeException("stateBackendType值只能是 0 1 2 非法参数值" + stateBackendType);
+        throw new RuntimeException("不支持的StateBackend: " + stateBackendType);
     }
 }

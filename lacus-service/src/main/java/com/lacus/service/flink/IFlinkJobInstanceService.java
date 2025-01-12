@@ -8,6 +8,5 @@ import java.util.Date;
 
 public interface IFlinkJobInstanceService extends IService<FlinkJobInstanceEntity> {
     void updateStatus(Long instanceId, FlinkStatusEnum flinkStatusEnum);
-
     void updateStatusByJobId(Long jobId, FlinkStatusEnum flinkStatusEnum, Date finishedTime);
 }

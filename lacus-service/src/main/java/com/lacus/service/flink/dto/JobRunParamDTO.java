@@ -1,4 +1,4 @@
-package com.lacus.service.flink.model;
+package com.lacus.service.flink.dto;
 
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.flink.entity.FlinkJobEntity;
@@ -13,45 +13,27 @@ import static com.lacus.common.constant.Constants.LACUS_APPLICATION_HOME;
 @Data
 public class JobRunParamDTO {
 
-    /**
-     * flink bin目录地址
-     */
     private String flinkBinPath;
 
-    /**
-     * flink 运行参数 如：
-     */
     private String flinkRunParam;
 
-    /**
-     * sql语句存放的目录
-     */
     private String sqlPath;
 
-    /**
-     * checkpointConfig
-     */
     private String flinkCheckpointConfig;
 
-    /**
-     * 程序所在目录 如：/use/local/lacus
-     */
-    private String appHome;
+    private String flinkSqlAppHome;
 
-    /**
-     * 主类jar地址
-     */
     private String mainJarPath;
 
     public JobRunParamDTO(String flinkBinPath,
                           String flinkRunParam,
                           String sqlPath,
-                          String appHome,
+                          String flinkSqlAppHome,
                           String flinkCheckpointConfig) {
         this.flinkBinPath = flinkBinPath;
         this.flinkRunParam = flinkRunParam;
         this.sqlPath = sqlPath;
-        this.appHome = appHome;
+        this.flinkSqlAppHome = flinkSqlAppHome;
         this.flinkCheckpointConfig = flinkCheckpointConfig;
     }
 
