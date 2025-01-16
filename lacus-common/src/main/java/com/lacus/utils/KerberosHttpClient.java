@@ -121,10 +121,10 @@ public class KerberosHttpClient {
 
         String responseContent;
         KerberosHttpClient kerberosHttpClient = new KerberosHttpClient(
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
-                PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
-                PropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
-        responseContent = kerberosHttpClient.get(url, PropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
+                CommonPropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME),
+                CommonPropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_PATH),
+                CommonPropertyUtils.getString(Constants.JAVA_SECURITY_KRB5_CONF_PATH), true);
+        responseContent = kerberosHttpClient.get(url, CommonPropertyUtils.getString(Constants.LOGIN_USER_KEY_TAB_USERNAME));
         return responseContent;
 
     }

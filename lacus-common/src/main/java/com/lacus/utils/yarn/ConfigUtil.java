@@ -1,7 +1,7 @@
 package com.lacus.utils.yarn;
 
 import com.lacus.common.constant.Constants;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.hdfs.HdfsUtil;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;
@@ -31,7 +31,7 @@ public class ConfigUtil {
             org.apache.flink.configuration.Configuration config = new org.apache.flink.configuration.Configuration();
             ;
             String separator = separator(pathPrefix);
-            Properties properties = PropertyUtils.loadPropertiesByStr(HdfsUtil.readFile(pathPrefix + separator + Constants.FLINK_CONF_YAML));
+            Properties properties = CommonPropertyUtils.loadPropertiesByStr(HdfsUtil.readFile(pathPrefix + separator + Constants.FLINK_CONF_YAML));
             for (Map.Entry<Object, Object> props : properties.entrySet()) {
                 config.setString(String.valueOf(props.getKey()), String.valueOf(props.getValue()));
             }

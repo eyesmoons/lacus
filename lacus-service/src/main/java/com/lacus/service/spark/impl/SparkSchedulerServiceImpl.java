@@ -1,4 +1,4 @@
-package com.lacus.domain.spark.job;
+package com.lacus.service.spark.impl;
 
 import com.lacus.common.exception.CustomException;
 import com.lacus.service.spark.ISparkSchedulerService;
@@ -29,7 +29,7 @@ public class SparkSchedulerServiceImpl implements ISparkSchedulerService {
     public void addJob(Long jobId, String cronExpression) {
         try {
             // 创建JobDetail
-            JobDetail jobDetail = JobBuilder.newJob(SparkQuartzJob.class)
+            JobDetail jobDetail = JobBuilder.newJob(SparkQuartzJobService.class)
                 .withIdentity(getJobKey(jobId))
                 .usingJobData("jobId", jobId)
                 .build();

@@ -1,5 +1,6 @@
-package com.lacus.domain.spark.job;
+package com.lacus.service.spark.impl;
 
+import com.lacus.service.spark.ISparkOperationService;
 import lombok.extern.slf4j.Slf4j;
 import org.quartz.JobDataMap;
 import org.quartz.JobExecutionContext;
@@ -10,10 +11,10 @@ import org.springframework.stereotype.Service;
 
 @Slf4j
 @Service
-public class SparkQuartzJob extends QuartzJobBean {
+public class SparkQuartzJobService extends QuartzJobBean {
 
     @Autowired
-    private SparkJobBusiness sparkJobBusiness;
+    private ISparkOperationService sparkOperationService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -22,7 +23,7 @@ public class SparkQuartzJob extends QuartzJobBean {
 
         try {
             log.info("开始执行定时Spark任务, jobId: {}", jobId);
-            sparkJobBusiness.start(jobId);
+            sparkOperationService.start(jobId);
         } catch (Exception e) {
             log.error("执行定时Spark任务失败, jobId: {}, error: {}", jobId, e.getMessage());
             throw new JobExecutionException(e);

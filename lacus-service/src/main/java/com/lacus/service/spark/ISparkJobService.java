@@ -9,4 +9,6 @@ public interface ISparkJobService extends IService<SparkJobEntity> {
     boolean isJobNameDuplicated(Long jobId, String jobName);
 
     void updateStatus(Long jobId, SparkStatusEnum sparkStatusEnum);
+
+    void updateStatus(Long jobId, String appId, SparkStatusEnum sparkStatusEnum);
 }

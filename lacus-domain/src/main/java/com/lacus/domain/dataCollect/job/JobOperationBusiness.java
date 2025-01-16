@@ -12,7 +12,7 @@ import com.lacus.domain.common.utils.DataCollectorJobUtil;
 import com.lacus.domain.dataCollect.instance.JobInstanceBusiness;
 import com.lacus.service.dataCollect.IDataSyncJobInstanceService;
 import com.lacus.service.dataCollect.IDataSyncJobService;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.yarn.FlinkParams;
 import com.lacus.utils.yarn.YarnUtil;
 import lombok.extern.slf4j.Slf4j;
@@ -75,16 +75,16 @@ public class JobOperationBusiness {
         try {
             DataSyncJobInstanceEntity instance = instanceService.saveInstance(job, syncType, timeStamp, JSON.toJSONString(jobConf));
             jobConf.getJobInfo().setInstanceId(instance.getInstanceId());
-            String flinkJobPath = dataCollectorJobUtil.getJobJarPath(PropertyUtils.getString(FLINK_HDFS_COLLECTOR_JAR_NAME));
+            String flinkJobPath = dataCollectorJobUtil.getJobJarPath(CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_JAR_NAME));
             String applicationId = YarnUtil.deployOnYarn(JOB_MAIN_CLASS,
                     new String[]{sourceType, sinkType, jobName, JSON.toJSONString(jobConf)},
                     jobName,
                     flinkParams,
                     flinkJobPath,
-                    PropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH),
+                    CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH),
                     jobConf.getSource().getSavePoints(),
-                    PropertyUtils.getString(FLINK_HDFS_COLLECTOR_LIB_PATH),
-                    PropertyUtils.getString(FLINK_HDFS_DIST_JAR_PATH));
+                    CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_LIB_PATH),
+                    CommonPropertyUtils.getString(FLINK_HDFS_DIST_JAR_PATH));
 
             if (Objects.nonNull(applicationId)) {
                 instanceService.updateInstance(instance, applicationId);
@@ -128,7 +128,7 @@ public class JobOperationBusiness {
             try {
                 for (int i = 0; i < 5; i++) {
                     // 停止flink任务
-                    YarnUtil.cancelYarnJob(applicationId, flinkJobId, PropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH));
+                    YarnUtil.cancelYarnJob(applicationId, flinkJobId, CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH));
                 }
                 // 修改任务状态
                 dataCollectorJobUtil.updateStopStatusForInstance(instance);

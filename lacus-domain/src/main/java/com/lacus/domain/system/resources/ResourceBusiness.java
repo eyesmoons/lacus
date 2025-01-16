@@ -33,10 +33,8 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.lacus.common.constant.Constants.JAR;
 import static com.lacus.common.constant.Constants.MAX_FILE_SIZE;
 import static com.lacus.common.constant.Constants.RESOURCE_FULL_NAME_MAX_LENGTH;
-import static com.lacus.common.constant.Constants.UDF;
 
 /**
  * @author shengyu
@@ -54,7 +52,7 @@ public class ResourceBusiness {
 
     public void createDirectory(Long pid, String name, ResourceType type, String remark) {
         if (FileUtil.directoryTraversal(name)) {
-            log.warn("Parameter name is invalid, name:{}.", RegexUtils.escapeNRT(name));
+            log.warn("文件夹名称不合法:{}.", RegexUtils.escapeNRT(name));
             throw new CustomException(Status.VERIFY_PARAMETER_NAME_FAILED.getMsg(), Status.VERIFY_PARAMETER_NAME_FAILED.getCode());
         }
 
@@ -68,34 +66,29 @@ public class ResourceBusiness {
 
         try {
             if (checkResourceExists(fullName)) {
-                log.error("resource directory {} exists, can't create again", fullName);
+                log.error("文件夹已经存在: {}", fullName);
                 throw new CustomException(Status.RESOURCE_EXIST.getMsg(), Status.RESOURCE_EXIST.getCode());
             }
         } catch (Exception e) {
-            log.warn("Resource exists, can't create again, fullName:{}.", fullName, e);
-            throw new CustomException("resource already exists, can't recreate");
+            log.warn("文件夹已经存在: {}.", fullName, e);
+            throw new CustomException("文件夹已经存在");
         }
-
-        // create directory in hdfs
         createDirectory(fullName, type);
-        // save to db
         addResource(pid, name, fullName, remark, 1);
     }
 
     public void uploadResource(Long pid, String aliaName, String remark, ResourceType type, MultipartFile file) {
         verifyFile(pid, aliaName, type, file);
 
-        // check resource name exists
         SysResourcesEntity pResource = sysResourcesService.getById(pid);
         String currDirNFileName = pResource.getFilePath() + File.separator + aliaName;
-
         try {
             if (checkResourceExists(currDirNFileName)) {
-                log.error("resource {} has exist, can't recreate", RegexUtils.escapeNRT(aliaName));
+                log.error("文件已经存在，不能重复上传: {}", RegexUtils.escapeNRT(aliaName));
                 throw new CustomException(Status.RESOURCE_EXIST.getMsg(), Status.RESOURCE_EXIST.getCode());
             }
         } catch (Exception e) {
-            throw new CustomException("resource already exists, can't recreate");
+            throw new CustomException("文件已经存在");
         }
 
         if (currDirNFileName.length() > RESOURCE_FULL_NAME_MAX_LENGTH) {
@@ -105,13 +98,10 @@ public class ResourceBusiness {
             throw new CustomException(Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR.getMsg(), Status.RESOURCE_FULL_NAME_TOO_LONG_ERROR.getCode());
         }
 
-        // fail upload
         if (!upload(currDirNFileName, file, type)) {
-            log.error("upload resource: {} file: {} failed.", RegexUtils.escapeNRT(aliaName), RegexUtils.escapeNRT(file.getOriginalFilename()));
-            throw new CustomException(String.format("upload resource: %s file: %s failed.", aliaName, file.getOriginalFilename()));
+            log.error("文件上传失败: {}", RegexUtils.escapeNRT(file.getOriginalFilename()));
+            throw new CustomException(String.format("文件上传失败: %s", file.getOriginalFilename()));
         }
-
-        // save to db
         addResource(pid, aliaName, currDirNFileName, remark, 0);
     }
 
@@ -169,18 +159,16 @@ public class ResourceBusiness {
             }
             resource = storageOperate.getFileStatus(byId.getFilePath(), null);
         } catch (Exception e) {
-            log.error("{}, Resource id: {}", e.getMessage(), id, e);
-            throw new CustomException(String.format(e.getMessage() + " resource id: %s", id));
+            log.error("{}, id: {}", e.getMessage(), id, e);
+            throw new CustomException(String.format(e.getMessage() + "id: %s", id));
         }
 
         if (resource == null) {
-            log.error("Resource does not exist, resource id：{}", id);
+            log.error("文件不存在，id：{}", id);
             throw new CustomException(Status.RESOURCE_NOT_EXIST.getMsg());
         }
         List<String> allChildren = storageOperate.listFilesStatusRecursively(byId.getFilePath(), resource.getType()).stream().map(StorageEntity::getFullName).collect(Collectors.toList());
-        // delete file on hdfs
         storageOperate.delete(byId.getFilePath(), allChildren, true);
-        // delete from db
         sysResourcesService.removeById(id);
     }
 
@@ -192,8 +180,8 @@ public class ResourceBusiness {
 
         String filePath = byId.getFilePath();
         if (filePath.endsWith("/")) {
-            log.error("resource {} is directory，can't download", filePath);
-            throw new CustomException("can't download directory");
+            log.error("文件夹不支持下载: {}", filePath);
+            throw new CustomException("文件夹不支持下载");
         }
 
         String[] aliasArr = filePath.split("/");
@@ -243,59 +231,45 @@ public class ResourceBusiness {
             throw new CustomException("根目录不支持上传文件，请选择其他目录！");
         }
         if (FileUtil.directoryTraversal(name)) {
-            log.warn("Parameter file alias name verify failed, fileAliasName:{}.", RegexUtils.escapeNRT(name));
+            log.warn("文件别名验证失败:{}.", RegexUtils.escapeNRT(name));
             throw new CustomException(Status.VERIFY_PARAMETER_NAME_FAILED.getMsg(), Status.VERIFY_PARAMETER_NAME_FAILED.getCode());
         }
 
         if (file != null && FileUtil.directoryTraversal(Objects.requireNonNull(file.getOriginalFilename()))) {
-            log.warn("File original name verify failed, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
+            log.warn("文件原始名称验证失败:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
             throw new CustomException(Status.VERIFY_PARAMETER_NAME_FAILED.getMsg(), Status.VERIFY_PARAMETER_NAME_FAILED.getCode());
         }
 
         if (file != null) {
-            // file is empty
             if (file.isEmpty()) {
-                log.warn("Parameter file is empty, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
+                log.warn("文件为空:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
                 throw new CustomException(Status.RESOURCE_FILE_IS_EMPTY.getMsg(), Status.RESOURCE_FILE_IS_EMPTY.getCode());
             }
 
-            // file suffix
             String fileSuffix = Files.getFileExtension(file.getOriginalFilename());
             String nameSuffix = Files.getFileExtension(name);
 
-            // determine file suffix
             if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
-                // rename file suffix and original suffix must be consistent
-                log.warn("Rename file suffix and original suffix must be consistent, fileOriginalName:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
+                log.warn("重命名和文件后缀必须和原始文件后缀保持一致:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()));
                 throw new CustomException(Status.RESOURCE_SUFFIX_FORBID_CHANGE.getMsg(), Status.RESOURCE_SUFFIX_FORBID_CHANGE.getCode());
             }
 
-            // If resource type is UDF, only jar packages are allowed to be uploaded, and the suffix must be .jar
-            if (UDF.equals(type.name()) && !JAR.equalsIgnoreCase(fileSuffix)) {
-                log.warn(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg());
-                throw new CustomException(Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getMsg(), Status.UDF_RESOURCE_SUFFIX_NOT_JAR.getCode());
-            }
             if (file.getSize() > MAX_FILE_SIZE) {
-                log.warn("Resource file size is larger than max file size, fileOriginalName:{}, fileSize:{}, maxFileSize:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()), file.getSize(), MAX_FILE_SIZE);
+                log.warn("文件大小超过最大限制:{}, fileSize:{}, maxFileSize:{}.", RegexUtils.escapeNRT(file.getOriginalFilename()), file.getSize(), MAX_FILE_SIZE);
                 throw new CustomException(Status.RESOURCE_SIZE_EXCEED_LIMIT.getMsg(), Status.RESOURCE_SIZE_EXCEED_LIMIT.getCode());
             }
         }
     }
 
     private boolean upload(String fullName, MultipartFile file, ResourceType type) {
-        // save to local
         String fileSuffix = Files.getFileExtension(Objects.requireNonNull(file.getOriginalFilename()));
         String nameSuffix = Files.getFileExtension(fullName);
 
-        // determine file suffix
         if (!fileSuffix.equalsIgnoreCase(nameSuffix)) {
             return false;
         }
-        // random file name
         String localFilename = FileUtil.getUploadFilename(UUID.randomUUID().toString());
 
-        // save file to hdfs, and delete original file
-        String resourcePath = storageOperate.getHdfsPath() + fullName;
         try {
             FileUtil.copyInputStreamToFile(file, localFilename);
             storageOperate.upload(localFilename, fullName, true, true);
@@ -313,7 +287,6 @@ public class ResourceBusiness {
             throw new CustomException(Status.RESOURCE_NOT_EXIST.getMsg(), Status.RESOURCE_NOT_EXIST.getCode());
         }
         String fullName = storageOperate.getHdfsPath() + resource.getFilePath();
-        // check preview or not by file suffix
         String nameSuffix = Files.getFileExtension(fullName);
         String resourceViewSuffixes = FileUtil.getResourceViewSuffixes();
         if (StringUtils.isNotEmpty(resourceViewSuffixes)) {
@@ -327,11 +300,11 @@ public class ResourceBusiness {
             if (storageOperate.exists(fullName)) {
                 content = storageOperate.vimFile(fullName, 0, 10000);
             } else {
-                log.error("read file {} does not exist in storage", fullName);
+                log.error("文件不存在: {}", fullName);
                 return null;
             }
         } catch (Exception e) {
-            throw new CustomException("Resource " + fullName + " read failed");
+            throw new CustomException("文件读取失败: " + fullName);
         }
         return String.join("\n", content);
     }

@@ -2,7 +2,7 @@ package com.lacus.service.flink.dto;
 
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.flink.entity.FlinkJobEntity;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import lombok.Data;
 import org.apache.commons.lang3.ObjectUtils;
 
@@ -38,11 +38,11 @@ public class JobRunParamDTO {
     }
 
     public static JobRunParamDTO buildJobRunParam(FlinkJobEntity flinkJobEntity, String sqlPath) {
-        String flinkHome = PropertyUtils.getString(FLINK_CLIENT_HOME);
+        String flinkHome = CommonPropertyUtils.getString(FLINK_CLIENT_HOME);
         String flinkBinPath = flinkHome + "/bin/flink";
         String flinkRunParam = flinkJobEntity.getFlinkRunConfig();
-        String flinkSavepointPath = PropertyUtils.getString(FLINK_DEFAULT_SAVEPOINT_PATH);
-        String appHome = PropertyUtils.getString(LACUS_APPLICATION_HOME);
+        String flinkSavepointPath = CommonPropertyUtils.getString(FLINK_DEFAULT_SAVEPOINT_PATH);
+        String appHome = CommonPropertyUtils.getString(LACUS_APPLICATION_HOME);
 
         if (ObjectUtils.isEmpty(flinkHome)) {
             throw new CustomException("请配置环境变量[FLINK_HOME]");

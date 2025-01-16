@@ -7,7 +7,7 @@ import javax.validation.constraints.NotEmpty;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class AddSparkSqlJobCommand extends CommonSparkRunCommand {
+public class AddSparkSqlJobCommand extends BaseSparkRunCommand {
 
     @NotEmpty(message = "任务名称不能为空")
     private String jobName;
@@ -26,4 +26,4 @@ public class AddSparkSqlJobCommand extends CommonSparkRunCommand {
     private Long envId;
 
     private String remark;
-} 
+}

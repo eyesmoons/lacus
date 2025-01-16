@@ -15,7 +15,7 @@ import com.lacus.service.flink.dto.JobRunParamDTO;
 import com.lacus.service.flink.dto.StandaloneFlinkJobInfo;
 import com.lacus.service.system.ISysEnvService;
 import com.lacus.utils.JobExecuteThreadPoolUtil;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.file.FileUtil;
 import com.lacus.utils.hdfs.HdfsUtil;
 import com.lacus.utils.time.DateUtils;
@@ -73,11 +73,11 @@ public class FlinkJobBaseService {
     }
 
     public void savepointForYarn(String jobId, String targetDirectory, String yarnAppId) throws Exception {
-        this.doSavepoint(buildSavepointCommand(jobId, targetDirectory, yarnAppId, PropertyUtils.getString(FLINK_CLIENT_HOME)));
+        this.doSavepoint(buildSavepointCommand(jobId, targetDirectory, yarnAppId, CommonPropertyUtils.getString(FLINK_CLIENT_HOME)));
     }
 
     public void savepointForStandalone(String jobId, String targetDirectory) throws Exception {
-        this.doSavepoint(buildSavepointCommand(jobId, targetDirectory, PropertyUtils.getString(FLINK_CLIENT_HOME)));
+        this.doSavepoint(buildSavepointCommand(jobId, targetDirectory, CommonPropertyUtils.getString(FLINK_CLIENT_HOME)));
     }
 
     private void doSavepoint(String command) throws Exception {
@@ -212,7 +212,7 @@ public class FlinkJobBaseService {
             case STREAMING_SQL:
             case BATCH_SQL:
                 command.append(" -c ").append(APP_CLASS_NAME);
-                command.append(" ").append(jobRunParamDTO.getFlinkSqlAppHome()).append(PropertyUtils.getString(FLINK_SQL_JOB_JAR));
+                command.append(" ").append(jobRunParamDTO.getFlinkSqlAppHome()).append(CommonPropertyUtils.getString(FLINK_SQL_JOB_JAR));
                 command.append(" -sql ").append(jobRunParamDTO.getSqlPath());
                 if (StringUtils.isNotEmpty(jobRunParamDTO.getFlinkCheckpointConfig())
                         && (Objects.equals(FlinkDeployModeEnum.YARN_APPLICATION, flinkJobEntity.getDeployMode()) || Objects.equals(FlinkDeployModeEnum.YARN_PER, flinkJobEntity.getDeployMode()))) {
@@ -277,7 +277,7 @@ public class FlinkJobBaseService {
     }
 
     public JobRunParamDTO generateSqlFile(FlinkJobEntity flinkJobEntity) {
-        String sqlPath = PropertyUtils.getString(FLINK_JOB_EXECUTE_HOME) + "flink_sql_job_" + flinkJobEntity.getJobId() + ".sql";
+        String sqlPath = CommonPropertyUtils.getString(FLINK_JOB_EXECUTE_HOME) + "flink_sql_job_" + flinkJobEntity.getJobId() + ".sql";
         boolean result = FileUtil.writeToFile(flinkJobEntity.getFlinkSql(), sqlPath);
         if (result) {
             return JobRunParamDTO.buildJobRunParam(flinkJobEntity, sqlPath);
@@ -342,7 +342,7 @@ public class FlinkJobBaseService {
                 if (Objects.equals(FlinkJobTypeEnum.JAR, flinkJobEntity.getJobType())) {
                     String mainJarPath = flinkJobEntity.getMainJarPath();
                     String mainJarName = new File(mainJarPath).getName();
-                    String localJarPath = PropertyUtils.getString(FLINK_JOB_EXECUTE_HOME) + "/download/" + flinkJobEntity.getJobId() + File.separator;
+                    String localJarPath = CommonPropertyUtils.getString(FLINK_JOB_EXECUTE_HOME) + "/download/" + flinkJobEntity.getJobId() + File.separator;
                     try {
                         HdfsUtil.copyFileFromHdfs(mainJarPath, localJarPath);
                         jobRunParamDTO.setMainJarPath(localJarPath + mainJarName);

@@ -1,6 +1,6 @@
 package com.lacus.common.config;
 
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import lombok.Data;
 import org.springframework.context.annotation.Configuration;
 
@@ -16,38 +16,24 @@ import static com.lacus.common.constant.Constants.YARN_RESOURCEMANAGER_HA_RM_IDS
 @Configuration
 public class HdfsStorageProperties {
 
-    /**
-     * HDFS storage user
-     */
-    private String user = PropertyUtils.getString(HADOOP_USER);
+    // hdfs username
+    private String user = CommonPropertyUtils.getString(HADOOP_USER);
 
-    /**
-     * HDFS default fs
-     */
-    private String defaultFS = PropertyUtils.getString(DEFAULT_HDFS_CONFIG);
+    // default fs
+    private String defaultFS = CommonPropertyUtils.getString(DEFAULT_HDFS_CONFIG);
 
-    /**
-     * YARN resource manager HA RM ids
-     */
-    private String yarnResourceRmIds = PropertyUtils.getString(YARN_RESOURCEMANAGER_HA_RM_IDS);
+    // yarn resource manager ha rm ids
+    private String yarnResourceRmIds = CommonPropertyUtils.getString(YARN_RESOURCEMANAGER_HA_RM_IDS);
 
-    /**
-     * YARN application status address
-     */
-    private String yarnAppStatusAddress = PropertyUtils.getString(YARN_APPLICATION_STATUS_ADDRESS);
+    // yarn application status address
+    private String yarnAppStatusAddress = CommonPropertyUtils.getString(YARN_APPLICATION_STATUS_ADDRESS);
 
-    /**
-     * YARN job history status address
-     */
-    private String yarnJobHistoryStatusAddress = PropertyUtils.getString(YARN_JOB_HISTORY_STATUS_ADDRESS);
+    // yarn job history status address
+    private String yarnJobHistoryStatusAddress = CommonPropertyUtils.getString(YARN_JOB_HISTORY_STATUS_ADDRESS);
 
-    /**
-     * Hadoop resource manager http address port
-     */
-    private String hadoopResourceManagerHttpAddressPort = PropertyUtils.getString(HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT);
+    // hadoop resource manager http address port
+    private String hadoopResourceManagerHttpAddressPort = CommonPropertyUtils.getString(HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT);
 
-    /**
-     * Hadoop security authentication startup state
-     */
-    private boolean hadoopSecurityAuthStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+    // hadoop security authentication startup state
+    private boolean hadoopSecurityAuthStartupState = CommonPropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
 }

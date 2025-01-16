@@ -1,6 +1,6 @@
 ######################################################################
 # Build Tools
-
+.vscode
 .gradle
 /build/
 !gradle/wrapper/gradle-wrapper.jar

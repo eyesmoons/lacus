@@ -24,26 +24,48 @@ public class SparkJobInstanceServiceImpl extends ServiceImpl<SparkJobInstanceMap
         if (instance == null) {
             throw new CustomException("任务实例不存在");
         }
-        
+
         // 更新状态
         instance.setStatus(sparkStatusEnum);
-        
+
         // 如果是终态,设置完成时间
         if (isTerminalStatus(sparkStatusEnum)) {
             instance.setFinishedTime(new Date());
         }
-        
+
+        baseMapper.updateById(instance);
+        log.info("更新任务实例状态成功, instanceId: {}, status: {}", instanceId, sparkStatusEnum);
+    }
+
+    @Override
+    public void updateStatus(Long instanceId, String appId, SparkStatusEnum sparkStatusEnum) {
+        SparkJobInstanceEntity instance = baseMapper.selectById(instanceId);
+        if (instance == null) {
+            throw new CustomException("任务实例不存在");
+        }
+
+        // 更新状态
+        instance.setStatus(sparkStatusEnum);
+
+        // 如果是终态,设置完成时间
+        if (isTerminalStatus(sparkStatusEnum)) {
+            instance.setFinishedTime(new Date());
+        }
+
+        if (ObjectUtils.isNotEmpty(appId)) {
+            instance.setApplicationId(appId);
+        }
         baseMapper.updateById(instance);
         log.info("更新任务实例状态成功, instanceId: {}, status: {}", instanceId, sparkStatusEnum);
     }
 
     @Override
     public void updateStatusByJobId(Long jobId, SparkStatusEnum sparkStatusEnum, Date finishedTime) {
-        LambdaQueryWrapper<SparkJobInstanceEntity> wrapper = 
-            new LambdaQueryWrapper<SparkJobInstanceEntity>()
-                .eq(SparkJobInstanceEntity::getJobId, jobId)
-                .eq(SparkJobInstanceEntity::getStatus, SparkStatusEnum.RUNNING);
-                
+        LambdaQueryWrapper<SparkJobInstanceEntity> wrapper =
+                new LambdaQueryWrapper<SparkJobInstanceEntity>()
+                        .eq(SparkJobInstanceEntity::getJobId, jobId)
+                        .eq(SparkJobInstanceEntity::getStatus, SparkStatusEnum.RUNNING);
+
         List<SparkJobInstanceEntity> runningInstances = baseMapper.selectList(wrapper);
         if (ObjectUtils.isNotEmpty(runningInstances)) {
             for (SparkJobInstanceEntity instance : runningInstances) {
@@ -55,8 +77,8 @@ public class SparkJobInstanceServiceImpl extends ServiceImpl<SparkJobInstanceMap
                 }
                 baseMapper.updateById(instance);
             }
-            log.info("批量更新任务实例状态成功, jobId: {}, status: {}, count: {}", 
-                jobId, sparkStatusEnum, runningInstances.size());
+            log.info("批量更新任务实例状态成功, jobId: {}, status: {}, count: {}",
+                    jobId, sparkStatusEnum, runningInstances.size());
         }
     }
 
@@ -64,8 +86,8 @@ public class SparkJobInstanceServiceImpl extends ServiceImpl<SparkJobInstanceMap
      * 判断是否是终态
      */
     private boolean isTerminalStatus(SparkStatusEnum status) {
-        return SparkStatusEnum.FINISHED.equals(status) 
-            || SparkStatusEnum.FAILED.equals(status)
-            || SparkStatusEnum.KILLED.equals(status);
+        return SparkStatusEnum.FINISHED.equals(status)
+                || SparkStatusEnum.FAILED.equals(status)
+                || SparkStatusEnum.KILLED.equals(status);
     }
-} 
+}

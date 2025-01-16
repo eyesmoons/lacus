@@ -8,7 +8,7 @@ import com.lacus.enums.FlinkStatusEnum;
 import com.lacus.service.flink.dto.YarnApplicationDTO;
 import com.lacus.service.flink.dto.YarnApplicationInfoDTO;
 import com.lacus.service.flink.dto.YarnJobInfoDTO;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.RestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -51,7 +51,7 @@ public class YarnRestService {
     }
 
     public String getYarnRmHttpAddress() {
-        String urlHa = PropertyUtils.getString(YARN_RESTAPI_ADDRESS);
+        String urlHa = CommonPropertyUtils.getString(YARN_RESTAPI_ADDRESS);
         if (StringUtils.isEmpty(urlHa)) {
             throw new CustomException("请配置[" + YARN_RESTAPI_ADDRESS + "]");
         }

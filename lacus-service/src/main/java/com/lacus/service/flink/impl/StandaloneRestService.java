@@ -5,7 +5,7 @@ import com.lacus.common.exception.CustomException;
 import com.lacus.enums.FlinkDeployModeEnum;
 import com.lacus.enums.FlinkStatusEnum;
 import com.lacus.service.flink.dto.StandaloneFlinkJobInfo;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.RestUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -82,7 +82,7 @@ public class StandaloneRestService {
     public String getFlinkRestAddress(FlinkDeployModeEnum flinkDeployModeEnum) {
         switch (flinkDeployModeEnum) {
             case LOCAL:
-                String urlLocal = PropertyUtils.getString(FLINK_HTTP_ADDRESS);
+                String urlLocal = CommonPropertyUtils.getString(FLINK_HTTP_ADDRESS);
                 if (StringUtils.isEmpty(urlLocal)) {
                     throw new CustomException("请配置" + FLINK_HTTP_ADDRESS);
                 }
@@ -91,7 +91,7 @@ public class StandaloneRestService {
                 }
                 throw new CustomException("连接异常,url: " + urlLocal);
             case STANDALONE:
-                String urlHA = PropertyUtils.getString(FLINK_REST_HA_HTTP_ADDRESS);
+                String urlHA = CommonPropertyUtils.getString(FLINK_REST_HA_HTTP_ADDRESS);
                 if (ObjectUtils.isEmpty(urlHA)) {
                     throw new CustomException("请配置" + FLINK_REST_HA_HTTP_ADDRESS);
                 }

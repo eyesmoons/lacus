@@ -6,7 +6,7 @@ import com.alibaba.fastjson2.JSONObject;
 import com.google.common.collect.Lists;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.RestUtil;
 import com.lacus.utils.kafka.KafkaUtil;
 import com.lacus.utils.time.DateUtils;
@@ -43,21 +43,21 @@ public class JobMonitorBusiness {
 
     private final static String appType = "Apache Flink";
 
-    private final String flinkRestPrefix = PropertyUtils.getString(YARN_RESTAPI_ADDRESS);
+    private final String flinkRestPrefix = CommonPropertyUtils.getString(YARN_RESTAPI_ADDRESS);
 
     public List<ApplicationModel> listFlinkJob() {
-        return YarnUtil.listYarnRunningJob(PropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH), appType);
+        return YarnUtil.listYarnRunningJob(CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH), appType);
     }
 
     public YarnMetrics clusterDetail() {
         YarnConfiguration conf = new YarnConfiguration();
-        ConfigUtil.initConfig(conf, PropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH));
+        ConfigUtil.initConfig(conf, CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH));
         String host = conf.get("yarn.resourcemanager.webapp.address");
         JSONObject json = restUtil.getForJsonObject("http://" + host + "/ws/v1/cluster/metrics");
         log.debug("返回信息:{}", JSON.toJSONString(json));
         YarnMetrics yarnMetrics = json.getJSONObject("clusterMetrics").toJavaObject(YarnMetrics.class);
 
-        yarnMetrics.setYarnNode(PropertyUtils.getString(YARN_NODE_ADDRESS));
+        yarnMetrics.setYarnNode(CommonPropertyUtils.getString(YARN_NODE_ADDRESS));
         yarnMetrics.setTotalGB(yarnMetrics.getTotalMB() / 1024);
         yarnMetrics.setAllocatedGB(yarnMetrics.getAllocatedMB() / 1024);
         yarnMetrics.setAvailableGB(yarnMetrics.getAvailableMB() / 1024);
@@ -70,7 +70,7 @@ public class JobMonitorBusiness {
     }
 
     public ApplicationModel yarnJobDetail(String appId) {
-        return YarnUtil.yarnJobDetail(PropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH), appId);
+        return YarnUtil.yarnJobDetail(CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH), appId);
     }
 
     public Object flinkJobOverview(String applicationId) {

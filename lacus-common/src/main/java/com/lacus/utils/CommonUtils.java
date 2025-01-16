@@ -33,9 +33,9 @@ public class CommonUtils {
      * @return true if upload resource is HDFS and kerberos startup
      */
     public static boolean getKerberosStartupState() {
-        String resUploadStartupType = PropertyUtils.getUpperCaseString(RESOURCE_STORAGE_TYPE);
+        String resUploadStartupType = CommonPropertyUtils.getUpperCaseString(RESOURCE_STORAGE_TYPE);
         ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-        Boolean kerberosStartupState = PropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
+        Boolean kerberosStartupState = CommonPropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
         return resUploadType == ResUploadType.HDFS && kerberosStartupState;
     }
 
@@ -47,9 +47,9 @@ public class CommonUtils {
      * @throws IOException errors
      */
     public static boolean loadKerberosConf(Configuration configuration) throws IOException {
-        return loadKerberosConf(PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH),
-                PropertyUtils.getString(LOGIN_USER_KEY_TAB_USERNAME),
-                PropertyUtils.getString(LOGIN_USER_KEY_TAB_PATH), configuration);
+        return loadKerberosConf(CommonPropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH),
+                CommonPropertyUtils.getString(LOGIN_USER_KEY_TAB_USERNAME),
+                CommonPropertyUtils.getString(LOGIN_USER_KEY_TAB_PATH), configuration);
     }
 
     /**
@@ -82,13 +82,13 @@ public class CommonUtils {
                                            String loginUserKeytabPath, Configuration configuration) throws IOException {
         if (CommonUtils.getKerberosStartupState()) {
             System.setProperty(JAVA_SECURITY_KRB5_CONF, StringUtils.defaultIfBlank(javaSecurityKrb5Conf,
-                    PropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH)));
+                    CommonPropertyUtils.getString(JAVA_SECURITY_KRB5_CONF_PATH)));
             configuration.set(HADOOP_SECURITY_AUTHENTICATION, KERBEROS);
             UserGroupInformation.setConfiguration(configuration);
             UserGroupInformation.loginUserFromKeytab(
                     StringUtils.defaultIfBlank(loginUserKeytabUsername,
-                            PropertyUtils.getString(LOGIN_USER_KEY_TAB_USERNAME)),
-                    StringUtils.defaultIfBlank(loginUserKeytabPath, PropertyUtils.getString(LOGIN_USER_KEY_TAB_PATH)));
+                            CommonPropertyUtils.getString(LOGIN_USER_KEY_TAB_USERNAME)),
+                    StringUtils.defaultIfBlank(loginUserKeytabPath, CommonPropertyUtils.getString(LOGIN_USER_KEY_TAB_PATH)));
             return true;
         }
         return false;

@@ -17,7 +17,7 @@ import static com.lacus.common.constant.Constants.COMMON_PROPERTIES_PATH;
 
 @Slf4j
 @UtilityClass
-public class PropertyUtils {
+public class CommonPropertyUtils {
 
     private static final IPropertyDelegate propertyDelegate = new ImmutablePriorityPropertyDelegate(COMMON_PROPERTIES_PATH);
 

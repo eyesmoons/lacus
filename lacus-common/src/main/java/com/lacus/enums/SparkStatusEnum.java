@@ -1,7 +1,7 @@
 package com.lacus.enums;
 
 public enum SparkStatusEnum {
-    SUBMITTED, RUNNING, FINISHED, FAILED, KILLED, UNKNOWN, CREATED;
+    SUBMITTED, CONNECTED, RUNNING, FINISHED, FAILED, KILLED, UNKNOWN, CREATED, LOST;
 
     public static SparkStatusEnum getSparkStateEnum(String state) {
         for (SparkStatusEnum stateEnum : SparkStatusEnum.values()) {

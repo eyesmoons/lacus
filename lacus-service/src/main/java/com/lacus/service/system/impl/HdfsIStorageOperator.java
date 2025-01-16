@@ -6,11 +6,11 @@ import com.lacus.common.exception.CustomException;
 import com.lacus.dao.system.entity.StorageEntity;
 import com.lacus.enums.ResourceType;
 import com.lacus.service.system.IStorageOperate;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.CommonUtils;
 import com.lacus.utils.HttpUtils;
 import com.lacus.utils.JSONUtils;
 import com.lacus.utils.KerberosHttpClient;
-import com.lacus.utils.PropertyUtils;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
@@ -70,7 +70,6 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
 
     public HdfsIStorageOperator(HdfsStorageProperties hdfsStorageProperties) {
         hdfsProperties = hdfsStorageProperties;
-        // init hadoop configuration
         init();
     }
 
@@ -86,21 +85,16 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
             }
 
             String defaultFS = getDefaultFS();
-            // first get key from core-site.xml hdfs-site.xml ,if null ,then try to get from properties file
-            // the default is the local file system
             if (StringUtils.isNotBlank(defaultFS)) {
-                Map<String, String> fsRelatedProps = PropertyUtils.getByPrefix("fs.");
+                Map<String, String> fsRelatedProps = CommonPropertyUtils.getByPrefix("fs.");
                 configuration.set(HDFS_DEFAULT_FS, defaultFS);
                 fsRelatedProps.forEach((key, value) -> configuration.set(key, value));
             } else {
-                log.error("property:{} can not to be empty, please set!", DEFAULT_HDFS_CONFIG);
-                throw new NullPointerException(
-                        String.format("property: %s can not to be empty, please set!", DEFAULT_HDFS_CONFIG));
+                log.error("请设置:{}", DEFAULT_HDFS_CONFIG);
+                throw new NullPointerException(String.format("请设置: %s", DEFAULT_HDFS_CONFIG));
             }
-
             if (!defaultFS.startsWith("file")) {
-                log.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", DEFAULT_HDFS_CONFIG,
-                        defaultFS);
+                log.info("get property:{} -> {}, from core-site.xml hdfs-site.xml ", DEFAULT_HDFS_CONFIG, defaultFS);
             }
 
             if (StringUtils.isNotEmpty(hdfsUser)) {
@@ -110,10 +104,8 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
                     return true;
                 });
             } else {
-                log.warn("resource.hdfs.root.user is not set value!");
                 fs = FileSystem.get(configuration);
             }
-
         } catch (Exception e) {
             log.error(e.getMessage(), e);
         }
@@ -130,18 +122,7 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
         return defaultFS;
     }
 
-    /**
-     * get application url
-     * if rmHaIds contains xx, it signs not use resourcemanager
-     * otherwise:
-     * if rmHaIds is empty, single resourcemanager enabled
-     * if rmHaIds not empty: resourcemanager HA enabled
-     *
-     * @param applicationId application id
-     * @return url of application
-     */
     public String getApplicationUrl(String applicationId) throws CustomException {
-
         yarnEnabled = true;
         String appUrl = StringUtils.isEmpty(hdfsProperties.getYarnResourceRmIds())
                 ? hdfsProperties.getYarnAppStatusAddress()
@@ -154,22 +135,16 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     public String getJobHistoryUrl(String applicationId) {
-        // eg:application_1587475402360_712719 -> job_1587475402360_712719
         String jobId = applicationId.replace("application", "job");
         return String.format(hdfsProperties.getYarnJobHistoryStatusAddress(), jobId);
     }
 
     /**
-     * cat file on hdfs
-     *
-     * @param hdfsFilePath hdfs file path
-     * @return byte[] byte array
-     * @throws IOException errors
+     * 查看hdfs文件内容
      */
     public byte[] catFile(String hdfsFilePath) throws IOException {
-
         if (StringUtils.isBlank(hdfsFilePath)) {
-            log.error("hdfs file path:{} is blank", hdfsFilePath);
+            log.error("hdfs 路径为空:{}", hdfsFilePath);
             return new byte[0];
         }
         try (FSDataInputStream fsDataInputStream = fs.open(new Path(hdfsFilePath))) {
@@ -178,13 +153,11 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * cat file on hdfs
+     * 查看hdfs人间内容
      *
-     * @param hdfsFilePath hdfs file path
-     * @param skipLineNums skip line numbers
-     * @param limit        read how many lines
-     * @return content of file
-     * @throws IOException errors
+     * @param hdfsFilePath hdfs文件路径
+     * @param skipLineNums 跳过的行数
+     * @param limit        读取的行数
      */
     public List<String> catFile(String hdfsFilePath, int skipLineNums, int limit) throws IOException {
 
@@ -206,13 +179,7 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * make the given file and all non-existent parents into
-     * directories. Has the semantics of Unix 'mkdir -p'.
-     * Existence of the directory hierarchy is not an error.
-     *
-     * @param hdfsPath path to create
-     * @return mkdir result
-     * @throws IOException errors
+     * 创建hdfs目录
      */
     @Override
     public boolean mkdir(String hdfsPath) throws IOException {
@@ -225,14 +192,12 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * copy files between FileSystems
+     * 复制hdfs文件
      *
      * @param srcPath      source hdfs path
      * @param dstPath      destination hdfs path
      * @param deleteSource whether to delete the src
      * @param overwrite    whether to overwrite an existing file
-     * @return if success or not
-     * @throws IOException errors
      */
     @Override
     public boolean copy(String srcPath, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
@@ -240,14 +205,12 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * the src file is on the local disk.  Add it to FS at
-     * the given dst name.
+     * 复制本地文件到hdfs
      *
      * @param srcFile      local file
      * @param dstHdfsPath  destination hdfs path
      * @param deleteSource whether to delete the src
      * @param overwrite    whether to overwrite an existing file
-     * @throws IOException errors
      */
     public void copyLocalToHdfs(String srcFile, String dstHdfsPath, boolean deleteSource, boolean overwrite) throws IOException {
         Path srcPath = new Path(srcFile);
@@ -255,53 +218,50 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
         fs.copyFromLocalFile(deleteSource, overwrite, srcPath, dstPath);
     }
 
+    /**
+     * 上传文件到hdfs
+     *
+     * @param srcFile      local file
+     * @param dstPath      destination hdfs path
+     * @param deleteSource whether to delete the src
+     * @param overwrite    whether to overwrite an existing file
+     */
     @Override
-    public void upload(String srcFile, String dstPath, boolean deleteSource,
-                       boolean overwrite) throws IOException {
+    public void upload(String srcFile, String dstPath, boolean deleteSource, boolean overwrite) throws IOException {
         copyLocalToHdfs(srcFile, dstPath, deleteSource, overwrite);
     }
 
     /**
-     * copy hdfs file to local
+     * 下载hdfs文件到本地
      *
      * @param srcHdfsFilePath source hdfs file path
      * @param dstFile         destination file
      * @param deleteSource    delete source
      * @param overwrite       overwrite
-     * @throws IOException errors
      */
-    public void copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource,
-                                boolean overwrite) throws IOException {
-
+    public void copyHdfsToLocal(String srcHdfsFilePath, String dstFile, boolean deleteSource, boolean overwrite) throws IOException {
         Path srcPath = new Path(srcHdfsFilePath);
         File dstPath = new File(dstFile);
-
         if (dstPath.exists()) {
             if (dstPath.isFile()) {
                 if (overwrite) {
                     Files.delete(dstPath.toPath());
                 }
             } else {
-                log.error("destination file must be a file");
+                log.error("目标文件必须是文件");
             }
         }
-
         if (!dstPath.getParentFile().exists() && !dstPath.getParentFile().mkdirs()) {
             return;
         }
-
         FileUtil.copy(fs, srcPath, dstPath, deleteSource, fs.getConf());
     }
 
     /**
-     * delete a file
+     * 删除hdfs文件
      *
-     * @param hdfsFilePath the path to delete.
-     * @param recursive    if path is a directory and set to
-     *                     true, the directory is deleted else throws an exception. In
-     *                     case of a file the recursive can be set to either true or false.
-     * @return true if delete is successful else false.
-     * @throws IOException errors
+     * @param hdfsFilePath hdfs文件路径，可以是文件或目录
+     * @param recursive    是否递归删除
      */
     @Override
     public boolean delete(String hdfsFilePath, boolean recursive) throws IOException {
@@ -309,14 +269,10 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * delete a list of files
+     * 批量删除文件
      *
-     * @param filePath  the path to delete, usually it is a directory.
-     * @param recursive if path is a directory and set to
-     *                  true, the directory is deleted else throws an exception. In
-     *                  case of a file the recursive can be set to either true or false.
-     * @return true if delete is successful else false.
-     * @throws IOException errors
+     * @param filePath  文件目录
+     * @param recursive 是否递归删除
      */
 
     @Override
@@ -328,11 +284,7 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * check if exists
-     *
-     * @param hdfsFilePath source file path
-     * @return result of exists or not
-     * @throws IOException errors
+     * 检查hdfs文件是否存在
      */
     @Override
     public boolean exists(String hdfsFilePath) throws IOException {
@@ -340,11 +292,7 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
     }
 
     /**
-     * Gets a list of files in the directory
-     *
-     * @param path file fullName path
-     * @return {@link FileStatus} file status
-     * @throws IOException errors
+     * 列出hdfs目录下所有文件
      */
     @Override
     public List<StorageEntity> listFilesStatus(String path, ResourceType type) throws IOException {
@@ -355,11 +303,8 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
                 return storageEntityList;
             }
             FileStatus[] fileStatuses = fs.listStatus(filePath);
-
-            // transform FileStatusArray into the StorageEntity List
             for (FileStatus fileStatus : fileStatuses) {
                 if (fileStatus.isDirectory()) {
-                    // the path is a directory
                     String fullName = fileStatus.getPath().toString();
                     fullName = addFolderSeparatorIfNotExisted(fullName);
 
@@ -379,7 +324,6 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
 
                     storageEntityList.add(entity);
                 } else {
-                    // the path is a file
                     String fullName = fileStatus.getPath().toString();
                     String[] aliasArr = fullName.split("/");
                     String alias = aliasArr[aliasArr.length - 1];
@@ -394,14 +338,13 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
                     entity.setCreateTime(new Date(fileStatus.getModificationTime()));
                     entity.setUpdateTime(new Date(fileStatus.getModificationTime()));
                     entity.setPfullName(path);
-
                     storageEntityList.add(entity);
                 }
             }
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("The path does not exist.");
+            throw new FileNotFoundException("hdfs文件路径不存在");
         } catch (IOException e) {
-            throw new IOException("Get file list exception.", e);
+            throw new IOException("列出文件异常", e);
         }
 
         return storageEntityList;
@@ -433,24 +376,17 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
             entity.setCreateTime(new Date(fileStatus.getModificationTime()));
             entity.setUpdateTime(new Date(fileStatus.getModificationTime()));
             entity.setPfullName(path);
-
             return entity;
         } catch (FileNotFoundException e) {
-            throw new FileNotFoundException("The path does not exist.");
+            throw new FileNotFoundException("hdfs文件路径不存在");
         } catch (IOException e) {
-            throw new IOException("Get file exception.", e);
+            throw new IOException("列出文件异常", e);
         }
     }
 
 
     /**
-     * Renames Path src to Path dst.  Can take place on local fs
-     * or remote DFS.
-     *
-     * @param src path to be renamed
-     * @param dst new path after rename
-     * @return true if rename is successful
-     * @throws IOException on failure
+     * 重命名hdfs文件
      */
     public boolean rename(String src, String dst) throws IOException {
         return fs.rename(new Path(src), new Path(dst));
@@ -460,37 +396,22 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
         return hdfsProperties.getDefaultFS();
     }
 
-    /**
-     * getAppAddress
-     *
-     * @param appAddress app address
-     * @param rmHa       resource manager ha
-     * @return app address
-     */
     public static String getAppAddress(String appAddress, String rmHa) {
-
         String[] split1 = appAddress.split(DOUBLE_SLASH);
-
         if (split1.length != 2) {
             return null;
         }
-
         String start = split1[0] + DOUBLE_SLASH;
         String[] split2 = split1[1].split(COLON);
 
         if (split2.length != 2) {
             return null;
         }
-
         String end = COLON + split2[1];
-
-        // get active ResourceManager
         String activeRM = YarnHAAdminUtils.getActiveRMName(start, rmHa);
-
         if (StringUtils.isEmpty(activeRM)) {
             return null;
         }
-
         return start + activeRM + end;
     }
 
@@ -500,31 +421,19 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
             try {
                 fs.close();
             } catch (IOException e) {
-                log.error("Close HadoopUtils instance failed", e);
-                throw new IOException("Close HadoopUtils instance failed", e);
+                throw new IOException(e);
             }
         }
     }
 
-    /**
-     * yarn ha admin utils
-     */
     private static final class YarnHAAdminUtils {
 
         /**
-         * get active resourcemanager node
-         *
-         * @param protocol http protocol
-         * @param rmIds    yarn ha ids
-         * @return yarn active node
+         * 获取活跃的rm节点
          */
         public static String getActiveRMName(String protocol, String rmIds) {
-
             String[] rmIdArr = rmIds.split(COMMA);
-
-            String yarnUrl =
-                    protocol + "%s:" + hdfsProperties.getHadoopResourceManagerHttpAddressPort() + "/ws/v1/cluster/info";
-
+            String yarnUrl = protocol + "%s:" + hdfsProperties.getHadoopResourceManagerHttpAddressPort() + "/ws/v1/cluster/info";
             try {
                 for (String rmId : rmIdArr) {
                     String state = getRMState(String.format(yarnUrl, rmId));
@@ -533,13 +442,13 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
                     }
                 }
             } catch (Exception e) {
-                log.error("yarn ha application url generation failed, message:{}", e.getMessage());
+                log.error(e.getMessage());
             }
             return null;
         }
 
         /**
-         * get ResourceManager state
+         * 获取rm节点状态
          */
         public static String getRMState(String url) {
 
@@ -551,22 +460,17 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
             if (StringUtils.isEmpty(retStr)) {
                 return null;
             }
-            // to json
             ObjectNode jsonObject = JSONUtils.parseObject(retStr);
-
-            // get ResourceManager state
             if (!jsonObject.has("clusterInfo")) {
                 return null;
             }
             return jsonObject.get("clusterInfo").path("haState").asText();
         }
-
     }
 
     @Override
     public List<StorageEntity> listFilesStatusRecursively(String path, ResourceType type) {
         List<StorageEntity> storageEntityList = new ArrayList<>();
-
         LinkedList<StorageEntity> foldersToFetch = new LinkedList<>();
         do {
             String pathToExplore;
@@ -575,20 +479,16 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
             } else {
                 pathToExplore = foldersToFetch.pop().getFullName();
             }
-
             try {
                 List<StorageEntity> tempList = listFilesStatus(pathToExplore, type);
-
                 for (StorageEntity temp : tempList) {
                     if (temp.isDirectory()) {
                         foldersToFetch.add(temp);
                     }
                 }
-
                 storageEntityList.addAll(tempList);
             } catch (IOException e) {
                 log.error("Resource path: {}", pathToExplore, e);
-                // return the resources fetched before error occurs.
                 return storageEntityList;
             }
 
@@ -596,13 +496,8 @@ public class HdfsIStorageOperator implements Closeable, IStorageOperate {
         return storageEntityList;
     }
 
-    /**
-     * find alias for directories, NOT for files
-     * a directory is a path ending with "/"
-     */
     private String findDirAlias(String myStr) {
         if (!myStr.endsWith("/")) {
-            // Make sure system won't crush down if someone accidentally misuse the function.
             return myStr;
         }
         int lastIndex = myStr.lastIndexOf("/");

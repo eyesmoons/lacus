@@ -1,7 +1,7 @@
 package com.lacus.utils.hdfs;
 
 import com.lacus.common.constant.Constants;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.FSDataInputStream;
@@ -39,7 +39,7 @@ public class HdfsUtil {
         envSetting();
         if (conf == null) {
             conf = new Configuration();
-            conf.set(DEFAULT_HDFS_CONFIG, PropertyUtils.getString(DEFAULT_HDFS_CONFIG));
+            conf.set(DEFAULT_HDFS_CONFIG, CommonPropertyUtils.getString(DEFAULT_HDFS_CONFIG));
             conf.set("dfs.client.use.datanode.hostname", "true");
         }
     }
@@ -48,7 +48,7 @@ public class HdfsUtil {
      * 设置hadoop用户环境变量
      */
     public static void envSetting() {
-        System.setProperty(Constants.HADOOP_USER_CONFIG, PropertyUtils.getString(HADOOP_USER));
+        System.setProperty(Constants.HADOOP_USER_CONFIG, CommonPropertyUtils.getString(HADOOP_USER));
     }
 
     /**

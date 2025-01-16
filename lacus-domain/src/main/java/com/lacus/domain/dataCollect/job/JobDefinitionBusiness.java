@@ -46,7 +46,7 @@ import com.lacus.service.dataCollect.IDataSyncTableMappingService;
 import com.lacus.service.metadata.IMetaColumnService;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.metadata.IMetaTableService;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.time.DateUtils;
 import com.lacus.utils.yarn.ApplicationModel;
 import com.lacus.utils.yarn.FlinkJobDetail;
@@ -782,7 +782,7 @@ public class JobDefinitionBusiness {
         } else {
             applicationModel.setApplicationId(instance.getApplicationId());
             applicationModel.setStartTime(DateUtils.getDatetimeStr(instance.getSubmitTime()));
-            applicationModel.setTrackingUrl(PropertyUtils.getString(YARN_RESTAPI_ADDRESS) + instance.getApplicationId());
+            applicationModel.setTrackingUrl(CommonPropertyUtils.getString(YARN_RESTAPI_ADDRESS) + instance.getApplicationId());
         }
         applicationModel.setFlinkStatus(FlinkStatusEnum.getName(instance.getStatus()));
         return applicationModel;

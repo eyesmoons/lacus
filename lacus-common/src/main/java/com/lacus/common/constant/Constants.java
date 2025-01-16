@@ -56,9 +56,6 @@ public class Constants {
     public static final String COMMON_PROPERTIES_PATH = "/common.properties";
     public static final String FORMAT_S_S = "%s/%s";
     public static final String FOLDER_SEPARATOR = "/";
-    public static final String RESOURCE_TYPE_FILE = "resources";
-    public static final String RESOURCE_TYPE_UDF = "udfs";
-    public static final String EMPTY_STRING = "";
     public static final String KAFKA_SERVERS = "kafka.bootstrapServers";
     public static final String HADOOP_RESOURCE_MANAGER_HTTPADDRESS_PORT = "yarn.resource.manager.httpaddress.port";
     public static final String YARN_RESOURCEMANAGER_HA_RM_IDS = "yarn.resourcemanager.ha.rm.ids";
@@ -112,8 +109,11 @@ public class Constants {
     public static final String FLINK_CLIENT_HOME = "flink.client.home";
     public static final String FLINK_JOB_EXECUTE_HOME = "flink.job.execute.home";
 
+    public static final String JAVA_HOME = "java.home";
+    public static final String HADOOP_CONF_DIR = "hadoop.conf.dir";
     public static final String SPARK_CLIENT_HOME = "spark.client.home";
-    public static final String SPARK_JOB_EXECUTE_HOME = "spark.job.execute.home";
-    public static final String SPARK_DEFAULT_QUEUE = "spark.default.queue";
     public static final String SPARK_SQL_JOB_JAR = "spark.sql.job.jar";
+    public static final long DEFAULT_SUBMIT_TIMEOUT_MS = 300000L;
+    public static final String SPARK_LOG_PATH = "spark.log.path";
+    public static final String SPARK_SQL_FILE_DIR = "spark.sql.file.dir";
 }

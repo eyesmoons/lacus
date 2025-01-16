@@ -25,7 +25,7 @@ import com.lacus.service.dataCollect.IDataSyncSinkTableService;
 import com.lacus.service.dataCollect.IDataSyncSourceTableService;
 import com.lacus.service.dataCollect.IDataSyncTableMappingService;
 import com.lacus.service.metadata.IMetaDataSourceService;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.hdfs.HdfsUtil;
 import com.lacus.utils.time.DateUtils;
 import com.lacus.utils.yarn.FlinkConf;
@@ -108,7 +108,7 @@ public class DataCollectorJobUtil {
             source.setTimeStamp(sourceJobConf.getTimeStamp());
         }
         source.setSourceName(sourceJobConf.getSourceName());
-        source.setBootStrapServers(PropertyUtils.getString(KAFKA_SERVERS));
+        source.setBootStrapServers(CommonPropertyUtils.getString(KAFKA_SERVERS));
         source.setTopics(Collections.singletonList(buildTopic(job.getJobId())));
         source.setGroupId(buildGroupId(job.getJobId()));
 
@@ -231,7 +231,7 @@ public class DataCollectorJobUtil {
         List<String> sourceTableNames = sourceTables.stream().map(sourceTable -> sourceTable.getSourceDbName() + "." + sourceTable.getSourceTableName()).collect(Collectors.toList());
         MetaDatasourceEntity metaDatasource = dataSourceService.getById(job.getSourceDatasourceId());
         if (ObjectUtils.isNotEmpty(metaDatasource)) {
-            sourceJobConf.setBootStrapServer(PropertyUtils.getString(KAFKA_SERVERS));
+            sourceJobConf.setBootStrapServer(CommonPropertyUtils.getString(KAFKA_SERVERS));
             sourceJobConf.setTopic(buildTopic(job.getJobId()));
             sourceJobConf.setSourceName(metaDatasource.getDatasourceName());
             sourceJobConf.setDatasourceType(metaDatasource.getType().toLowerCase());
@@ -318,7 +318,7 @@ public class DataCollectorJobUtil {
             try {
                 for (int i = 0; i < 5; i++) {
                     // 停止flink任务
-                    YarnUtil.cancelYarnJob(applicationId, flinkJobId, PropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH));
+                    YarnUtil.cancelYarnJob(applicationId, flinkJobId, CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH));
                 }
                 // 修改任务状态
                 updateStopStatusForInstance(instance);
@@ -338,8 +338,8 @@ public class DataCollectorJobUtil {
      * @param jarName jar包名称
      */
     public String getJobJarPath(String jarName) {
-        String fsPrefix = ObjectUtils.isEmpty(PropertyUtils.getString(DEFAULT_HDFS_CONFIG)) ? Constants.DEFAULT_HDFS_CONFIG : PropertyUtils.getString(DEFAULT_HDFS_CONFIG);
-        String hdfsJarPath = fsPrefix + PropertyUtils.getString(FLINK_HDFS_COLLECTOR_JOB_JARS_PATH) + jarName;
+        String fsPrefix = ObjectUtils.isEmpty(CommonPropertyUtils.getString(DEFAULT_HDFS_CONFIG)) ? Constants.DEFAULT_HDFS_CONFIG : CommonPropertyUtils.getString(DEFAULT_HDFS_CONFIG);
+        String hdfsJarPath = fsPrefix + CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_JOB_JARS_PATH) + jarName;
         if (!HdfsUtil.exists(hdfsJarPath)) {
             throw new RuntimeException("找不到路径:" + hdfsJarPath);
         }

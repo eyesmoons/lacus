@@ -8,6 +8,7 @@ import com.lacus.dao.spark.mapper.SparkJobMapper;
 import com.lacus.enums.SparkStatusEnum;
 import com.lacus.service.spark.ISparkJobService;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 
 /**
@@ -33,6 +34,19 @@ public class SparkJobServiceImpl extends ServiceImpl<SparkJobMapper, SparkJobEnt
             throw new CustomException("任务不存在");
         }
         sparkJobEntity.setJobStatus(sparkStatusEnum);
+        baseMapper.updateById(sparkJobEntity);
+    }
+
+    @Override
+    public void updateStatus(Long jobId, String appId, SparkStatusEnum sparkStatusEnum) {
+        SparkJobEntity sparkJobEntity = baseMapper.selectById(jobId);
+        if (sparkJobEntity == null) {
+            throw new CustomException("任务不存在");
+        }
+        sparkJobEntity.setJobStatus(sparkStatusEnum);
+        if (ObjectUtils.isNotEmpty(appId)) {
+            sparkJobEntity.setAppId(appId);
+        }
         baseMapper.updateById(sparkJobEntity);
     }
 }

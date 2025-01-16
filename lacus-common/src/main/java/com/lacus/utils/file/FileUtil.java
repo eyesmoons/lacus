@@ -2,7 +2,7 @@ package com.lacus.utils.file;
 
 import com.lacus.common.constant.Constants;
 import com.lacus.utils.OSUtils;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.time.DateUtils;
 import lombok.NonNull;
 import lombok.experimental.UtilityClass;
@@ -38,7 +38,7 @@ import static com.lacus.utils.time.DateUtils.YYYYMMDDHHMMSS;
 @Slf4j
 public class FileUtil {
 
-    public static final String DATA_BASEDIR = PropertyUtils.getString(DATA_BASEDIR_PATH, System.getProperty("user.home") + "/tmp/lacus");
+    public static final String DATA_BASEDIR = CommonPropertyUtils.getString(DATA_BASEDIR_PATH, System.getProperty("user.home") + "/tmp/lacus");
 
     public static final String APPINFO_PATH = "appInfo.log";
 
@@ -126,7 +126,7 @@ public class FileUtil {
      * @return get suffixes for resource files that support online viewing
      */
     public static String getResourceViewSuffixes() {
-        return PropertyUtils.getString(Constants.RESOURCE_VIEW_SUFFIXES, Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE);
+        return CommonPropertyUtils.getString(Constants.RESOURCE_VIEW_SUFFIXES, Constants.RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE);
     }
 
     public static boolean writeToFile(String content, String filePath) {

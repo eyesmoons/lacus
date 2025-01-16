@@ -31,8 +31,14 @@ public class SparkJobEntity extends BaseEntity<SparkJobEntity> {
     @TableField("job_type")
     private SparkJobTypeEnum jobType;
 
+    @TableField("master")
+    private String master;
+
     @TableField("deploy_mode")
     private SparkDeployModeEnum deployMode;
+
+    @TableField("parallelism")
+    private Integer parallelism;
 
     @TableField("driver_cores")
     private Integer driverCores;

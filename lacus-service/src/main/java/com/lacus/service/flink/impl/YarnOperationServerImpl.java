@@ -8,7 +8,7 @@ import com.lacus.service.flink.IFlinkJobInstanceService;
 import com.lacus.service.flink.IFlinkJobService;
 import com.lacus.service.flink.IFlinkOperationService;
 import com.lacus.service.flink.dto.YarnJobInfoDTO;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.time.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -101,7 +101,7 @@ public class YarnOperationServerImpl extends FlinkJobBaseService implements IFli
         }
         // 执行savepoint
         try {
-            savepointForYarn(jobInfo.getId(), PropertyUtils.getString(FLINK_DEFAULT_SAVEPOINT_PATH) + jobId, flinkJobEntity.getAppId());
+            savepointForYarn(jobInfo.getId(), CommonPropertyUtils.getString(FLINK_DEFAULT_SAVEPOINT_PATH) + jobId, flinkJobEntity.getAppId());
         } catch (Exception e) {
             throw new CustomException("执行savePoint失败");
         }

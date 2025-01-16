@@ -10,7 +10,7 @@ import com.lacus.service.flink.IFlinkJobInstanceService;
 import com.lacus.service.flink.IFlinkJobService;
 import com.lacus.service.flink.IFlinkOperationService;
 import com.lacus.service.flink.dto.StandaloneFlinkJobInfo;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.time.DateUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -54,7 +54,6 @@ public class StandaloneOperationServerImpl extends FlinkJobBaseService implement
 
         // 检查启动任务参数
         checkStartParams(byId);
-
         // 保存任务实例
         FlinkJobInstanceEntity instance = new FlinkJobInstanceEntity();
         instance.setJobId(jobId);
@@ -66,7 +65,6 @@ public class StandaloneOperationServerImpl extends FlinkJobBaseService implement
 
         // 变更任务状态：启动中
         flinkJobService.updateStatus(jobId, FlinkStatusEnum.RUNNING);
-
         String savepointPath = null;
         if (resume) {
             savepointPath = byId.getSavepoint();
@@ -117,7 +115,7 @@ public class StandaloneOperationServerImpl extends FlinkJobBaseService implement
 
         // 执行savepoint
         try {
-            String targetDirectory = PropertyUtils.getString(FLINK_DEFAULT_SAVEPOINT_PATH) + jobId;
+            String targetDirectory = CommonPropertyUtils.getString(FLINK_DEFAULT_SAVEPOINT_PATH) + jobId;
             if (FlinkDeployModeEnum.LOCAL.equals(flinkJobEntity.getDeployMode())) {
                 targetDirectory = "savepoint/" + jobId;
             }

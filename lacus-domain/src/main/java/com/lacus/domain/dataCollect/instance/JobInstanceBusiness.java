@@ -11,7 +11,7 @@ import com.lacus.domain.dataCollect.instance.query.JobInstancePageQuery;
 import com.lacus.domain.dataCollect.job.JobMonitorBusiness;
 import com.lacus.service.dataCollect.IDataSyncJobInstanceService;
 import com.lacus.service.dataCollect.IDataSyncJobService;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.time.DateUtils;
 import com.lacus.utils.yarn.FlinkJobDetail;
 import org.apache.commons.lang3.ObjectUtils;
@@ -95,7 +95,7 @@ public class JobInstanceBusiness {
             DataSyncJobInstanceModel model = new DataSyncJobInstanceModel(entity);
             model.setJobName(finalJobMap.get(entity.getJobId()));
             if (Objects.equals(FlinkStatusEnum.RUNNING.getStatus(), entity.getStatus())) {
-                model.setTrackingUrl(PropertyUtils.getString(YARN_RESTAPI_ADDRESS) + entity.getApplicationId() + "/#/overview");
+                model.setTrackingUrl(CommonPropertyUtils.getString(YARN_RESTAPI_ADDRESS) + entity.getApplicationId() + "/#/overview");
             }
             return model;
         }).collect(Collectors.toList());

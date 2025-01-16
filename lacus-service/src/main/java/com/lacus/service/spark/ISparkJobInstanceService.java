@@ -7,8 +7,10 @@ import com.lacus.enums.SparkStatusEnum;
 import java.util.Date;
 
 public interface ISparkJobInstanceService extends IService<SparkJobInstanceEntity> {
-    
+
     void updateStatus(Long instanceId, SparkStatusEnum sparkStatusEnum);
+
+    void updateStatus(Long instanceId, String appId, SparkStatusEnum sparkStatusEnum);
 
     void updateStatusByJobId(Long jobId, SparkStatusEnum sparkStatusEnum, Date finishedTime);
 }

@@ -3,7 +3,7 @@ package com.lacus.utils.yarn;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import com.lacus.common.constant.Constants;
-import com.lacus.utils.PropertyUtils;
+import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.hdfs.HdfsUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.cli.ParseException;
@@ -84,11 +84,11 @@ public class YarnUtil {
         flinkConfig.set(CheckpointingOptions.INCREMENTAL_CHECKPOINTS, true);
         // 设置用户flink项目jar包
         flinkConfig.set(PipelineOptions.JARS, Collections.singletonList(userJarPath));
-        Path remoteLib = new Path(PropertyUtils.getString(DEFAULT_HDFS_CONFIG) + flinkLibs);
+        Path remoteLib = new Path(CommonPropertyUtils.getString(DEFAULT_HDFS_CONFIG) + flinkLibs);
         // 设置依赖jar包
         flinkConfig.set(YarnConfigOptions.PROVIDED_LIB_DIRS, Collections.singletonList(remoteLib.toString()));
         // 设置flink jar包
-        flinkConfig.set(YarnConfigOptions.FLINK_DIST_JAR, PropertyUtils.getString(DEFAULT_HDFS_CONFIG) + flinkDistJar);
+        flinkConfig.set(YarnConfigOptions.FLINK_DIST_JAR, CommonPropertyUtils.getString(DEFAULT_HDFS_CONFIG) + flinkDistJar);
         //设置为application模式
         flinkConfig.set(DeploymentOptions.TARGET, YarnDeploymentTarget.APPLICATION.getName());
         // yarn application name

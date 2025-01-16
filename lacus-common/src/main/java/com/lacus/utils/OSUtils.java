@@ -291,7 +291,7 @@ public class OSUtils {
     }
 
     public static boolean isSudoEnable() {
-        return PropertyUtils.getBoolean(SUDO_ENABLE, true);
+        return CommonPropertyUtils.getBoolean(SUDO_ENABLE, true);
     }
 
     /**
