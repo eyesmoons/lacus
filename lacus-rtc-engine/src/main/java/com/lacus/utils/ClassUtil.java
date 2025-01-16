@@ -1,6 +1,6 @@
 package com.lacus.utils;
 
-import com.lacus.reader.impl.BaseReader;
+import com.lacus.source.impl.BaseSource;
 import com.lacus.factory.DataCollectReaderFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +27,7 @@ public class ClassUtil {
 
     @SuppressWarnings({"rawtypes"})
     public static void main(String[] args) throws Exception {
-        List<Class> classes = ClassUtil.getAllClassByInterface(Class.forName(BaseReader.class.getName()));
+        List<Class> classes = ClassUtil.getAllClassByInterface(Class.forName(BaseSource.class.getName()));
         for (Class clas : classes) {
             System.out.println(clas.getName());
         }

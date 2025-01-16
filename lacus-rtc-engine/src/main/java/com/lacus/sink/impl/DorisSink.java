@@ -1,23 +1,15 @@
-package com.lacus.writer.impl;
+package com.lacus.sink.impl;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.google.common.collect.Maps;
-import com.lacus.utils.DorisUtil;
-import com.lacus.function.BinlogFilterFunction;
-import com.lacus.function.BinlogMapFunction;
-import com.lacus.function.BinlogProcessWindowFunction;
-import com.lacus.model.*;
 import com.lacus.function.DorisSinkFunction;
 import com.lacus.function.DorisStreamLoad;
-import com.lacus.function.RateLimiter;
-import com.lacus.utils.KafkaUtil;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
-import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
-import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
-import org.apache.flink.streaming.api.windowing.time.Time;
-import org.apache.kafka.clients.consumer.ConsumerRecord;
+import com.lacus.model.JobConf;
+import com.lacus.model.SinkConfig;
+import com.lacus.model.SinkDataSource;
+import com.lacus.model.StreamLoadProperty;
+import com.lacus.utils.DorisUtil;
+import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -25,55 +17,43 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.lacus.constant.CommonContext.*;
+import static com.lacus.constant.CommonContext.DELETE_KEY;
+import static com.lacus.constant.CommonContext.STREAM_LOAD_COLUMNS;
+import static com.lacus.constant.CommonContext.STREAM_LOAD_FORMAT;
+import static com.lacus.constant.CommonContext.STREAM_LOAD_JSONPATH;
+import static com.lacus.constant.CommonContext.STREAM_LOAD_MAX_FILTER_RATIO;
+import static com.lacus.constant.CommonContext.STREAM_LOAD_STRIP_OUTER_ARRAY;
+import static com.lacus.constant.CommonContext.UPDATE_STAMP_KEY;
 import static com.lacus.constant.ConnectorContext.DORIS_WRITER;
 
 /**
  * @author shengyu
  * @date 2024/4/30 14:44
  */
-public class DorisWriter extends BaseWriter {
+public class DorisSink extends BaseSink {
 
-    public DorisWriter() {
+    public DorisSink() {
         super(DORIS_WRITER);
     }
 
     @Override
-    public void write(StreamExecutionEnvironment env, JobConf jobConf) {
-        Sink sink = jobConf.getSink();
-        FlinkConf flinkConf = jobConf.getFlinkConf();
-        Source source = jobConf.getSource();
-        List<String> topics = source.getTopics();
-        String bootStrapServers = source.getBootStrapServers();
-        // read from kafka
-        DataStreamSource<ConsumerRecord<String, String>> kafkaSourceDs = env.fromSource(KafkaUtil.getKafkaSource(bootStrapServers, topics, source.getGroupId()), WatermarkStrategy.noWatermarks(), "kafka_source");
-        // kafka消息过滤
-        SingleOutputStreamOperator<ConsumerRecord<String, String>> filterDs = kafkaSourceDs.filter(new BinlogFilterFunction()).name("kafka_filter");
-        // kafka消息增加删除标识和落库时间
-        SingleOutputStreamOperator<Map<String, String>> mapDs = filterDs.map(new BinlogMapFunction()).name("kafka_map");
-        // 构建doris stream load配置
-        Map<String, DorisStreamLoad> dorisStreamLoadMap = buildDorisStreamConfig(sink);
-        // 应用开窗函数，主要起限流作用
-        SingleOutputStreamOperator<Map<String, String>> triggerDs = mapDs.windowAll(TumblingProcessingTimeWindows.of(Time.seconds(flinkConf.getMaxBatchInterval())))
-                .trigger(new RateLimiter<>(flinkConf.getMaxBatchRows(), flinkConf.getMaxBatchSize()))
-                .apply(new BinlogProcessWindowFunction()).name("kafka_trigger");
-        // 将kafka中的数据写入doris
-        triggerDs.addSink(new DorisSinkFunction(dorisStreamLoadMap)).name("doris_sink");
+    public RichSinkFunction<Map<String, String>> getSink(JobConf jobConf) {
+        return new DorisSinkFunction(buildDorisStreamConfig(jobConf.getSink()));
     }
 
     /**
      * 构建doris stream load参数
      *
-     * @param sink sink
+     * @param sinkConfig sinkConfig
      */
-    private static Map<String, DorisStreamLoad> buildDorisStreamConfig(Sink sink) {
+    private static Map<String, DorisStreamLoad> buildDorisStreamConfig(SinkConfig sinkConfig) {
         Map<String, DorisStreamLoad> dorisStreamLoadMap = Maps.newHashMap();
-        SinkDataSource sinkDataSource = sink.getSinkDataSource();
+        SinkDataSource sinkDataSource = sinkConfig.getSinkDataSource();
         String hostPort = sinkDataSource.getIp() + ":" + sinkDataSource.getPort();
         sinkDataSource.setHostPort(hostPort);
         Map<String, Integer> beConfig = DorisUtil.getBeConfig(sinkDataSource);
 
-        Map<String, StreamLoadProperty> streamLoadPropertyMap = sink.getStreamLoadPropertyMap();
+        Map<String, StreamLoadProperty> streamLoadPropertyMap = sinkConfig.getStreamLoadPropertyMap();
         for (Map.Entry<String, StreamLoadProperty> entry : streamLoadPropertyMap.entrySet()) {
             StreamLoadProperty streamLoadProperty = entry.getValue();
             Map<String, String> conf = new HashMap<>();

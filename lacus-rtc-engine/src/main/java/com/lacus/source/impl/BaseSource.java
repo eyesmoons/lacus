@@ -1,6 +1,6 @@
-package com.lacus.reader.impl;
+package com.lacus.source.impl;
 
-import com.lacus.reader.IReader;
+import com.lacus.source.ISource;
 import com.ververica.cdc.connectors.base.options.StartupOptions;
 import lombok.Getter;
 
@@ -12,11 +12,11 @@ import java.util.Properties;
  * @created by shengyu on 2023/8/31 10:55
  */
 @Getter
-public abstract class BaseReader implements IReader {
+public abstract class BaseSource implements ISource {
 
     protected String name;
 
-    public BaseReader(String name) {
+    public BaseSource(String name) {
         this.name = name;
     }
 

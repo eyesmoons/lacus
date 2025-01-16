@@ -9,8 +9,8 @@ import com.lacus.app.DataCollectApp;
 public class DataCollectAppTest {
     public static void main(String[] args) throws Exception {
         args = new String[4];
-        args[0] = "mysql"; // reader type
-        args[1] = "doris"; // writer type
+        args[0] = "mysql"; // source type
+        args[1] = "doris"; // sink type
         args[2] = "demo"; // job name
         args[3] = "{\n" +
                 "    \"flinkConf\": {\n" +

@@ -524,47 +524,47 @@
     </dependencies>
   </dependencyManagement>
   <properties>
-    <netty.version>4.1.109.Final</netty.version>
-    <protobuf-java.version>3.24.2</protobuf-java.version>
-    <auto-service.version>1.1.1</auto-service.version>
-    <flink-connector-postgres-cdc.version>3.0.1</flink-connector-postgres-cdc.version>
-    <hutool.version>5.8.25</hutool.version>
-    <fastjson2.version>2.0.26</fastjson2.version>
-    <jetty.version>12.0.8</jetty.version>
-    <mysql-connector-j.version>8.2.0</mysql-connector-j.version>
-    <guava.version>33.1.0-jre</guava.version>
-    <flink-connector-mongo-cdc.version>3.0.1</flink-connector-mongo-cdc.version>
-    <flink.version>1.16.2</flink.version>
+    <maven.compiler.target>8</maven.compiler.target>
     <flink-connector-mysql-cdc.version>3.0.1</flink-connector-mysql-cdc.version>
-    <wildfly.version>1.15.24.Final</wildfly.version>
-    <slf4j.version>2.0.7</slf4j.version>
-    <flink-shaded.version>2.8.3-10.0</flink-shaded.version>
+    <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
+    <jackson-databind.version>2.15.2</jackson-databind.version>
+    <flink-connector-postgres-cdc.version>3.0.1</flink-connector-postgres-cdc.version>
+    <avro.version>1.11.3</avro.version>
+    <lombok.version>1.18.26</lombok.version>
+    <flink-connector-mongo-cdc.version>3.0.1</flink-connector-mongo-cdc.version>
     <connect-runtime.version>3.5.1</connect-runtime.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <commons-lang3.version>3.12.0</commons-lang3.version>
-    <scope.setting>provided</scope.setting>
-    <kafka-clients.version>3.5.1</kafka-clients.version>
-    <avro.version>1.11.3</avro.version>
-    <commons-codec.version>1.16.0</commons-codec.version>
-    <flink-connector-sqlserver-cdc.version>3.0.1</flink-connector-sqlserver-cdc.version>
+    <netty.version>4.1.109.Final</netty.version>
     <flink-connector-oracle-cdc.version>3.0.1</flink-connector-oracle-cdc.version>
-    <commons-collections4.version>4.4</commons-collections4.version>
-    <http.version>4.5.14</http.version>
-    <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
-    <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
-    <java.version>1.8</java.version>
+    <hutool.version>5.8.25</hutool.version>
+    <scope.setting>provided</scope.setting>
+    <flink.version>1.16.2</flink.version>
     <maven.compiler.source>8</maven.compiler.source>
-    <jetty-servlets.version>9.4.54.v20240208</jetty-servlets.version>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <snappy-java.version>1.1.10.5</snappy-java.version>
-    <jose4j.version>0.9.4</jose4j.version>
-    <lombok.version>1.18.26</lombok.version>
-    <jackson-databind.version>2.15.2</jackson-databind.version>
-    <maven.compiler.target>8</maven.compiler.target>
-    <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
-    <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
-    <postgresql.version>42.7.3</postgresql.version>
+    <kafka-clients.version>3.5.1</kafka-clients.version>
+    <jetty.version>12.0.8</jetty.version>
     <druid.version>1.2.18</druid.version>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <flink-connector-kafka.version>1.13.0</flink-connector-kafka.version>
+    <jose4j.version>0.9.4</jose4j.version>
+    <mysql-connector-j.version>8.2.0</mysql-connector-j.version>
+    <postgresql.version>42.7.3</postgresql.version>
+    <commons-codec.version>1.16.0</commons-codec.version>
+    <auto-service.version>1.1.1</auto-service.version>
+    <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
+    <snappy-java.version>1.1.10.5</snappy-java.version>
+    <commons-lang3.version>3.12.0</commons-lang3.version>
+    <slf4j.version>2.0.7</slf4j.version>
+    <flink-connector-sqlserver-cdc.version>3.0.1</flink-connector-sqlserver-cdc.version>
+    <flink-shaded.version>2.8.3-10.0</flink-shaded.version>
+    <protobuf-java.version>3.24.2</protobuf-java.version>
+    <java.version>1.8</java.version>
+    <commons-collections4.version>4.4</commons-collections4.version>
+    <guava.version>33.1.0-jre</guava.version>
+    <fastjson2.version>2.0.26</fastjson2.version>
+    <flink-connector-jdbc_2.12.version>1.13.5</flink-connector-jdbc_2.12.version>
+    <wildfly.version>1.15.24.Final</wildfly.version>
+    <jetty-servlets.version>9.4.54.v20240208</jetty-servlets.version>
+    <http.version>4.5.14</http.version>
   </properties>
 </project>
 

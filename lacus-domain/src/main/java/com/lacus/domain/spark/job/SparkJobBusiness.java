@@ -102,7 +102,7 @@ public class SparkJobBusiness {
 
         // 检查任务状态
         if (sparkJobEntity.getScheduleStatus()) {
-            throw new CustomException("任务已经是上线状态");
+            throw new CustomException("任务已经上线");
         }
 
         // 添加到定时调度系统
@@ -123,7 +123,7 @@ public class SparkJobBusiness {
 
         // 检查任务状态
         if (!sparkJobEntity.getScheduleStatus()) {
-            throw new CustomException("任务已经是下线状态");
+            throw new CustomException("任务已经下线");
         }
 
         // 从定时调度系统中移除

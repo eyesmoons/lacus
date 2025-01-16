@@ -1,7 +1,7 @@
 package com.lacus.factory;
 
-import com.lacus.writer.IWriter;
-import com.lacus.writer.impl.BaseWriter;
+import com.lacus.sink.ISink;
+import com.lacus.sink.impl.BaseSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,15 +17,15 @@ import java.util.ServiceLoader;
 public class DataCollectWriterFactory {
     private static final Logger logger = LoggerFactory.getLogger(DataCollectWriterFactory.class);
 
-    private final Map<String, BaseWriter> context = new HashMap<>();
+    private final Map<String, BaseSink> context = new HashMap<>();
     private static final DataCollectWriterFactory factory = new DataCollectWriterFactory();
 
     /**
      * 所有processor必须注册到Factory
      */
     public void register() {
-        ServiceLoader<BaseWriter> writers = ServiceLoader.load(BaseWriter.class);
-        for (BaseWriter writer : writers) {
+        ServiceLoader<BaseSink> writers = ServiceLoader.load(BaseSink.class);
+        for (BaseSink writer : writers) {
             try {
                 register(writer);
             } catch (Exception e) {
@@ -34,11 +34,11 @@ public class DataCollectWriterFactory {
         }
     }
 
-    private void register(BaseWriter writer) {
+    private void register(BaseSink writer) {
         context.put(writer.getName(), writer);
     }
 
-    public IWriter getWriter(String name) {
+    public ISink getWriter(String name) {
         return context.get(name);
     }
 

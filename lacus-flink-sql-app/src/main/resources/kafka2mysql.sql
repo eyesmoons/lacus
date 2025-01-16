@@ -5,7 +5,7 @@ CREATE TABLE input_table
     behavior STRING
 )
 WITH ( 'connector' = 'kafka',
-    'topic' = 'source',
+    'topic' = 'sourceConfig',
     'properties.bootstrap.servers' = 'hadoop1:9092,hadoop2:9092,hadoop3:9092',
     'scan.startup.mode' = 'earliest-offset',
     'properties.group.id' = 'testGroup002',

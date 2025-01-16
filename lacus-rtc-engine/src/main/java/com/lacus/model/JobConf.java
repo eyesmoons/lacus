@@ -12,6 +12,6 @@ public class JobConf implements Serializable {
     private static final long serialVersionUID = 1560138527352748105L;
     private JobInfo jobInfo;
     private FlinkConf flinkConf;
-    private Sink sink;
-    private Source source;
+    private SinkConfig sink;
+    private SourceConfig source;
 }

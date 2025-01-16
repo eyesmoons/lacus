@@ -9,7 +9,7 @@ import java.util.List;
  * @created by shengyu on 2023/9/6 10:01
  */
 @Data
-public class Source implements Serializable {
+public class SourceConfig implements Serializable {
     private static final long serialVersionUID = -662762323409934001L;
     private String hostname;
     private String port;

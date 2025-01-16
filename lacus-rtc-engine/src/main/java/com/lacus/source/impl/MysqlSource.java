@@ -1,15 +1,13 @@
-package com.lacus.reader.impl;
+package com.lacus.source.impl;
 
-import com.alibaba.fastjson2.JSON;
 import com.google.auto.service.AutoService;
 import com.lacus.function.CustomerDeserializationSchemaMysql;
 import com.lacus.model.JobConf;
-import com.lacus.model.Source;
+import com.lacus.model.SourceConfig;
 import com.ververica.cdc.connectors.mysql.source.MySqlSource;
 import com.ververica.cdc.connectors.mysql.table.StartupOptions;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.flink.api.common.eventtime.WatermarkStrategy;
-import org.apache.flink.streaming.api.datastream.DataStreamSource;
+import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
@@ -22,25 +20,25 @@ import static com.lacus.constant.ConnectorContext.MYSQL_READER;
  * @created by shengyu on 2023/8/31 11:16
  */
 @Slf4j
-@AutoService(BaseReader.class)
-public class MysqlReader extends BaseReader {
+@AutoService(BaseSource.class)
+public class MysqlSource extends BaseSource {
 
-    public MysqlReader() {
+    public MysqlSource() {
         super(MYSQL_READER);
     }
 
     @Override
-    public DataStreamSource<String> read(StreamExecutionEnvironment env, String jobName, String jobParams) {
-        JobConf jobConf = JSON.parseObject(jobParams, JobConf.class);
-        Source source = jobConf.getSource();
-        List<String> databaseList = source.getDatabaseList();
-        List<String> tableList = source.getTableList();
-        StartupOptions startupOptions = getMysqlStartupOptions(source.getSyncType(), source.getTimeStamp());
-        MySqlSource<String> mysqlSource = MySqlSource.<String>builder()
-                .hostname(source.getHostname())
-                .port(Integer.parseInt(source.getPort()))
-                .username(source.getUsername())
-                .password(source.getPassword())
+    public Source<String, ?, ?> getSource(StreamExecutionEnvironment env, String jobName, JobConf jobConf) {
+        SourceConfig sourceConfig = jobConf.getSource();
+        List<String> databaseList = sourceConfig.getDatabaseList();
+        List<String> tableList = sourceConfig.getTableList();
+        StartupOptions startupOptions = getMysqlStartupOptions(sourceConfig.getSyncType(), sourceConfig.getTimeStamp());
+        // read from mysql binlog
+        return MySqlSource.<String>builder()
+                .hostname(sourceConfig.getHostname())
+                .port(Integer.parseInt(sourceConfig.getPort()))
+                .username(sourceConfig.getUsername())
+                .password(sourceConfig.getPassword())
                 // 设置捕获的数据库
                 .databaseList(databaseList.toArray(new String[0]))
                 // 设置捕获的表 [db.table]
@@ -52,8 +50,12 @@ public class MysqlReader extends BaseReader {
                 // 自定义反序列化
                 .deserializer(new CustomerDeserializationSchemaMysql())
                 .build();
-        // read from mysql binlog
-        return env.fromSource(mysqlSource, WatermarkStrategy.noWatermarks(), MYSQL_READER + "_source");
+    }
+
+    @Override
+    public String transform(String input) {
+        // TODO: 实现具体的数据转换逻辑, 将数据转换为统一的数据格式，便于source和sink组件解耦
+        return input;
     }
 
     protected StartupOptions getMysqlStartupOptions(String syncType, Long timeStamp) {

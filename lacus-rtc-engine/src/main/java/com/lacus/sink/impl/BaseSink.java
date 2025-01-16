@@ -1,6 +1,6 @@
-package com.lacus.writer.impl;
+package com.lacus.sink.impl;
 
-import com.lacus.writer.IWriter;
+import com.lacus.sink.ISink;
 import lombok.Getter;
 
 /**
@@ -9,11 +9,11 @@ import lombok.Getter;
  * @date 2024/4/30 15:56
  */
 @Getter
-public abstract class BaseWriter implements IWriter {
+public abstract class BaseSink implements ISink {
 
     protected String name;
 
-    public BaseWriter(String name) {
+    public BaseSink(String name) {
         this.name = name;
     }
 }

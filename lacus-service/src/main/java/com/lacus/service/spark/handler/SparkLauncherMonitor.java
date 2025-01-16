@@ -146,7 +146,7 @@ public class SparkLauncherMonitor extends Thread {
                     outputStream.close();
                 }
             } catch (IOException e) {
-                logger.warn("close buffered reader error", e);
+                logger.warn("close buffered source error", e);
             }
         }
     }
