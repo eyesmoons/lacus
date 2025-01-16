@@ -12,22 +12,22 @@ import lombok.Getter;
 public class Parameter {
     private static final int REQUIRED_ARGS_LENGTH = 4;
 
-    public final String readerName;
-    public final String writerName;
+    public final String sourceName;
+    public final String sinkName;
     public final String jobName;
     public final String jobParams;
 
     public Parameter(String[] args) {
         validateParams(args);
-        this.readerName = args[0];
-        this.writerName = args[1];
+        this.sourceName = args[0];
+        this.sinkName = args[1];
         this.jobName = args[2];
         this.jobParams = args[3];
     }
 
     private void validateParams(String[] args) {
         if (ObjectUtils.isEmpty(args) || args.length < REQUIRED_ARGS_LENGTH) {
-            throw new CustomException("参数不足，需要提供：readerName、writerName、jobName、jobParams");
+            throw new CustomException("参数不足，需要提供：sourceName、sinkName、jobName、jobParams");
         }
         for (int i = 0; i < REQUIRED_ARGS_LENGTH; i++) {
             if (StringUtils.isEmpty(args[i])) {

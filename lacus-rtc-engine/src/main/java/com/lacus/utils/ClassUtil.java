@@ -1,7 +1,7 @@
 package com.lacus.utils;
 
 import com.lacus.source.impl.BaseSource;
-import com.lacus.factory.DataCollectReaderFactory;
+import com.lacus.factory.DataCollectSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,7 +23,7 @@ import java.util.jar.JarFile;
  * @author casey
  */
 public class ClassUtil {
-    private static final Logger logger = LoggerFactory.getLogger(DataCollectReaderFactory.class);
+    private static final Logger logger = LoggerFactory.getLogger(DataCollectSourceFactory.class);
 
     @SuppressWarnings({"rawtypes"})
     public static void main(String[] args) throws Exception {

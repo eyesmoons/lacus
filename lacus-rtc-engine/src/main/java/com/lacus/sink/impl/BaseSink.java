@@ -4,7 +4,7 @@ import com.lacus.sink.ISink;
 import lombok.Getter;
 
 /**
- * writer抽象处理器
+ * sink抽象处理器
  * @author shengyu
  * @date 2024/4/30 15:56
  */

@@ -24,7 +24,7 @@ import static com.lacus.constant.CommonContext.STREAM_LOAD_JSONPATH;
 import static com.lacus.constant.CommonContext.STREAM_LOAD_MAX_FILTER_RATIO;
 import static com.lacus.constant.CommonContext.STREAM_LOAD_STRIP_OUTER_ARRAY;
 import static com.lacus.constant.CommonContext.UPDATE_STAMP_KEY;
-import static com.lacus.constant.ConnectorContext.DORIS_WRITER;
+import static com.lacus.constant.ConnectorContext.DORIS_SINK;
 
 /**
  * @author shengyu
@@ -33,7 +33,7 @@ import static com.lacus.constant.ConnectorContext.DORIS_WRITER;
 public class DorisSink extends BaseSink {
 
     public DorisSink() {
-        super(DORIS_WRITER);
+        super(DORIS_SINK);
     }
 
     @Override

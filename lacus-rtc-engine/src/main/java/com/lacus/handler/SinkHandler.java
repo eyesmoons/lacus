@@ -1,7 +1,7 @@
-package com.lacus.config;
+package com.lacus.handler;
 
 import com.lacus.exception.CustomException;
-import com.lacus.factory.DataCollectWriterFactory;
+import com.lacus.factory.DataCollectSinkFactory;
 import com.lacus.function.BinlogFilterFunction;
 import com.lacus.function.BinlogMapFunction;
 import com.lacus.function.BinlogProcessWindowFunction;
@@ -27,17 +27,17 @@ import java.util.Objects;
  * 写入器配置类
  */
 @Slf4j
-public class WriterConfig {
+public class SinkHandler {
 
     /**
      * 配置并获取写入器
      */
-    public static void configureWriter(StreamExecutionEnvironment env, JobConf jobConf, String writerName) {
-        DataCollectWriterFactory sinkFactory = DataCollectWriterFactory.getInstance();
+    public static void configureSink(StreamExecutionEnvironment env, JobConf jobConf, String sinkName) {
+        DataCollectSinkFactory sinkFactory = DataCollectSinkFactory.getInstance();
         sinkFactory.register();
-        ISink sink = sinkFactory.getWriter(writerName);
+        ISink sink = sinkFactory.getSink(sinkName);
         if (Objects.isNull(sink)) {
-            throw new CustomException("找不到对应的sink: " + writerName);
+            throw new CustomException("找不到对应的sink: " + sinkName);
         }
 
         FlinkConf flinkConf = jobConf.getFlinkConf();
@@ -52,6 +52,6 @@ public class WriterConfig {
                 .trigger(new RateLimiter<>(flinkConf.getMaxBatchRows(), flinkConf.getMaxBatchSize()))
                 .apply(new BinlogProcessWindowFunction()).name("kafka_trigger");
         // 将kafka中的数据写入相应的sink
-        triggerDs.addSink(sink.getSink(jobConf)).name(writerName + "_SINK");
+        triggerDs.addSink(sink.getSink(jobConf)).name(sinkName + "_SINK");
     }
 }

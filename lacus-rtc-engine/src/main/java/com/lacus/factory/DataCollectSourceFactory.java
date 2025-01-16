@@ -14,17 +14,17 @@ import java.util.ServiceLoader;
  *
  * @created by shengyu on 2024/1/21 20:18
  */
-public class DataCollectReaderFactory {
-    private static final Logger logger = LoggerFactory.getLogger(DataCollectReaderFactory.class);
+public class DataCollectSourceFactory {
+    private static final Logger logger = LoggerFactory.getLogger(DataCollectSourceFactory.class);
 
     private final Map<String, BaseSource> context = new HashMap<>();
-    private static final DataCollectReaderFactory factory = new DataCollectReaderFactory();
+    private static final DataCollectSourceFactory factory = new DataCollectSourceFactory();
     private boolean isRegistered = false;
 
-    private DataCollectReaderFactory() {
+    private DataCollectSourceFactory() {
     }
 
-    public static DataCollectReaderFactory getInstance() {
+    public static DataCollectSourceFactory getInstance() {
         return factory;
     }
 
@@ -36,28 +36,28 @@ public class DataCollectReaderFactory {
             return;
         }
 
-        ServiceLoader<BaseSource> readers = ServiceLoader.load(BaseSource.class);
-        for (BaseSource reader : readers) {
+        ServiceLoader<BaseSource> sourceList = ServiceLoader.load(BaseSource.class);
+        for (BaseSource source : sourceList) {
             try {
-                register(reader);
+                register(source);
             } catch (Exception e) {
-                logger.error("new source instance {} error: ", reader.getClass().getName(), e);
+                logger.error("new source instance {} error: ", source.getClass().getName(), e);
             }
         }
         isRegistered = true;
     }
 
-    private void register(BaseSource reader) {
-        context.put(reader.getName(), reader);
+    private void register(BaseSource source) {
+        context.put(source.getName(), source);
     }
 
     /**
-     * 获取指定名称的Reader
+     * 获取指定名称的source
      *
-     * @param name Reader名称
-     * @return Reader实例
+     * @param name source名称
+     * @return source实例
      */
-    public ISource getReader(String name) {
+    public ISource getSource(String name) {
         return context.get(name);
     }
 }

@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
 
-import static com.lacus.constant.ConnectorContext.ORACLE_READER;
+import static com.lacus.constant.ConnectorContext.ORACLE_SOURCE;
 
 /**
  * oracle采集处理器
@@ -24,7 +24,7 @@ import static com.lacus.constant.ConnectorContext.ORACLE_READER;
 public class OracleSource extends BaseSource {
 
     public OracleSource() {
-        super(ORACLE_READER);
+        super(ORACLE_SOURCE);
     }
 
     @Override

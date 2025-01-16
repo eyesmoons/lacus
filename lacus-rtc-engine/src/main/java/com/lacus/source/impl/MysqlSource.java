@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
 
-import static com.lacus.constant.ConnectorContext.MYSQL_READER;
+import static com.lacus.constant.ConnectorContext.MYSQL_SOURCE;
 
 /**
  * mysql采集处理器
@@ -24,7 +24,7 @@ import static com.lacus.constant.ConnectorContext.MYSQL_READER;
 public class MysqlSource extends BaseSource {
 
     public MysqlSource() {
-        super(MYSQL_READER);
+        super(MYSQL_SOURCE);
     }
 
     @Override

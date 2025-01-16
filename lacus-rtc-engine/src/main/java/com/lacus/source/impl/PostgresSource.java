@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
 
-import static com.lacus.constant.ConnectorContext.POSTGRES_READER;
+import static com.lacus.constant.ConnectorContext.POSTGRES_SOURCE;
 
 /**
  * pg采集处理器
@@ -24,7 +24,7 @@ import static com.lacus.constant.ConnectorContext.POSTGRES_READER;
 public class PostgresSource extends BaseSource {
 
     public PostgresSource() {
-        super(POSTGRES_READER);
+        super(POSTGRES_SOURCE);
     }
 
     @Override

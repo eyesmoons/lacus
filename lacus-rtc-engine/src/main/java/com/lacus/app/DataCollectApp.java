@@ -2,8 +2,8 @@ package com.lacus.app;
 
 import com.alibaba.fastjson2.JSON;
 import com.lacus.config.FlinkEnvConfig;
-import com.lacus.config.ReaderConfig;
-import com.lacus.config.WriterConfig;
+import com.lacus.handler.SourceHandler;
+import com.lacus.handler.SinkHandler;
 import com.lacus.exception.CustomException;
 import com.lacus.model.JobConf;
 import com.lacus.model.Parameter;
@@ -11,7 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 /**
- * 数据采集引擎统一入口，用户只需要编写自己的 Reader 和 Writer 即可
+ * 数据采集引擎统一入口，用户只需要编写自己的 source 和 sink 即可
  */
 @Slf4j
 public class DataCollectApp {
@@ -25,10 +25,10 @@ public class DataCollectApp {
         try {
             // 3. 解析任务配置
             JobConf jobConf = parseJobConfig(parameter.jobParams);
-            // 4. 配置reader
-            ReaderConfig.configureReader(env, jobConf.getSource(), parameter);
-            // 5. 配置writer
-            WriterConfig.configureWriter(env, jobConf, parameter.writerName);
+            // 4. 配置source
+            SourceHandler.configureSource(env, jobConf.getSource(), parameter);
+            // 5. 配置sink
+            SinkHandler.configureSink(env, jobConf, parameter.sinkName);
             // 6. 执行任务
             env.execute(parameter.jobName);
         } catch (Exception e) {

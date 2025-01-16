@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
 
-import static com.lacus.constant.ConnectorContext.SQLSERVER_READER;
+import static com.lacus.constant.ConnectorContext.SQLSERVER_SOURCE;
 
 /**
  * sqlserver采集处理器
@@ -24,7 +24,7 @@ import static com.lacus.constant.ConnectorContext.SQLSERVER_READER;
 public class SqlServerSource extends BaseSource {
 
     public SqlServerSource(String name) {
-        super(SQLSERVER_READER);
+        super(SQLSERVER_SOURCE);
     }
 
     @Override

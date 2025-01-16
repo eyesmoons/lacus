@@ -7,7 +7,7 @@ import lombok.Getter;
 import java.util.Properties;
 
 /**
- * reader抽象处理器
+ * source抽象处理器
  *
  * @created by shengyu on 2023/8/31 10:55
  */
