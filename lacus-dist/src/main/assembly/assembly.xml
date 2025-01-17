@@ -39,7 +39,7 @@
             <directory>${jar_home}/${output.jar.file.path}</directory>
             <outputDirectory>/boot</outputDirectory>
             <includes>
-                <include>lacus-admin-1.0.0.jar</include>
+                <include>lacus-admin-2.0.0.jar</include>
             </includes>
         </fileSet>
 
