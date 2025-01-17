@@ -6,12 +6,13 @@
 
     <groupId>com.lacus</groupId>
     <artifactId>lacus</artifactId>
-    <version>1.0.0</version>
+    <version>${revision}</version>
 
     <name>lacus</name>
     <description>lacus</description>
 
     <properties>
+        <revision>2.0.0</revision>
         <jar_home>../lacus-dist/origin</jar_home>
         <!-- 依赖输出目录 -->
         <output.dependence.file.path>lib/</output.dependence.file.path>
@@ -21,7 +22,6 @@
         <output.resource.file.path>conf/</output.resource.file.path>
         <!-- 启动脚本输出目录 -->
         <output.bin.file.path>bin/</output.bin.file.path>
-        <lacus.version>1.0.0</lacus.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <java.version>1.8</java.version>
@@ -196,39 +196,46 @@
                 <version>${kaptcha.version}</version>
             </dependency>
 
-            <!-- admin管理模块 -->
+            <!-- admin模块 -->
             <dependency>
                 <groupId>com.lacus</groupId>
                 <artifactId>lacus-admin</artifactId>
-                <version>${lacus.version}</version>
+                <version>${revision}</version>
             </dependency>
 
-            <!-- 代码生成-->
+            <!-- domain模块 -->
             <dependency>
                 <groupId>com.lacus</groupId>
                 <artifactId>lacus-domain</artifactId>
-                <version>${lacus.version}</version>
+                <version>${revision}</version>
             </dependency>
 
-            <!-- 核心模块-->
+            <!-- core模块-->
             <dependency>
                 <groupId>com.lacus</groupId>
                 <artifactId>lacus-core</artifactId>
-                <version>${lacus.version}</version>
+                <version>${revision}</version>
             </dependency>
 
-            <!-- 系统模块-->
+            <!-- service模块 -->
+            <dependency>
+                <groupId>com.lacus</groupId>
+                <artifactId>lacus-service</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
+            <!-- dao模块-->
             <dependency>
                 <groupId>com.lacus</groupId>
                 <artifactId>lacus-dao</artifactId>
-                <version>${lacus.version}</version>
+                <version>${revision}</version>
             </dependency>
 
-            <!-- 通用工具-->
+            <!-- common模块-->
             <dependency>
                 <groupId>com.lacus</groupId>
                 <artifactId>lacus-common</artifactId>
-                <version>${lacus.version}</version>
+                <version>${revision}</version>
             </dependency>
 
             <!-- hutool common tools-->

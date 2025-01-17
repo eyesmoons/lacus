@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.lacus</groupId>
         <artifactId>lacus</artifactId>
-        <version>1.0.0</version>
+        <version>${revision}</version>
     </parent>
 
     <artifactId>lacus-dist</artifactId>

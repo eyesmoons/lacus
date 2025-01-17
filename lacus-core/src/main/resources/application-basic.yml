@@ -3,9 +3,9 @@ lacus:
   # 名称
   name: lacus
   # 版本
-  version: 1.0.0
+  version: 2.0.0
   # 版权年份
-  copyright-year: 2023
+  copyright-year: 2025
   # 实例演示开关
   demo-enabled: true
   # 文件基路径 示例（ Windows配置D:\lacus，Linux配置 /home/lacus）

@@ -4,7 +4,7 @@
   <img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="Build Status">
    <img src="https://img.shields.io/badge/Spring%20Boot-2.7.1-blue.svg" alt="Downloads">
  </p>
-<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Lacus v1.0.0</h1>
+<h1 align="center" style="margin: 30px 0 30px; font-weight: bold;">Lacus v2.0.0</h1>
 <h4 align="center">简单好用的开源大数据平台</h4>
 <p align="center">
 </p>
@@ -121,16 +121,16 @@ application-basic.yml：修改 yarn、hdfs 和 kafka 等信息。
 ```shell
 mvn clean package -Dmaven.test.skip=true
 ```
-打包完生成的文件为：lacus-dist/target/lacus-dist-1.0.0-all.tar.gz
+打包完生成的文件为：lacus-dist/target/lacus-dist-2.0.0-all.tar.gz
 ### 2. 上传
-将打包之后的jar包上传至服务器：lacus-dist-1.0.0-all.tar.gz
+将打包之后的jar包上传至服务器：lacus-dist-2.0.0-all.tar.gz
 ### 3. 解压
 ```
-tar -zxvf lacus-dist-1.0.0-all.tar.gz
+tar -zxvf lacus-dist-2.0.0-all.tar.gz
 ```
 解压完的目录为：
 ```
-lacus-dist-1.0.0
+lacus-dist-2.0.0
 ├── bin -- 启动脚本
 ├── boot -- 启动jar包
 ├── conf -- 配置文件
@@ -143,7 +143,7 @@ lacus-dist-1.0.0
 修改解压完的conf目录下的配置文件，可根据需要修改
 ### 5. 启动
 ```shell
-cd lacus-dist-1.0.0/bin
+cd lacus-dist-2.0.0/bin
 sh lacus-admin.sh start
 ```
 ### 6. 其他命令
