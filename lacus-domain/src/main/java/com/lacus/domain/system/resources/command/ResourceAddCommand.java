@@ -30,6 +30,8 @@ public class ResourceAddCommand {
     @NotBlank(message = "资源路径不能为空")
     private String filePath;
 
+    private Long size;
+
     @NotNull
     private Integer isDirectory;
 

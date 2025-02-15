@@ -28,13 +28,11 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import static com.lacus.common.constant.Constants.MAX_FILE_SIZE;
 import static com.lacus.common.constant.Constants.RESOURCE_FULL_NAME_MAX_LENGTH;
@@ -77,7 +75,7 @@ public class ResourceBusiness {
             throw new CustomException("文件夹已经存在");
         }
         createDirectory(fullName, type);
-        addResource(pid, name, fullName, remark, 1);
+        addResource(pid, name, fullName, 0, remark, 1);
     }
 
     public void uploadResource(Long pid, String aliaName, String remark, ResourceType type, MultipartFile file) {
@@ -105,7 +103,7 @@ public class ResourceBusiness {
             log.error("文件上传失败: {}", RegexUtils.escapeNRT(file.getOriginalFilename()));
             throw new CustomException(String.format("文件上传失败: %s", file.getOriginalFilename()));
         }
-        addResource(pid, aliaName, currDirNFileName, remark, 0);
+        addResource(pid, aliaName, currDirNFileName, file.getSize(), remark, 0);
     }
 
     public List<SysResourcesEntity> queryResourceDirectoryList(ResourceType type) {
@@ -203,9 +201,9 @@ public class ResourceBusiness {
         }
     }
 
-    private static void addResource(Long pid, String aliasName, String fullName, String remark, Integer isDirectory) {
+    private static void addResource(Long pid, String aliasName, String fullName, long fileSize, String remark, Integer isDirectory) {
         String fileName = new File(fullName).getName();
-        ResourceAddCommand command = new ResourceAddCommand(pid, 0, aliasName, fileName, fullName, isDirectory, remark);
+        ResourceAddCommand command = new ResourceAddCommand(pid, 0, aliasName, fileName, fullName, fileSize, isDirectory, remark);
         ResourceModel model = ResourceModelFactory.loadFromAddCommand(command, new ResourceModel());
         model.insert();
     }
@@ -350,7 +348,7 @@ public class ResourceBusiness {
                 // 为当前资源生成id
                 pathToIdMap.put(hdfsResource, currentId);
                 // 添加到数据库的逻辑
-                addResource(pid, new File(hdfsResource).getName(), hdfsResource, null, hdfsEntity.isDirectory() ? 1 : 0);
+                addResource(pid, new File(hdfsResource).getName(), hdfsResource, hdfsEntity.getSize(), null, hdfsEntity.isDirectory() ? 1 : 0);
                 currentId++;
             }
         }
