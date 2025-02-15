@@ -926,22 +926,22 @@ CREATE TABLE `sys_env` (
 -- Table structure for sys_resources
 -- ----------------------------
 CREATE TABLE `sys_resources` (
-    `id` int NOT NULL AUTO_INCREMENT COMMENT 'resource id',
-    `pid` int DEFAULT NULL COMMENT 'parent resource id',
-    `name` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'alia name',
-    `file_name` varchar(64) DEFAULT NULL COMMENT 'file name',
-    `file_path` varchar(128) DEFAULT NULL COMMENT 'file path',
-    `remark` varchar(255) DEFAULT NULL,
-    `type` tinyint DEFAULT NULL COMMENT 'resource type: 0 FILE，1 UDF',
-    `size` bigint DEFAULT NULL COMMENT 'resource size',
-    `is_directory` tinyint DEFAULT NULL,
-    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
-    `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
-    `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
-    `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
-    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`id`),
-    UNIQUE KEY `sys_resources_un` (`file_path`,`type`)
+     `id` int NOT NULL AUTO_INCREMENT COMMENT 'resource id',
+     `pid` int DEFAULT NULL COMMENT 'parent resource id',
+     `name` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci DEFAULT NULL COMMENT 'alia name',
+     `file_name` varchar(200) DEFAULT NULL COMMENT 'file name',
+     `file_path` varchar(500) DEFAULT NULL COMMENT 'file path',
+     `remark` varchar(200) DEFAULT NULL,
+     `type` tinyint DEFAULT NULL COMMENT 'resource type: 0 FILE，1 UDF',
+     `size` bigint DEFAULT NULL COMMENT 'resource size',
+     `is_directory` tinyint DEFAULT NULL,
+     `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+     `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+     `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+     `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+     PRIMARY KEY (`id`),
+     UNIQUE KEY `sys_resources_un` (`file_path`,`type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------

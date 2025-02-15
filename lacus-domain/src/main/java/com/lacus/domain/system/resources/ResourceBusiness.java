@@ -28,10 +28,13 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.lacus.common.constant.Constants.MAX_FILE_SIZE;
 import static com.lacus.common.constant.Constants.RESOURCE_FULL_NAME_MAX_LENGTH;
@@ -125,14 +128,15 @@ public class ResourceBusiness {
     }
 
     public PageDTO queryAllResourcesPaging(ResourceQuery query) {
-        List<SysResourcesEntity> allResources = new ArrayList<>();
-        // 递归查询所有资源
-        findAllResourcesRecursively(query.getPid(), allResources);
-        // 分页处理
-        int start = (query.getPageNum() - 1) * query.getPageSize();
-        int end = Math.min(start + query.getPageSize(), allResources.size());
-        List<SysResourcesEntity> pagedResources = allResources.subList(start, end);
-        return new PageDTO(pagedResources, (long) allResources.size());
+        Page<SysResourcesEntity> page = sysResourcesService.page(query.toPage(), query.toQueryWrapper());
+        // 批量赋值pFilePath属性
+        for (SysResourcesEntity file : page.getRecords()) {
+            SysResourcesEntity pResource = sysResourcesService.getById(file.getPid());
+            if (ObjectUtils.isNotEmpty(pResource)) {
+                file.setPFilePath(pResource.getFilePath());
+            }
+        }
+        return new PageDTO(page.getRecords(), page.getTotal());
     }
 
     private void findAllResourcesRecursively(Long pid, List<SysResourcesEntity> allResources) {
@@ -298,7 +302,7 @@ public class ResourceBusiness {
         List<String> content;
         try {
             if (storageOperate.exists(fullName)) {
-                content = storageOperate.vimFile(fullName, 0, 10000);
+                content = storageOperate.vimFile(fullName, 0, 500000);
             } else {
                 log.error("文件不存在: {}", fullName);
                 return null;
@@ -307,5 +311,55 @@ public class ResourceBusiness {
             throw new CustomException("文件读取失败: " + fullName);
         }
         return String.join("\n", content);
+    }
+
+    public void syncResources() {
+        // 获取HDFS中的所有资源
+        List<StorageEntity> hdfsResourceList = storageOperate.listFilesStatusRecursively(storageOperate.getHdfsPath() + "/", null);
+        // 获取数据库中的所有资源
+        List<SysResourcesEntity> dbResources = sysResourcesService.listAllResources();
+        List<String> hdfsResources = hdfsResourceList.stream()
+                .map(entity -> entity.getFullName().replaceFirst("^hdfs://[^/]+", "")) // 去掉HDFS前缀
+                .collect(Collectors.toList());
+
+        // 获取数据库中最大的id
+        Long maxId = dbResources.stream().mapToLong(SysResourcesEntity::getId).max().orElse(0L);
+        Long currentId = maxId + 1;
+
+        // 创建路径到id的映射
+        Map<String, Long> pathToIdMap = dbResources.stream()
+                .collect(Collectors.toMap(SysResourcesEntity::getFilePath, SysResourcesEntity::getId));
+
+        // 将HDFS中存在但数据库中不存在的资源添加到数据库
+        for (StorageEntity hdfsEntity : hdfsResourceList) {
+            String hdfsResource = hdfsEntity.getFullName().replaceFirst("^hdfs://[^/]+", "");
+            boolean existsInDb = dbResources.stream().anyMatch(dbResource -> dbResource.getFilePath().equals(hdfsResource));
+            if (!existsInDb) {
+                // 获取父资源的pid
+                final String pPath = hdfsEntity.getPfullName();
+                Long pid = null;
+                if (pPath != null) {
+                    String parentPath = pPath.replaceFirst("^hdfs://[^/]+", "");
+                    if ("/".equals(parentPath)) {
+                        pid = 0L; // 根目录
+                    } else {
+                        pid = pathToIdMap.get(parentPath);
+                    }
+                }
+                // 为当前资源生成id
+                pathToIdMap.put(hdfsResource, currentId);
+                // 添加到数据库的逻辑
+                addResource(pid, new File(hdfsResource).getName(), hdfsResource, null, hdfsEntity.isDirectory() ? 1 : 0);
+                currentId++;
+            }
+        }
+
+        // 将数据库中存在但HDFS中不存在的资源从数据库中删除
+        for (SysResourcesEntity dbResource : dbResources) {
+            boolean existsInHdfs = hdfsResources.contains(dbResource.getFilePath());
+            if (!existsInHdfs) {
+                sysResourcesService.removeById(dbResource.getId());
+            }
+        }
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 @JsonPropertyOrder({"id", "pid", "name", "fullName", "description", "isDirctory", "children", "type"})
 public abstract class ResourceComponent {
 
-    public ResourceComponent(int id, String pid, String name, String fullName, String description, boolean isDirctory) {
+    public ResourceComponent(Long id, String pid, String name, String fullName, boolean isDirctory) {
         this.id = id;
         this.pid = pid;
         this.name = name;
@@ -29,7 +29,7 @@ public abstract class ResourceComponent {
     /**
      * id
      */
-    protected int id;
+    protected Long id;
     /**
      * parent id
      */
@@ -76,7 +76,7 @@ public abstract class ResourceComponent {
         children.add(resourceComponent);
     }
 
-    public void setIdValue(int id, boolean isDirctory) {
+    public void setIdValue(Long id, boolean isDirctory) {
         int directoryFlag = isDirctory ? 1 : 0;
         this.idValue = String.format("%s_%s", id, directoryFlag);
     }

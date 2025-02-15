@@ -112,4 +112,11 @@ public class SysResourceController extends BaseController {
     public ResponseDTO<?> viewResource(@PathVariable("id") Long id) {
         return ResponseDTO.ok(resourceBusiness.readResource(id));
     }
+
+    @ApiOperation("同步资源")
+    @GetMapping("/sync")
+    public ResponseDTO<?> syncResources() {
+        resourceBusiness.syncResources();
+        return ResponseDTO.ok();
+    }
 }

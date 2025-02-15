@@ -38,4 +38,16 @@ public class SysResourcesServiceImpl extends ServiceImpl<SysResourcesMapper, Sys
         wrapper.like(ObjectUtils.isNotEmpty(fileName), "file_name", fileName);
         return this.list(wrapper);
     }
+
+    @Override
+    public List<SysResourcesEntity> listAllResources() {
+        return this.list();
+    }
+
+    @Override
+    public SysResourcesEntity getByFilePath(String filePath) {
+        QueryWrapper<SysResourcesEntity> wrapper = new QueryWrapper<>();
+        wrapper.eq("file_path", filePath);
+        return this.getOne(wrapper);
+    }
 }

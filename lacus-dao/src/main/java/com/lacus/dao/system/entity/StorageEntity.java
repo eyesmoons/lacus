@@ -11,7 +11,7 @@ public class StorageEntity {
     /**
      * exist only if it is stored in t_ds_relation_resources_task.
      */
-    private int id;
+    private Long id;
     /**
      * fullname is in a format of basepath + tenantCode + res/udf + filename
      */
