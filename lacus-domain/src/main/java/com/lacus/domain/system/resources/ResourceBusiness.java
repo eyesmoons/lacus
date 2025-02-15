@@ -62,9 +62,9 @@ public class ResourceBusiness {
         SysResourcesEntity pResource = sysResourcesService.getById(pid);
         String fullName;
         if (ObjectUtils.isEmpty(pResource)) {
-            fullName = "/" + name;
+            fullName = "/" + name + "/";
         } else {
-            fullName = pResource.getFilePath() + File.separator + name;
+            fullName = pResource.getFilePath() + File.separator + name + "/";
         }
 
         try {
@@ -335,6 +335,7 @@ public class ResourceBusiness {
             String hdfsResource = hdfsEntity.getFullName().replaceFirst("^hdfs://[^/]+", "");
             boolean existsInDb = dbResources.stream().anyMatch(dbResource -> dbResource.getFilePath().equals(hdfsResource));
             if (!existsInDb) {
+                log.info("同步HDFS资源到数据库: {}", hdfsResource);
                 // 获取父资源的pid
                 final String pPath = hdfsEntity.getPfullName();
                 Long pid = null;
@@ -358,6 +359,7 @@ public class ResourceBusiness {
         for (SysResourcesEntity dbResource : dbResources) {
             boolean existsInHdfs = hdfsResources.contains(dbResource.getFilePath());
             if (!existsInHdfs) {
+                log.info("从数据库中删除不存在于HDFS的资源: {}", dbResource.getFilePath());
                 sysResourcesService.removeById(dbResource.getId());
             }
         }
