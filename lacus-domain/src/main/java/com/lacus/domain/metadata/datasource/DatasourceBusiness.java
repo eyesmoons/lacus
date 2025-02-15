@@ -6,7 +6,6 @@ import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.CustomException;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
 import com.lacus.datasource.api.DataSourcePlugin;
 import com.lacus.datasource.service.DataSourcePluginService;
 import com.lacus.domain.metadata.datasource.command.AddMetaDatasourceCommand;
@@ -16,7 +15,6 @@ import com.lacus.domain.metadata.datasource.model.MetaDatasourceModel;
 import com.lacus.domain.metadata.datasource.model.MetaDatasourceModelFactory;
 import com.lacus.domain.metadata.datasource.query.DatasourceQuery;
 import com.lacus.service.metadata.IMetaDataSourceService;
-import com.lacus.service.metadata.IMetaDataSourceTypeService;
 import com.lacus.utils.beans.MetaDatasource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -34,9 +32,6 @@ public class DatasourceBusiness {
 
     @Autowired
     private IMetaDataSourceService metadataSourceService;
-
-    @Autowired
-    private IMetaDataSourceTypeService dataSourceTypeService;
 
     @Autowired
     private DataSourcePluginService dataSourcePluginService;
@@ -71,9 +66,7 @@ public class DatasourceBusiness {
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
-        MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
         MetaDatasource datasource = new MetaDatasource();
-        datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
         try {
             boolean testConnection = processor.testConnection(updateCommand.getConnectionParams());
             if (testConnection) {
@@ -102,9 +95,6 @@ public class DatasourceBusiness {
         if (ObjectUtils.isEmpty(model)) {
             throw new ApiException(ErrorCode.Business.OBJECT_NOT_FOUND, datasourceId);
         }
-        MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
-        MetaDatasource datasource = new MetaDatasource();
-        datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
         DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
