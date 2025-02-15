@@ -53,10 +53,16 @@ public class DataSourcePluginService {
                     newPlugin.setIcon(plugin.getIcon());
                     newPlugin.setConnectionParams(JSON.toJSONString(plugin.getConnectionParamDefinitions()));
                     newPlugin.setRemark(plugin.getRemark());
-
                     pluginMapper.insert(newPlugin);
-                    dataSourcePluginMap.put(plugin.getName(), plugin);
+                } else {
+                    // 更新已存在的插件
+                    existingPlugin.setDriverName(plugin.getDriverName());
+                    existingPlugin.setIcon(plugin.getIcon());
+                    existingPlugin.setConnectionParams(JSON.toJSONString(plugin.getConnectionParamDefinitions()));
+                    existingPlugin.setRemark(plugin.getRemark());
+                    pluginMapper.updateById(existingPlugin);
                 }
+                dataSourcePluginMap.put(plugin.getName(), plugin);
                 log.info("注册数据源插件成功: {}", plugin.getName());
             } catch (Exception e) {
                 log.error("注册数据源插件失败: {}", plugin.getName(), e);
