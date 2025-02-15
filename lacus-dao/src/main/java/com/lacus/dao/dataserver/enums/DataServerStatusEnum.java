@@ -1,7 +1,7 @@
 package com.lacus.dao.dataserver.enums;
 
-import com.lacus.dao.system.enums.dictionary.CssTag;
-import com.lacus.dao.system.enums.interfaces.DictionaryEnum;
+import com.lacus.enums.dictionary.CssTag;
+import com.lacus.enums.interfaces.DictionaryEnum;
 
 public enum DataServerStatusEnum implements DictionaryEnum<Integer> {
 

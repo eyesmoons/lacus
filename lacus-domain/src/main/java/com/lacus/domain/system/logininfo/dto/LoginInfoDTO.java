@@ -3,8 +3,8 @@ package com.lacus.domain.system.logininfo.dto;
 import com.lacus.common.annotation.ExcelColumn;
 import com.lacus.common.annotation.ExcelSheet;
 import com.lacus.dao.system.entity.SysLoginInfoEntity;
-import com.lacus.dao.system.enums.LoginStatusEnum;
-import com.lacus.dao.system.enums.interfaces.BasicEnumUtil;
+import com.lacus.enums.LoginStatusEnum;
+import com.lacus.enums.interfaces.BasicEnumUtil;
 import java.util.Date;
 import lombok.Data;
 

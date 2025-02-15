@@ -17,6 +17,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>com.lacus</groupId>
+            <artifactId>lacus-datasource-plugin</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
             <groupId>org.codehaus.plexus</groupId>
             <artifactId>plexus-interpolation</artifactId>
             <version>1.26</version>

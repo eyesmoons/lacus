@@ -3,22 +3,31 @@ package com.lacus.admin.controller.metadata;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.metadata.enums.DatasourceTypeEnum;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.metadata.datasource.DatasourceBusiness;
 import com.lacus.domain.metadata.datasource.command.AddMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.command.UpdateMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.dto.MetaDatasourceDTO;
 import com.lacus.domain.metadata.datasource.model.MetaDatasourceModel;
 import com.lacus.domain.metadata.datasource.query.DatasourceQuery;
+import com.lacus.enums.DatasourceTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.constraints.NotNull;
 import java.util.List;
+import java.util.Map;
 
 @Api(value = "数据源管理", tags = {"数据源定义"})
 @RestController
@@ -93,8 +102,8 @@ public class DatasourceController {
 
     @ApiOperation("数据源类型下拉框")
     @GetMapping("/types")
-    public ResponseDTO<List<String>> datasourceTypeList() {
-        List<String> list = DatasourceTypeEnum.listAll();
+    public ResponseDTO<List<Map<String, Object>>> datasourceTypeList() {
+        List<Map<String, Object>> list = DatasourceTypeEnum.listAll();
         return ResponseDTO.ok(list);
     }
 

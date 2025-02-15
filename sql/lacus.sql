@@ -211,6 +211,26 @@ CREATE TABLE `meta_column` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='字段';
 
 -- ----------------------------
+-- Table structure for meta_datasource_plugin
+-- ----------------------------
+CREATE TABLE `meta_datasource_plugin` (
+  `id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `name` varchar(50) NOT NULL COMMENT '插件名称',
+  `type` int NOT NULL COMMENT '插件类型：1-关系型数据库，2-非关系型数据库，3-OLAP数据库',
+  `driver_name` varchar(100) DEFAULT NULL COMMENT '驱动类名',
+  `icon` varchar(200) DEFAULT NULL COMMENT '图标URL',
+  `connection_params` text COMMENT '连接参数模板',
+  `remark` varchar(200) DEFAULT NULL COMMENT '备注说明',
+  `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+  `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+  `create_time` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_name` (`name`) COMMENT '插件名称唯一索引'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据源插件信息表';
+
+-- ----------------------------
 -- Table structure for meta_datasource
 -- ----------------------------
 DROP TABLE IF EXISTS `meta_datasource`;
@@ -220,11 +240,6 @@ CREATE TABLE `meta_datasource` (
   `type` varchar(10) NOT NULL DEFAULT '' COMMENT '数据源类型。(mysql,doris)',
   `source_type` tinyint(4) DEFAULT NULL COMMENT '同步类型：1输入源，2输出源',
   `remark` varchar(100) NOT NULL DEFAULT '' COMMENT '数据源描述',
-  `ip` varchar(100) NOT NULL DEFAULT '' COMMENT 'ip/主机名',
-  `port` int(11) NOT NULL COMMENT '端口',
-  `username` varchar(20) NOT NULL DEFAULT '' COMMENT '用户名',
-  `password` varchar(30) NOT NULL DEFAULT '' COMMENT '密码',
-  `default_db_name` varchar(100) DEFAULT NULL COMMENT '默认数据库名',
   `connection_params` varchar(300) DEFAULT NULL COMMENT '连接参数',
   `status` tinyint(4) NOT NULL DEFAULT '1' COMMENT '数据源状态：启用 1，禁用 0',
   `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',

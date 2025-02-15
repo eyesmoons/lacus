@@ -4,7 +4,7 @@ import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.dao.dataCollect.entity.DataSyncJobCatalogEntity;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.dataCollect.jobCatalog.JobCatalogBusiness;
 import com.lacus.domain.dataCollect.jobCatalog.command.AddJobCatalogCommand;
 import com.lacus.domain.dataCollect.jobCatalog.command.UpdateJobCatalogCommand;

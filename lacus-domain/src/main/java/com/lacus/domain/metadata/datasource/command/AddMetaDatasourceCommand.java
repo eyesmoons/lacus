@@ -22,22 +22,9 @@ public class AddMetaDatasourceCommand {
     @Size(max = 500, message = "数据源描述长度不能超过500个字符")
     private String remark;
 
-    @NotBlank(message = "ip或主机名称不能为空")
-    private String ip;
-
-    @NotNull(message = "ip或主机名称不能为空")
-    private Integer port;
-
     @NotNull(message = "数据源状态不能为空")
     private Integer status;
 
-    @NotBlank(message = "用户名不能为空")
-    private String username;
-
-    private String password;
-
-    @NotBlank(message = "默认数据库不能为空")
-    private String defaultDbName;
-
+    @NotBlank(message = "数据源连接信息不能为空")
     private String connectionParams;
 }

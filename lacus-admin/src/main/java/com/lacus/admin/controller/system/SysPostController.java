@@ -11,7 +11,7 @@ import com.lacus.domain.system.post.PostBusiness;
 import com.lacus.domain.system.post.query.PostQuery;
 import com.lacus.domain.system.post.command.UpdatePostCommand;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

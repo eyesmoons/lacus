@@ -1,7 +1,7 @@
 package com.lacus.admin;
 
 import cn.hutool.core.date.DateUtil;
-import com.lacus.core.factory.MetaDatasourceFactory;
+import com.lacus.datasource.service.DataSourcePluginService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +17,7 @@ import org.springframework.context.event.EventListener;
 public class LacusApplication {
 
     @Autowired
-    private MetaDatasourceFactory metaDatasourceFactory;
+    private DataSourcePluginService dataSourcePluginService;
 
     public static void main(String[] args) {
         SpringApplication.run(LacusApplication.class, args);
@@ -27,6 +27,6 @@ public class LacusApplication {
     @EventListener
     public void run(ApplicationReadyEvent event) {
         log.info("开始注册数据源...");
-        metaDatasourceFactory.register();
+        dataSourcePluginService.registerAll();
     }
 }

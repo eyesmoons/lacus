@@ -1,10 +1,8 @@
 package com.lacus.domain.metadata.datasourceType;
 
 import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
-import com.lacus.dao.metadata.enums.DatasourceCatalogEnum;
 import com.lacus.domain.metadata.datasourceType.command.AddMetaDatasourceTypeCommand;
 import com.lacus.domain.metadata.datasourceType.command.UpdateMetaDatasourceTypeCommand;
-import com.lacus.domain.metadata.datasourceType.dto.DatasourceCatalogDTO;
 import com.lacus.domain.metadata.datasourceType.dto.DatasourceTypeDTO;
 import com.lacus.domain.metadata.datasourceType.model.MetaDatasourceTypeModel;
 import com.lacus.domain.metadata.datasourceType.model.MetaDatasourceTypeModelFactory;
@@ -53,17 +51,5 @@ public class DatasourceTypeBusiness {
     public DatasourceTypeDTO getDatasourceTypeInfo(Long typeId) {
         MetaDatasourceTypeEntity byId = dataSourceTypeService.getById(typeId);
         return new DatasourceTypeDTO(byId);
-    }
-
-    public List<DatasourceCatalogDTO> listDatasourceCatalog() {
-        List<DatasourceCatalogDTO> list = new ArrayList<>();
-        DatasourceCatalogEnum[] values = DatasourceCatalogEnum.values();
-        for (DatasourceCatalogEnum value : values) {
-            DatasourceCatalogDTO dto = new DatasourceCatalogDTO();
-            dto.setName(value.getName());
-            dto.setRemark(value.getRemark());
-            list.add(dto);
-        }
-        return list;
     }
 }

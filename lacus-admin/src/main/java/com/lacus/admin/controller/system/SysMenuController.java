@@ -12,7 +12,7 @@ import com.lacus.domain.system.menu.command.UpdateMenuCommand;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.core.security.AuthenticationUtils;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.PositiveOrZero;

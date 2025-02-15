@@ -8,7 +8,7 @@ import com.lacus.core.web.domain.permission.checker.DefaultDataPermissionChecker
 import com.lacus.core.web.domain.permission.checker.DeptTreeDataPermissionChecker;
 import com.lacus.core.web.domain.permission.checker.OnlySelfDataPermissionChecker;
 import com.lacus.core.web.domain.permission.checker.SingleDeptDataPermissionChecker;
-import com.lacus.dao.system.enums.DataScopeEnum;
+import com.lacus.enums.DataScopeEnum;
 import com.lacus.service.system.ISysDeptService;
 import javax.annotation.PostConstruct;
 import org.springframework.stereotype.Component;

@@ -34,26 +34,6 @@ public class MetaDatasourceEntity extends BaseEntity<MetaDatasourceEntity> {
     @TableField("remark")
     private String remark;
 
-    @ApiModelProperty("ip/主机名")
-    @TableField("ip")
-    private String ip;
-
-    @ApiModelProperty("端口")
-    @TableField("port")
-    private Integer port;
-
-    @ApiModelProperty("用户名")
-    @TableField("username")
-    private String username;
-
-    @ApiModelProperty("密码")
-    @TableField("password")
-    private String password;
-
-    @ApiModelProperty("默认数据库名")
-    @TableField("default_db_name")
-    private String defaultDbName;
-
     @ApiModelProperty("数据源状态：启用 1，禁用 0")
     @TableField("status")
     private Integer status;

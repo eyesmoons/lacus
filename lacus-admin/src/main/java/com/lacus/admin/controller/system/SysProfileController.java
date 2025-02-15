@@ -15,7 +15,7 @@ import com.lacus.domain.system.user.command.UpdateUserPasswordCommand;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.core.security.AuthenticationUtils;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;

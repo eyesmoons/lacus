@@ -10,7 +10,7 @@ import com.lacus.domain.system.operationlog.dto.OperationLogDTO;
 import com.lacus.domain.system.operationlog.OperationLogBusiness;
 import com.lacus.domain.system.operationlog.query.OperationLogQuery;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

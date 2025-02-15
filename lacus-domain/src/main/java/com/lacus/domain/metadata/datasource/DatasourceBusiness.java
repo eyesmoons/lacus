@@ -5,11 +5,10 @@ import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.CustomException;
 import com.lacus.common.exception.error.ErrorCode;
-import com.lacus.core.factory.MetaDatasourceFactory;
-import com.lacus.core.processors.IDatasourceProcessor;
-import com.lacus.utils.beans.MetaDatasource;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
+import com.lacus.datasource.api.DataSourcePlugin;
+import com.lacus.datasource.service.DataSourcePluginService;
 import com.lacus.domain.metadata.datasource.command.AddMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.command.UpdateMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.dto.MetaDatasourceDTO;
@@ -18,14 +17,15 @@ import com.lacus.domain.metadata.datasource.model.MetaDatasourceModelFactory;
 import com.lacus.domain.metadata.datasource.query.DatasourceQuery;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.metadata.IMetaDataSourceTypeService;
+import com.lacus.utils.beans.MetaDatasource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -39,60 +39,52 @@ public class DatasourceBusiness {
     private IMetaDataSourceTypeService dataSourceTypeService;
 
     @Autowired
-    private MetaDatasourceFactory metaDatasourceFactory;
+    private DataSourcePluginService dataSourcePluginService;
 
     public PageDTO pageList(DatasourceQuery query) {
         Page<MetaDatasourceEntity> page = metadataSourceService.page(query.toPage(), query.toQueryWrapper());
-        page.getRecords().forEach(item -> item.setPassword("******"));
         return new PageDTO(page.getRecords(), page.getTotal());
     }
 
     public void addDatasource(AddMetaDatasourceCommand addCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromAddCommand(addCommand, new MetaDatasourceModel());
-        IDatasourceProcessor processor = metaDatasourceFactory.getProcessor(model.getType());
+        DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType().toUpperCase());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
-        MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
-        MetaDatasource datasource = new MetaDatasource();
-        datasource.setIp(model.getIp());
-        datasource.setPort(model.getPort());
-        datasource.setDbName(model.getDefaultDbName());
-        datasource.setUser(model.getUsername());
-        datasource.setPassword(model.getPassword());
-        datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
-        if (processor.testDatasourceConnection(datasource)) {
-            model.checkDatasourceNameUnique(metadataSourceService);
-            model.insert();
-        } else {
-            throw new CustomException("数据源连接失败");
+        try {
+            boolean testConnection = processor.testConnection(addCommand.getConnectionParams());
+            if (testConnection) {
+                model.checkDatasourceNameUnique(metadataSourceService);
+                model.insert();
+            } else {
+                throw new CustomException("数据源连接失败");
+            }
+        } catch (Exception e) {
+            throw new CustomException("数据源连接失败", e);
         }
     }
 
     public void updateDatasource(UpdateMetaDatasourceCommand updateCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromDb(updateCommand.getDatasourceId(), metadataSourceService);
-        IDatasourceProcessor processor = metaDatasourceFactory.getProcessor(model.getType());
+        DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
         MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
         MetaDatasource datasource = new MetaDatasource();
-        datasource.setIp(updateCommand.getIp());
-        datasource.setPort(updateCommand.getPort());
-        datasource.setDbName(updateCommand.getDefaultDbName());
-        datasource.setUser(updateCommand.getUsername());
-        if (Objects.nonNull(updateCommand.getPassword())) {
-            datasource.setPassword(updateCommand.getPassword());
-        } else {
-            datasource.setPassword(model.getPassword());
-        }
         datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
-        if (processor.testDatasourceConnection(datasource)) {
-            model.loadUpdateCommand(updateCommand);
-            model.checkDatasourceNameUnique(metadataSourceService);
-            model.updateById();
-        } else {
-            throw new CustomException("数据源连接失败");
+        try {
+            boolean testConnection = processor.testConnection(updateCommand.getConnectionParams());
+            if (testConnection) {
+                model.loadUpdateCommand(updateCommand);
+                model.checkDatasourceNameUnique(metadataSourceService);
+                model.updateById();
+            } else {
+                throw new CustomException("数据源连接失败");
+            }
+        } catch (SQLException e) {
+            throw new CustomException("数据源连接失败", e);
         }
     }
 
@@ -112,17 +104,17 @@ public class DatasourceBusiness {
         }
         MetaDatasourceTypeEntity metaDatasourceTypeEntity = dataSourceTypeService.getByDatasourceName(model.getType());
         MetaDatasource datasource = new MetaDatasource();
-        datasource.setIp(model.getIp());
-        datasource.setPort(model.getPort());
-        datasource.setDbName(model.getDefaultDbName());
-        datasource.setUser(model.getUsername());
-        datasource.setPassword(model.getPassword());
         datasource.setDriver(metaDatasourceTypeEntity.getDriverName());
-        IDatasourceProcessor processor = metaDatasourceFactory.getProcessor(model.getType());
+        DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
-        return processor.testDatasourceConnection(datasource);
+        try {
+            return processor.testConnection(model.getConnectionParams());
+        } catch (SQLException e) {
+            log.error("数据源连接失败", e);
+            return false;
+        }
     }
 
     public Boolean changeStatus(Long datasourceId, Integer status) {
@@ -134,11 +126,7 @@ public class DatasourceBusiness {
     public List<MetaDatasourceModel> getDatasourceList(String datasourceName, String sourceType) {
         List<MetaDatasourceEntity> datasourceList = metadataSourceService.getDatasourceList(datasourceName, sourceType);
         if (ObjectUtils.isNotEmpty(datasourceList)) {
-            return datasourceList.stream().map(entity -> {
-                MetaDatasourceModel model = new MetaDatasourceModel(entity);
-                model.setPassword("******");
-                return model;
-            }).collect(Collectors.toList());
+            return datasourceList.stream().map(MetaDatasourceModel::new).collect(Collectors.toList());
         }
         return new ArrayList<>();
     }

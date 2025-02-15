@@ -1,7 +1,7 @@
 package com.lacus.dao.system.result;
 
 import cn.hutool.core.util.StrUtil;
-import com.lacus.dao.system.enums.interfaces.DictionaryEnum;
+import com.lacus.enums.interfaces.DictionaryEnum;
 import lombok.Data;
 
 /**

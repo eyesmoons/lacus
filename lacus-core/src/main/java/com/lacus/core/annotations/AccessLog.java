@@ -1,7 +1,7 @@
 package com.lacus.core.annotations;
 
-import com.lacus.dao.system.enums.OperatorTypeEnum;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.OperatorTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

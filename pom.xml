@@ -294,6 +294,7 @@
         <module>lacus-dao</module>
         <module>lacus-service</module>
         <module>lacus-dist</module>
+        <module>lacus-datasource-plugin</module>
     </modules>
     <packaging>pom</packaging>
 

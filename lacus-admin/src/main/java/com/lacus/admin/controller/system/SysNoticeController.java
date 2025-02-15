@@ -10,7 +10,7 @@ import com.lacus.domain.system.notice.NoticeBusiness;
 import com.lacus.domain.system.notice.query.NoticeQuery;
 import com.lacus.domain.system.notice.command.NoticeUpdateCommand;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;

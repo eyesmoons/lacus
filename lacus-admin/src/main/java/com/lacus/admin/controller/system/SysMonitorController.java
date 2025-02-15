@@ -9,7 +9,7 @@ import com.lacus.core.annotations.AccessLog;
 import com.lacus.core.cache.redis.RedisCacheService;
 import com.lacus.domain.system.monitor.dto.OnlineUser;
 import com.lacus.domain.system.monitor.dto.ServerInfo;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;

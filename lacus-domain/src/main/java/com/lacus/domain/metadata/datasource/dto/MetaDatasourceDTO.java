@@ -1,10 +1,10 @@
 package com.lacus.domain.metadata.datasource.dto;
 
-import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.dao.metadata.enums.DatasourceStatusEnum;
-import com.lacus.dao.system.entity.SysUserEntity;
-import com.lacus.dao.system.enums.interfaces.BasicEnumUtil;
 import com.lacus.core.cache.CacheCenter;
+import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
+import com.lacus.dao.system.entity.SysUserEntity;
+import com.lacus.enums.DatasourceStatusEnum;
+import com.lacus.enums.interfaces.BasicEnumUtil;
 import lombok.Data;
 
 import java.util.Date;
@@ -16,11 +16,6 @@ public class MetaDatasourceDTO {
     private String type;
     private Integer sourceType;
     private String remark;
-    private String ip;
-    private Integer port;
-    private String username;
-    private String password;
-    private String defaultDbName;
     private String connectionParams;
     private String status;
     private String statusName;
@@ -33,10 +28,6 @@ public class MetaDatasourceDTO {
         this.type = entity.getType();
         this.sourceType = entity.getSourceType();
         this.remark = entity.getRemark();
-        this.ip = entity.getIp();
-        this.port = entity.getPort();
-        this.username = entity.getUsername();
-        this.defaultDbName = entity.getDefaultDbName();
         this.connectionParams = entity.getConnectionParams();
         this.status = String.valueOf(entity.getStatus());
         this.statusName = BasicEnumUtil.getDescriptionByValue(DatasourceStatusEnum.class, entity.getStatus());

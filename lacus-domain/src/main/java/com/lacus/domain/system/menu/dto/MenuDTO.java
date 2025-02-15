@@ -2,8 +2,8 @@ package com.lacus.domain.system.menu.dto;
 
 import cn.hutool.core.util.BooleanUtil;
 import com.lacus.dao.system.entity.SysMenuEntity;
-import com.lacus.dao.system.enums.dictionary.StatusEnum;
-import com.lacus.dao.system.enums.interfaces.BasicEnumUtil;
+import com.lacus.enums.dictionary.StatusEnum;
+import com.lacus.enums.interfaces.BasicEnumUtil;
 import java.util.Date;
 import lombok.Data;
 

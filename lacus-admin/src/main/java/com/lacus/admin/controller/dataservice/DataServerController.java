@@ -3,7 +3,7 @@ package com.lacus.admin.controller.dataservice;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.dataServer.command.AddDataServerCommand;
 import com.lacus.domain.dataServer.command.ParseParamCommand;
 import com.lacus.domain.dataServer.dto.ParseParamsDTO;

@@ -6,7 +6,7 @@ import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.core.cache.guava.GuavaCacheService;
 import com.lacus.core.cache.map.MapCache;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import com.lacus.dao.system.result.DictionaryData;
 import com.lacus.domain.system.config.ConfigBusiness;
 import com.lacus.domain.system.config.command.ConfigUpdateCommand;

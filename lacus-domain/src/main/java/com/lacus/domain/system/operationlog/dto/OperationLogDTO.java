@@ -4,11 +4,11 @@ import cn.hutool.core.bean.BeanUtil;
 import com.lacus.common.annotation.ExcelColumn;
 import com.lacus.common.annotation.ExcelSheet;
 import com.lacus.dao.system.entity.SysOperationLogEntity;
-import com.lacus.dao.system.enums.OperatorTypeEnum;
-import com.lacus.dao.system.enums.RequestMethodEnum;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
-import com.lacus.dao.system.enums.dictionary.OperationStatusEnum;
-import com.lacus.dao.system.enums.interfaces.BasicEnumUtil;
+import com.lacus.enums.OperatorTypeEnum;
+import com.lacus.enums.RequestMethodEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.OperationStatusEnum;
+import com.lacus.enums.interfaces.BasicEnumUtil;
 import java.util.Date;
 import lombok.Data;
 

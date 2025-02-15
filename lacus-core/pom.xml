@@ -65,6 +65,11 @@
             <artifactId>lacus-common</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>com.lacus</groupId>
+            <artifactId>lacus-datasource-plugin</artifactId>
+            <version>${revision}</version>
+        </dependency>
 
         <!-- mybatis plus 代码生成器依赖 -->
         <dependency>

@@ -16,7 +16,7 @@ import com.lacus.domain.system.role.command.UpdateStatusCommand;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.core.security.AuthenticationUtils;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotNull;

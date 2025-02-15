@@ -7,7 +7,7 @@ import com.lacus.core.thread.AsyncTaskFactory;
 import com.lacus.core.thread.ThreadPoolManager;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.core.web.service.TokenService;
-import com.lacus.dao.system.enums.LoginStatusEnum;
+import com.lacus.enums.LoginStatusEnum;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;

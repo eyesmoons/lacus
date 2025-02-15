@@ -3,7 +3,7 @@ package com.lacus.admin.controller.dataCollect;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.dataCollect.job.JobDefinitionBusiness;
 import com.lacus.domain.dataCollect.job.command.AddJobCommand;
 import com.lacus.domain.dataCollect.job.command.UpdateJobCommand;

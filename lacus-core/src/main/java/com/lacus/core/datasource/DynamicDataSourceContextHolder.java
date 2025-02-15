@@ -1,16 +1,13 @@
 package com.lacus.core.datasource;
 
 import com.alibaba.druid.pool.DruidDataSource;
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lacus.common.exception.CustomException;
-import com.lacus.utils.spring.SpringUtils;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
-import com.lacus.dao.metadata.entity.MetaDatasourceTypeEntity;
 import com.lacus.dao.metadata.mapper.MetaDatasourceMapper;
-import com.lacus.dao.metadata.mapper.MetaDatasourceTypeMapper;
+import com.lacus.datasource.api.DataSourcePlugin;
+import com.lacus.datasource.service.DataSourcePluginService;
+import com.lacus.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
-import org.apache.commons.lang3.StringUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -32,16 +29,8 @@ public class DynamicDataSourceContextHolder {
      * 设置数据源的变量
      */
     public static void setDataSourceType(String dsType) {
-        log.info("切换到{}数据源", dsType);
+        log.info("切换{}数据源", dsType);
         CONTEXT_HOLDER.set(dsType);
-    }
-
-    private static String convertUrl(MetaDatasourceEntity metaDatasource, String protocol) {
-        return String.format("jdbc:%s://%s:%s/", protocol, metaDatasource.getIp(), metaDatasource.getPort());
-    }
-
-    private static String convertUrl(String jdbcUrl, MetaDatasourceEntity metaDatasource) {
-        return String.format(jdbcUrl, metaDatasource.getIp(), metaDatasource.getPort(), metaDatasource.getDefaultDbName());
     }
 
     /**
@@ -60,29 +49,14 @@ public class DynamicDataSourceContextHolder {
 
     public static void setDataSourceId(Long datasourceId) {
         MetaDatasourceMapper metaDatasourceMapper = SpringUtils.getBean(MetaDatasourceMapper.class);
+        DynamicDataSource dynamicDataSource = SpringUtils.getBean(DynamicDataSource.class);
         MetaDatasourceEntity metaDatasource = metaDatasourceMapper.selectById(datasourceId);
         if (Objects.isNull(metaDatasource)) {
             throw new CustomException("无效数据源ID:" + datasourceId);
         }
-        DruidDataSource druidDataSource = new DruidDataSource();
-        MetaDatasourceTypeMapper metaDatasourceTypeMapper = SpringUtils.getBean(MetaDatasourceTypeMapper.class);
-        LambdaQueryWrapper<MetaDatasourceTypeEntity> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(MetaDatasourceTypeEntity::getTypeName, metaDatasource.getType());
-        MetaDatasourceTypeEntity datasourceTypeEntity = metaDatasourceTypeMapper.selectOne(wrapper);
-        if (ObjectUtils.isNotEmpty(datasourceTypeEntity)) {
-            druidDataSource.setDriverClassName(datasourceTypeEntity.getDriverName());
-            druidDataSource.setUrl(convertUrl(datasourceTypeEntity.getJdbcUrl(), metaDatasource));
-        }
-        druidDataSource.setUsername(metaDatasource.getUsername());
-        druidDataSource.setBreakAfterAcquireFailure(true);
-        druidDataSource.setConnectionErrorRetryAttempts(1);
-        druidDataSource.setMaxWait(2000);
-        druidDataSource.setFailFast(true);
-        if (StringUtils.isNotEmpty(metaDatasource.getPassword())) {
-            druidDataSource.setPassword(metaDatasource.getPassword());
-        }
-
-        DynamicDataSource dynamicDataSource = SpringUtils.getBean(DynamicDataSource.class);
+        DataSourcePluginService dataSourcePluginService = SpringUtils.getBean(DataSourcePluginService.class);
+        DataSourcePlugin dataSourcePlugin = dataSourcePluginService.getProcessor(metaDatasource.getType());
+        DruidDataSource druidDataSource = dataSourcePlugin.createDataSource(metaDatasource.getConnectionParams());
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put(metaDatasource.getDatasourceName(), druidDataSource);
         dynamicDataSource.setTargetDataSources(targetDataSources);

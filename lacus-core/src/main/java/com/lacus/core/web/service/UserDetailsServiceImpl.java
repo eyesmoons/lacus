@@ -8,7 +8,7 @@ import com.lacus.dao.system.entity.SysMenuEntity;
 import com.lacus.dao.system.entity.SysRoleEntity;
 import com.lacus.dao.system.entity.SysRoleMenuEntity;
 import com.lacus.dao.system.entity.SysUserEntity;
-import com.lacus.dao.system.enums.UserStatusEnum;
+import com.lacus.enums.UserStatusEnum;
 import com.lacus.service.system.ISysMenuService;
 import com.lacus.service.system.ISysRoleMenuService;
 import com.lacus.service.system.ISysUserService;

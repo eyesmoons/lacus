@@ -1,5 +1,6 @@
 package com.lacus.domain.common.utils;
 
+import com.alibaba.fastjson2.JSON;
 import com.lacus.common.constant.Constants;
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.dataCollect.entity.DataSyncJobEntity;
@@ -10,6 +11,7 @@ import com.lacus.dao.dataCollect.entity.DataSyncSinkTableEntity;
 import com.lacus.dao.dataCollect.entity.DataSyncSourceTableEntity;
 import com.lacus.dao.dataCollect.enums.FlinkStatusEnum;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
+import com.lacus.datasource.model.ConnectionParam;
 import com.lacus.domain.common.dto.JobConf;
 import com.lacus.domain.common.dto.JobInfo;
 import com.lacus.domain.common.dto.Sink;
@@ -121,10 +123,11 @@ public class DataCollectorJobUtil {
             SinkDataSource sinkDataSource = new SinkDataSource();
             sinkDataSource.setDataSourceType(sinkMetaDatasource.getType());
             sinkDataSource.setDataSourceName(sinkMetaDatasource.getDatasourceName());
-            sinkDataSource.setIp(sinkMetaDatasource.getIp());
-            sinkDataSource.setPort(sinkMetaDatasource.getPort());
-            sinkDataSource.setUserName(sinkMetaDatasource.getUsername());
-            sinkDataSource.setPassword(sinkMetaDatasource.getPassword());
+            ConnectionParam connectionParam = JSON.parseObject(sinkMetaDatasource.getConnectionParams(), ConnectionParam.class);
+            sinkDataSource.setIp(connectionParam.getHost());
+            sinkDataSource.setPort(connectionParam.getPort());
+            sinkDataSource.setUserName(connectionParam.getUsername());
+            sinkDataSource.setPassword(connectionParam.getPassword());
             if (ObjectUtils.isNotEmpty(sinkTables)) {
                 sinkDataSource.setDbName(sinkTables.get(0).getSinkDbName());
             }
@@ -235,10 +238,11 @@ public class DataCollectorJobUtil {
             sourceJobConf.setTopic(buildTopic(job.getJobId()));
             sourceJobConf.setSourceName(metaDatasource.getDatasourceName());
             sourceJobConf.setDatasourceType(metaDatasource.getType().toLowerCase());
-            sourceJobConf.setHostname(metaDatasource.getIp());
-            sourceJobConf.setPort(String.valueOf(metaDatasource.getPort()));
-            sourceJobConf.setUsername(metaDatasource.getUsername());
-            sourceJobConf.setPassword(metaDatasource.getPassword());
+            ConnectionParam connectionParam = JSON.parseObject(metaDatasource.getConnectionParams(), ConnectionParam.class);
+            sourceJobConf.setHostname(connectionParam.getHost());
+            sourceJobConf.setPort(String.valueOf(connectionParam.getPort()));
+            sourceJobConf.setUsername(connectionParam.getUsername());
+            sourceJobConf.setPassword(connectionParam.getPassword());
             sourceJobConf.setDatabaseList(Collections.singletonList(sourceDbName));
             sourceJobConf.setTableList(sourceTableNames);
             sourceJobConf.setSyncType(syncType);

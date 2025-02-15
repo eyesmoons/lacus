@@ -16,7 +16,7 @@ import com.lacus.domain.system.menu.model.RouterModel;
 import com.lacus.domain.system.menu.query.MenuQuery;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.dao.system.entity.SysMenuEntity;
-import com.lacus.dao.system.enums.MenuTypeEnum;
+import com.lacus.enums.MenuTypeEnum;
 import com.lacus.service.system.ISysMenuService;
 import java.util.LinkedList;
 import java.util.List;

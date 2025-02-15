@@ -7,7 +7,7 @@ import com.lacus.utils.ServletHolderUtil;
 import com.lacus.utils.ip.IpRegionUtil;
 import com.lacus.dao.system.entity.SysLoginInfoEntity;
 import com.lacus.dao.system.entity.SysOperationLogEntity;
-import com.lacus.dao.system.enums.LoginStatusEnum;
+import com.lacus.enums.LoginStatusEnum;
 import com.lacus.service.system.ISysLoginInfoService;
 import com.lacus.service.system.ISysOperationLogService;
 import eu.bitwalker.useragentutils.UserAgent;

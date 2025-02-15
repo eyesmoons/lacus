@@ -5,7 +5,7 @@ import com.lacus.common.core.base.BaseController;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.common.command.BulkOperationCommand;
 import com.lacus.domain.system.env.EnvBusiness;
 import com.lacus.domain.system.env.command.EnvAddCommand;

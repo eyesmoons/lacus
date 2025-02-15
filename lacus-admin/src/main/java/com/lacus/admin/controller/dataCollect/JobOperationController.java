@@ -2,7 +2,7 @@ package com.lacus.admin.controller.dataCollect;
 
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import com.lacus.domain.dataCollect.job.JobOperationBusiness;
 import com.lacus.domain.dataCollect.job.dto.JobSubmitDTO;
 import io.swagger.annotations.Api;

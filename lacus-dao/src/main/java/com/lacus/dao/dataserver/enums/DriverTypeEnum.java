@@ -1,6 +1,6 @@
 package com.lacus.dao.dataserver.enums;
 
-import com.lacus.dao.system.enums.interfaces.DictionaryEnum;
+import com.lacus.enums.interfaces.DictionaryEnum;
 
 public enum DriverTypeEnum implements DictionaryEnum<Integer> {
 

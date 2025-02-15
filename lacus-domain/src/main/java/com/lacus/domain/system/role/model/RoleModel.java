@@ -9,7 +9,7 @@ import com.lacus.domain.system.role.command.UpdateRoleCommand;
 import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.dao.system.entity.SysRoleEntity;
 import com.lacus.dao.system.entity.SysRoleMenuEntity;
-import com.lacus.dao.system.enums.dictionary.StatusEnum;
+import com.lacus.enums.dictionary.StatusEnum;
 import com.lacus.service.system.ISysRoleMenuService;
 import com.lacus.service.system.ISysRoleService;
 import java.util.ArrayList;

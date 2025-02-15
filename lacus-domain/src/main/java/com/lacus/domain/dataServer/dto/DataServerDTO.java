@@ -5,7 +5,7 @@ import com.lacus.dao.dataserver.entity.DataServerEntity;
 import com.lacus.dao.dataserver.enums.DataServerStatusEnum;
 import com.lacus.dao.dataserver.enums.DriverTypeEnum;
 import com.lacus.dao.system.entity.SysUserEntity;
-import com.lacus.dao.system.enums.interfaces.BasicEnumUtil;
+import com.lacus.enums.interfaces.BasicEnumUtil;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 

@@ -11,7 +11,7 @@ import com.lacus.domain.system.logininfo.dto.LoginInfoDTO;
 import com.lacus.domain.system.logininfo.LoginInfoBusiness;
 import com.lacus.domain.system.logininfo.query.LoginInfoQuery;
 import com.lacus.core.annotations.AccessLog;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.constraints.NotEmpty;

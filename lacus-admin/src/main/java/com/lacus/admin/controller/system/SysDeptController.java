@@ -11,7 +11,7 @@ import com.lacus.domain.system.dept.query.DeptQuery;
 import com.lacus.domain.system.dept.command.UpdateDeptCommand;
 import com.lacus.core.annotations.AccessLog;
 import com.lacus.core.security.AuthenticationUtils;
-import com.lacus.dao.system.enums.dictionary.BusinessTypeEnum;
+import com.lacus.enums.dictionary.BusinessTypeEnum;
 import java.util.List;
 import javax.validation.constraints.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
