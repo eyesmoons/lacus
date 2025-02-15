@@ -64,7 +64,7 @@ taskmanager.numberOfTaskSlots: 1
 parallelism.default: 1
 
 # The default file system scheme and authority.
-# 
+#
 # By default file paths without scheme are interpreted relative to the local
 # root file system 'file:///'. Use this to override the default and interpret
 # relative paths relative to a different file system,
@@ -83,9 +83,9 @@ parallelism.default: 1
 # The path where metadata for master recovery is persisted. While ZooKeeper stores
 # the small ground truth for checkpoint and leader election, this location stores
 # the larger objects, like persisted dataflow graphs.
-# 
+#
 # Must be a durable file system that is accessible from all nodes
-# (like HDFS, S3, Ceph, nfs, ...) 
+# (like HDFS, S3, Ceph, nfs, ...)
 #
 # high-availability.storageDir: hdfs:///flink/ha/
 
@@ -125,7 +125,7 @@ state.checkpoints.num-retained: 5
 state.savepoints.dir: hdfs://hadoop1:9000/flink/flink-savepoints
 
 # Flag to enable/disable incremental checkpoints for backends that
-# support incremental checkpoints (like the RocksDB state backend). 
+# support incremental checkpoints (like the RocksDB state backend).
 #
 # state.backend.incremental: false
 
@@ -191,10 +191,10 @@ jobmanager.execution.failover-strategy: region
 #
 classloader.resolve-order: parent-first
 
-# The amount of memory going to the network stack. These numbers usually need 
+# The amount of memory going to the network stack. These numbers usually need
 # no tuning. Adjusting them may be necessary in case of an "Insufficient number
 # of network buffers" error. The default min is 64MB, the default max is 1GB.
-# 
+#
 # taskmanager.memory.network.fraction: 0.1
 # taskmanager.memory.network.min: 64mb
 # taskmanager.memory.network.max: 1gb
@@ -227,8 +227,8 @@ classloader.resolve-order: parent-first
 
 # Below configurations are applicable if ZK ensemble is configured for security
 
-# Override below configuration to provide custom ZK service name if configured
-# zookeeper.sasl.service-name: zookeeper
+# Override below configuration to provide custom ZK manager name if configured
+# zookeeper.sasl.manager-name: zookeeper
 
 # The configuration below must match one of the values set in "security.kerberos.login.contexts"
 # zookeeper.sasl.login-context-name: Client

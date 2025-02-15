@@ -42,7 +42,7 @@ import static com.lacus.common.constant.Constants.SPARK_SQL_JOB_JAR;
 @Service
 public class SparkOperationServiceImpl implements ISparkOperationService {
 
-    private static final String SPARK_SQL_MAIN_CLASS = "com.lacus.service.spark.SparkSqlMain";
+    private static final String SPARK_SQL_MAIN_CLASS = "com.lacus.manager.spark.SparkSqlMain";
     private static final String APP_NAME_PREFIX = "SPARK_JOB_";
     private static final String SPARK_SQL_FILE_PREFIX = "spark_sql_";
     private static final String SQL_FILE_SUFFIX = ".sql";

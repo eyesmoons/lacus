@@ -1,4 +1,4 @@
-package com.lacus.datasource.service;
+package com.lacus.datasource.manager;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
@@ -20,7 +20,7 @@ import java.util.ServiceLoader;
  */
 @Slf4j
 @Service
-public class DataSourcePluginService {
+public class DataSourcePluginManager {
 
     @Autowired
     private MetaDatasourcePluginMapper pluginMapper;

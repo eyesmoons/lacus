@@ -5,7 +5,7 @@ import com.lacus.common.exception.CustomException;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.dao.metadata.mapper.MetaDatasourceMapper;
 import com.lacus.datasource.api.DataSourcePlugin;
-import com.lacus.datasource.service.DataSourcePluginService;
+import com.lacus.datasource.manager.DataSourcePluginManager;
 import com.lacus.utils.spring.SpringUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -54,8 +54,8 @@ public class DynamicDataSourceContextHolder {
         if (Objects.isNull(metaDatasource)) {
             throw new CustomException("无效数据源ID:" + datasourceId);
         }
-        DataSourcePluginService dataSourcePluginService = SpringUtils.getBean(DataSourcePluginService.class);
-        DataSourcePlugin dataSourcePlugin = dataSourcePluginService.getProcessor(metaDatasource.getType());
+        DataSourcePluginManager dataSourcePluginManager = SpringUtils.getBean(DataSourcePluginManager.class);
+        DataSourcePlugin dataSourcePlugin = dataSourcePluginManager.getProcessor(metaDatasource.getType());
         DruidDataSource druidDataSource = dataSourcePlugin.createDataSource(metaDatasource.getConnectionParams());
         Map<Object, Object> targetDataSources = new HashMap<>();
         targetDataSources.put(metaDatasource.getDatasourceName(), druidDataSource);

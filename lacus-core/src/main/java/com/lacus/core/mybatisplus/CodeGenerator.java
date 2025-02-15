@@ -105,13 +105,13 @@ public class CodeGenerator {
             .parent(parentPackage)
             .moduleName("dao")
             .entity("entity")
-            .service("service")
-            .serviceImpl("service.impl")
+            .service("manager")
+            .serviceImpl("manager.impl")
             .mapper("mapper")
             .xml("mapper.xml")
             .controller("controller")
             .other("other")
-            // define dir related to OutputFileType(entity,mapper,service,controller,mapper.xml)
+            // define dir related to OutputFileType(entity,mapper,manager,controller,mapper.xml)
             .pathInfo(Collections.singletonMap(OutputFile.mapperXml, System.getProperty("user.dir") + module
                 + "/src/main/resources/mapper/system/test"))
             .build());
@@ -122,7 +122,7 @@ public class CodeGenerator {
         generator.templateConfig(builder -> builder
             .disable(TemplateType.ENTITY)
             .entity("/templates/entity.java")
-            .service("/templates/service.java")
+            .service("/templates/manager.java")
             .serviceImpl("/templates/serviceImpl.java")
             .mapper("/templates/mapper.java")
             .mapperXml("/templates/mapper.xml")

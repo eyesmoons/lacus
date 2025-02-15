@@ -1,7 +1,7 @@
 package com.lacus.admin;
 
 import cn.hutool.core.date.DateUtil;
-import com.lacus.datasource.service.DataSourcePluginService;
+import com.lacus.datasource.manager.DataSourcePluginManager;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -17,7 +17,7 @@ import org.springframework.context.event.EventListener;
 public class LacusApplication {
 
     @Autowired
-    private DataSourcePluginService dataSourcePluginService;
+    private DataSourcePluginManager dataSourcePluginManager;
 
     public static void main(String[] args) {
         SpringApplication.run(LacusApplication.class, args);
@@ -27,6 +27,6 @@ public class LacusApplication {
     @EventListener
     public void run(ApplicationReadyEvent event) {
         log.info("开始注册数据源...");
-        dataSourcePluginService.registerAll();
+        dataSourcePluginManager.registerAll();
     }
 }

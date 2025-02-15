@@ -13,7 +13,7 @@ import com.lacus.dao.metadata.entity.SchemaTableEntity;
 import com.lacus.dao.metadata.mapper.MetaTableMapper;
 import com.lacus.dao.metadata.mapper.MysqlSchemaMapper;
 import com.lacus.datasource.api.DataSourcePlugin;
-import com.lacus.datasource.service.DataSourcePluginService;
+import com.lacus.datasource.manager.DataSourcePluginManager;
 import com.lacus.domain.metadata.schema.dto.SchemaDbDTO;
 import com.lacus.domain.metadata.schema.dto.SchemaTableDTO;
 import com.lacus.domain.metadata.schema.model.SchemaDbTreeNode;
@@ -56,7 +56,7 @@ public class SyncSchemaBusiness {
     private IMetaDataSourceService metaDataSourceService;
 
     @Autowired
-    private DataSourcePluginService dataSourcePluginService;
+    private DataSourcePluginManager dataSourcePluginManager;
 
     /**
      * query schema databases by datasourceId
@@ -79,7 +79,7 @@ public class SyncSchemaBusiness {
 
     public List<SchemaDbDTO> getSchemaDbList(Long datasourceId) {
         MetaDatasourceEntity metaDatasource = metaDataSourceService.getById(datasourceId);
-        DataSourcePlugin processor = dataSourcePluginService.getProcessor(metaDatasource.getType().toUpperCase());
+        DataSourcePlugin processor = dataSourcePluginManager.getProcessor(metaDatasource.getType().toUpperCase());
         try {
             DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
             List<SchemaDbEntity> schemaDbList = processor.listAllSchemaDb(datasourceId);
@@ -98,7 +98,7 @@ public class SyncSchemaBusiness {
      */
     public List<SchemaTableDTO> getSchemaTableList(Long datasourceId, String dbName, String tableName) {
         MetaDatasourceEntity metaDatasource = metaDataSourceService.getById(datasourceId);
-        DataSourcePlugin processor = dataSourcePluginService.getProcessor(metaDatasource.getType().toUpperCase());
+        DataSourcePlugin processor = dataSourcePluginManager.getProcessor(metaDatasource.getType().toUpperCase());
         try {
             DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
             List<SchemaTableEntity> schemaTableList = processor.listSchemaTable(dbName, tableName);
@@ -147,7 +147,7 @@ public class SyncSchemaBusiness {
             boolean remove = metaColumnService.removeColumnsByTableId(tableDTO.getTableId());
             List<SchemaColumnEntity> columnList;
             MetaDatasourceEntity metaDatasource = metaDataSourceService.getById(datasourceId);
-            DataSourcePlugin processor = dataSourcePluginService.getProcessor(metaDatasource.getType().toUpperCase());
+            DataSourcePlugin processor = dataSourcePluginManager.getProcessor(metaDatasource.getType().toUpperCase());
             try {
                 DynamicDataSourceContextHolder.setDataSourceId(datasourceId);
                 columnList = processor.listSchemaColumn(tableDTO.getDbName(), tableDTO.getTableName());

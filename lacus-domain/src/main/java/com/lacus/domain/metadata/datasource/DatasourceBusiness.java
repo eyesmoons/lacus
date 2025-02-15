@@ -7,7 +7,7 @@ import com.lacus.common.exception.CustomException;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.dao.metadata.entity.MetaDatasourceEntity;
 import com.lacus.datasource.api.DataSourcePlugin;
-import com.lacus.datasource.service.DataSourcePluginService;
+import com.lacus.datasource.manager.DataSourcePluginManager;
 import com.lacus.domain.metadata.datasource.command.AddMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.command.UpdateMetaDatasourceCommand;
 import com.lacus.domain.metadata.datasource.dto.MetaDatasourceDTO;
@@ -34,7 +34,7 @@ public class DatasourceBusiness {
     private IMetaDataSourceService metadataSourceService;
 
     @Autowired
-    private DataSourcePluginService dataSourcePluginService;
+    private DataSourcePluginManager dataSourcePluginManager;
 
     public PageDTO pageList(DatasourceQuery query) {
         Page<MetaDatasourceEntity> page = metadataSourceService.page(query.toPage(), query.toQueryWrapper());
@@ -43,7 +43,7 @@ public class DatasourceBusiness {
 
     public void addDatasource(AddMetaDatasourceCommand addCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromAddCommand(addCommand, new MetaDatasourceModel());
-        DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType().toUpperCase());
+        DataSourcePlugin processor = dataSourcePluginManager.getProcessor(model.getType().toUpperCase());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
@@ -62,7 +62,7 @@ public class DatasourceBusiness {
 
     public void updateDatasource(UpdateMetaDatasourceCommand updateCommand) {
         MetaDatasourceModel model = MetaDatasourceModelFactory.loadFromDb(updateCommand.getDatasourceId(), metadataSourceService);
-        DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType());
+        DataSourcePlugin processor = dataSourcePluginManager.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
@@ -95,7 +95,7 @@ public class DatasourceBusiness {
         if (ObjectUtils.isEmpty(model)) {
             throw new ApiException(ErrorCode.Business.OBJECT_NOT_FOUND, datasourceId);
         }
-        DataSourcePlugin processor = dataSourcePluginService.getProcessor(model.getType());
+        DataSourcePlugin processor = dataSourcePluginManager.getProcessor(model.getType());
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
