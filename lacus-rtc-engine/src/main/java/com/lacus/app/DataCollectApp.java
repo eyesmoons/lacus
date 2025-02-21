@@ -10,11 +10,14 @@ import com.lacus.model.Parameter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.io.Serializable;
+
 /**
  * 数据采集引擎统一入口，用户只需要编写自己的 source 和 sink 即可
  */
 @Slf4j
-public class DataCollectApp {
+public class DataCollectApp implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     public static void main(String[] args) throws Exception {
         // 1. 解析参数

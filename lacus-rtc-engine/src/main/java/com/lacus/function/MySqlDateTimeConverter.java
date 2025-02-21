@@ -20,9 +20,9 @@ public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, Re
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_TIME;
     private DateTimeFormatter datetimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
     private DateTimeFormatter timestampFormatter = DateTimeFormatter.ISO_DATE_TIME;
- 
+
     private ZoneId timestampZoneId = ZoneId.systemDefault();
- 
+
     @Override
     public void configure(Properties props) {
         readProps(props, "format.date", p -> dateFormatter = DateTimeFormatter.ofPattern(p));
@@ -31,7 +31,7 @@ public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, Re
         readProps(props, "format.timestamp", p -> timestampFormatter = DateTimeFormatter.ofPattern(p));
         readProps(props, "format.timestamp.zone", z -> timestampZoneId = ZoneId.of(z));
     }
- 
+
     private void readProps(Properties properties, String settingKey, Consumer<String> callback) {
         String settingValue = (String) properties.get(settingKey);
         if (settingValue == null || settingValue.isEmpty()) {
@@ -70,7 +70,7 @@ public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, Re
             registration.register(schemaBuilder, converter);
         }
     }
- 
+
     private String convertDate(Object input) {
         if (input instanceof LocalDate) {
             return dateFormatter.format((LocalDate) input);
@@ -81,7 +81,7 @@ public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, Re
         }
         return null;
     }
- 
+
     private String convertTime(Object input) {
         if (input instanceof Duration) {
             Duration duration = (Duration) input;
@@ -92,7 +92,7 @@ public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, Re
         }
         return null;
     }
- 
+
     private String convertDateTime(Object input) {
         if (input instanceof LocalDateTime) {
             return datetimeFormatter.format((LocalDateTime) input);
@@ -107,7 +107,7 @@ public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, Re
         }
         return null;
     }
- 
+
     private String convertTimestamp(Object input) {
         if (input instanceof ZonedDateTime) {
             // mysql的timestamp会转成UTC存储，这里的zonedDatetime都是UTC时间

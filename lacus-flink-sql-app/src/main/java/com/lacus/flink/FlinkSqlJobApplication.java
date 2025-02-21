@@ -30,6 +30,7 @@ import org.apache.flink.table.operations.command.SetOperation;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -52,9 +53,9 @@ public class FlinkSqlJobApplication {
                 setCheckpoint(env, flinkJobParam.getCheckPointParam());
             }
             JobID jobID = executeSql(sqlList, tableEnv);
-            log.info("任务提交成功: {}", jobID);
+            log.info("任务提交成功，请关注运行日志: {}", jobID);
         } catch (Exception e) {
-            log.error("任务执行失败：", e);
+            log.error("任务提交失败, message: {}, stack: {}", e.getMessage(), Arrays.toString(e.getStackTrace()), e);
         }
     }
 
@@ -139,16 +140,16 @@ public class FlinkSqlJobApplication {
      */
     private static FlinkJobParam buildParam(String[] args) {
         ParameterTool parameterTool = ParameterTool.fromArgs(args);
-        String sqlPath = parameterTool.get("sql");
+        String sqlPath = parameterTool.get("sqlPath");
         if (StringUtils.isEmpty(sqlPath)) {
-            throw new NullPointerException("-sql参数为必填项");
+            throw new NullPointerException("sqlPath参数不能为空");
         }
         FlinkJobParam.FlinkJobParamBuilder paramBuilder = FlinkJobParam.builder()
                 .sqlPath(sqlPath)
                 .checkPointParam(buildCheckPointParam(parameterTool));
-        String type = parameterTool.get("jobType");
-        if (StringUtils.isNotEmpty(type)) {
-            paramBuilder.jobTypeEnum(FlinkJobTypeEnum.getJobTypeEnum(type));
+        String sqlModel = parameterTool.get("sqlModel");
+        if (StringUtils.isNotEmpty(sqlModel)) {
+            paramBuilder.jobTypeEnum(FlinkJobTypeEnum.getJobTypeEnum(sqlModel));
         }
         return paramBuilder.build();
     }

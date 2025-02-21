@@ -14,7 +14,7 @@ import org.apache.kafka.connect.source.SourceRecord;
 import java.util.List;
 
 public class CustomerDeserializationSchemaOrcale implements DebeziumDeserializationSchema<String> {
-
+    private static final long serialVersionUID = 1L;
     /**
      *{
      * "db":""

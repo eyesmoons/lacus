@@ -1,12 +1,15 @@
 package com.lacus.constant;
 
+import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 
 /**
  * @created by shengyu on 2023/9/7 10:58
  */
-public class CommonContext {
+public class CommonContext implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     public static final String DELETE_KEY = "_is_deleted";
     public static final String UPDATE_STAMP_KEY = "_update_stamp";
 

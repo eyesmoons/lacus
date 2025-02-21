@@ -7,12 +7,12 @@ package com.lacus.flink.enums;
 public enum FlinkJobTypeEnum {
     STREAMING_SQL, BATCH_SQL, JAR;
 
-    public static FlinkJobTypeEnum getJobTypeEnum(String type) {
-        if (type == null) {
+    public static FlinkJobTypeEnum getJobTypeEnum(String sqlModel) {
+        if (sqlModel == null) {
             return null;
         }
         for (FlinkJobTypeEnum jobTypeEnum : FlinkJobTypeEnum.values()) {
-            if (type.equals(jobTypeEnum.name())) {
+            if (sqlModel.equals(jobTypeEnum.name())) {
                 return jobTypeEnum;
             }
         }

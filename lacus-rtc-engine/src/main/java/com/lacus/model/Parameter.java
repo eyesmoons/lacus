@@ -5,11 +5,14 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import lombok.Getter;
 
+import java.io.Serializable;
+
 /**
  * 应用程序参数类
  */
 @Getter
-public class Parameter {
+public class Parameter implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static final int REQUIRED_ARGS_LENGTH = 4;
 
     public final String sourceName;

@@ -4,10 +4,14 @@ import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.environment.CheckpointConfig;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.io.Serializable;
+
 /**
  * Flink环境配置类
  */
-public class FlinkEnvConfig {
+public class FlinkEnvConfig implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static final int CHECKPOINT_INTERVAL = 60000;
     private static final int CHECKPOINT_MIN_PAUSE = 1000;
     private static final int CHECKPOINT_TIMEOUT = 60000;
@@ -35,4 +39,4 @@ public class FlinkEnvConfig {
             CheckpointConfig.ExternalizedCheckpointCleanup.RETAIN_ON_CANCELLATION
         );
     }
-} 
+}

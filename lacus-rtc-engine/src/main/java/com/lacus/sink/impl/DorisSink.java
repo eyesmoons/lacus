@@ -31,6 +31,7 @@ import static com.lacus.constant.ConnectorContext.DORIS_SINK;
  * @date 2024/4/30 14:44
  */
 public class DorisSink extends BaseSink {
+    private static final long serialVersionUID = 1L;
 
     public DorisSink() {
         super(DORIS_SINK);

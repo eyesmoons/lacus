@@ -14,12 +14,14 @@ import org.apache.flink.streaming.api.datastream.DataStreamSource;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * 读取器配置类
  */
-public class SourceHandler {
+public class SourceHandler implements Serializable {
+    private static final long serialVersionUID = 1L;
     private static final String KAFKA_CHANNEL_NAME = "_kafka_channel";
 
     public static void configureSource(StreamExecutionEnvironment env, com.lacus.model.SourceConfig sourceConfig, Parameter parameter) {

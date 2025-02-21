@@ -22,7 +22,7 @@ import static com.lacus.constant.ConnectorContext.ORACLE_SOURCE;
 @Slf4j
 @AutoService(BaseSource.class)
 public class OracleSource extends BaseSource {
-
+    private static final long serialVersionUID = 1L;
     public OracleSource() {
         super(ORACLE_SOURCE);
     }

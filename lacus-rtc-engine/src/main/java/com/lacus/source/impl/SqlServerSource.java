@@ -22,8 +22,8 @@ import static com.lacus.constant.ConnectorContext.SQLSERVER_SOURCE;
 @Slf4j
 @AutoService(BaseSource.class)
 public class SqlServerSource extends BaseSource {
-
-    public SqlServerSource(String name) {
+    private static final long serialVersionUID = 1L;
+    public SqlServerSource() {
         super(SQLSERVER_SOURCE);
     }
 

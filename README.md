@@ -58,26 +58,30 @@
 
 ### 三、技术栈
 
-| 技术             | 说明              | 版本     |
-|----------------|-----------------|--------|
-| `springboot`   | Java web 项目必备框架 | 2.7    |
-| `druid`        | 数据库连接池          | 1.2.8  |
-| `mybatis-plus` | 数据库框架           | 3.5.2  |
-| `kafka`        | 消息队列            | 2.1.1  |
-| `flink`        | flink框架         | 1.16.2 |
-| `flink-cdc`    | cdc connector   | 2.3.0  |
-| `yarn`         | 资源调度框架          | 3.3.6  |
-| `hdfs`         | 主要提供hdfs存储      | 3.3.6  |
-| `vue`          | 前端框架            | 2.x    |
+| 技术             | 说明            | 版本           |
+|----------------|---------------|--------------|
+| `java`         | java          | 1.8          |
+| `springboot`   | Java web框架    | 2.7          |
+| `druid`        | 数据库连接池        | 1.2.8        |
+| `mybatis-plus` | 数据库框架         | 3.5.2        |
+| `kafka`        | 消息队列          | 3.6.0        |
+| `flink`        | flink流处理框架    | 1.16.2       |
+| `flink-cdc`    | cdc connector | 2.3.0        |
+| `hadoop`       | hadoop        | 3.3.6        |
+| `zookeeper`    | 分布式协调服务       | 3.9.1        |
+| `spark`        | spark批处理框架    | 2.4.5, 3.4.2 |
+| `doris`        | MPP数据库        | 2.1.2        |
+| `redis`        | redis缓存       | 最新版本         |
 
 ### 四、快速开始
 
 #### 1. 前置准备
 
-- 项目代码下载
+- 代码下载
 ```
 前端项目代码：git clone https://github.com/eyesmoons/lacus
 后端项目代码：git clone https://github.com/eyesmoons/lacus-ui
+docker部署：git clone https://github.com/eyesmoons/lacus-docker
 ```
 - 安装 Mysql
 - 安装 Redis
@@ -157,12 +161,14 @@ sh lacus-admin.sh restart
 ```
 ## 系统功能
 
-| 功能    | 描述                 | 状态    |
-|-------|--------------------|-------|
-| 元数据管理 | 根据源库表管理所有元数据信息     | 已完成   |
-| 数据服务  | 通过API接口,对外提供获取数据能力 | 前端待开发 |
-| 数据同步  | 通过可视化配置，一键部署采集任务   | 前端待完善 |
-| 数据开发  | 通过可视化配置，在线提交数据开发任务 | 开发中   |
+| 功能      | 描述                     | 状态    |
+|---------|------------------------|-------|
+| 元数据管理   | 根据源库表管理所有元数据信息         | 已完成   |
+| 数据服务    | 通过API接口,对外提供获取数据能力     | 已完成 |
+| 数据采集    | 通过可视化配置，一键部署实时数据采集任务   | 已完成 |
+| spark开发 | 通过可视化配置，在线提交spark批处理任务 |  已完成  |
+| flink开发 | 通过可视化配置，在线提交flink流处理任务 |  已完成  |
+| 资源管理    | 提供Hdfs资源管理，方便管理hdfs文件  |  已完成  |
 
 ## 项目结构
 
@@ -172,15 +178,17 @@ lacus
 ├── lacus-common -- 公共模块
 ├── lacus-core  -- 核心基础模块
 ├── lacus-dao  -- 数据库交互模块
+├── lacus-datasource-plugin  -- 数据源插件模块
 ├── lacus-dist  -- 打包模块
 ├── lacus-domain  -- 业务领域模块
+├── lacus-flink-sql-app  -- flink sql模块，需要单独打包
+├── lacus-rtc-engine  -- 实时采集引擎，需要单独打包
 ├── lacus-service  -- 服务层
-├── lacus-rtc-engine  -- 实时采集引擎
+├── lacus-spark-sql-app  -- spark sql模块，需要单独打包
 └── sql  -- sql脚本
 ```
 
 ## 注意事项
-- idea会自动将.properties文件的编码设置为ISO-8859-1,请在Settings > Editor > File Encodings > Properties Files > 设置为UTF-8
 - 如需要生成新的表，请使用CodeGenerator类进行生成。
   - 填入数据库地址，账号密码，库名。然后填入所需的表名执行代码即可。
 

@@ -22,7 +22,7 @@ import static com.lacus.constant.ConnectorContext.POSTGRES_SOURCE;
 @Slf4j
 @AutoService(BaseSource.class)
 public class PostgresSource extends BaseSource {
-
+    private static final long serialVersionUID = 1L;
     public PostgresSource() {
         super(POSTGRES_SOURCE);
     }

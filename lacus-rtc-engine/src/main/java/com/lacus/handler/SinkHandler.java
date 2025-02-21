@@ -20,6 +20,7 @@ import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTime
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 
+import java.io.Serializable;
 import java.util.Map;
 import java.util.Objects;
 
@@ -27,7 +28,8 @@ import java.util.Objects;
  * 写入器配置类
  */
 @Slf4j
-public class SinkHandler {
+public class SinkHandler implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 配置并获取写入器

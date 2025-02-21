@@ -20,12 +20,14 @@ package com.lacus.script;
 
 
 import javax.tools.SimpleJavaFileObject;
+import java.io.Serializable;
 import java.net.URI;
 
 /**
  * Memory JavaFile Object
  */
-public class JavaSourceFromString extends SimpleJavaFileObject {
+public class JavaSourceFromString extends SimpleJavaFileObject implements Serializable {
+    private static final long serialVersionUID = 1L;
     /**
      * The source code of this "file".
      */

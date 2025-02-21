@@ -2,8 +2,11 @@ package com.lacus.model;
 
 import lombok.Data;
 
+import java.io.Serializable;
+
 @Data
-public class StreamLoadResponse {
+public class StreamLoadResponse implements Serializable {
+    private static final long serialVersionUID = 1L;
 
     /**
      * 导入的事务ID。用户可不感知。

@@ -22,7 +22,7 @@ import static com.lacus.constant.ConnectorContext.MONGODB_SOURCE;
 @Slf4j
 @AutoService(BaseSource.class)
 public class MongoDbSource extends BaseSource {
-
+    private static final long serialVersionUID = 1L;
     public MongoDbSource() {
         super(MONGODB_SOURCE);
     }

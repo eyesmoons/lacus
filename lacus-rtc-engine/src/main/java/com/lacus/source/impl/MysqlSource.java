@@ -22,7 +22,7 @@ import static com.lacus.constant.ConnectorContext.MYSQL_SOURCE;
 @Slf4j
 @AutoService(BaseSource.class)
 public class MysqlSource extends BaseSource {
-
+    private static final long serialVersionUID = 1L;
     public MysqlSource() {
         super(MYSQL_SOURCE);
     }

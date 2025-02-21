@@ -4,6 +4,7 @@ import com.lacus.source.ISource;
 import com.ververica.cdc.connectors.base.options.StartupOptions;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Properties;
 
 /**
@@ -12,8 +13,8 @@ import java.util.Properties;
  * @created by shengyu on 2023/8/31 10:55
  */
 @Getter
-public abstract class BaseSource implements ISource {
-
+public abstract class BaseSource implements ISource, Serializable {
+    private static final long serialVersionUID = 1L;
     protected String name;
 
     public BaseSource(String name) {

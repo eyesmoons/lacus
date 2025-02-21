@@ -5,6 +5,7 @@ import com.lacus.source.impl.BaseSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -14,7 +15,9 @@ import java.util.ServiceLoader;
  *
  * @created by shengyu on 2024/1/21 20:18
  */
-public class DataCollectSourceFactory {
+public class DataCollectSourceFactory implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = LoggerFactory.getLogger(DataCollectSourceFactory.class);
 
     private final Map<String, BaseSource> context = new HashMap<>();

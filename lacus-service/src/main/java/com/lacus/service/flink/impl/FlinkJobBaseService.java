@@ -213,12 +213,13 @@ public class FlinkJobBaseService {
             case BATCH_SQL:
                 command.append(" -c ").append(APP_CLASS_NAME);
                 command.append(" ").append(jobRunParamDTO.getFlinkSqlAppHome()).append(CommonPropertyUtils.getString(FLINK_SQL_JOB_JAR));
-                command.append(" -sql ").append(jobRunParamDTO.getSqlPath());
+                command.append(" -sqlPath ").append(jobRunParamDTO.getSqlPath());
                 if (StringUtils.isNotEmpty(jobRunParamDTO.getFlinkCheckpointConfig())
-                        && (Objects.equals(FlinkDeployModeEnum.YARN_APPLICATION, flinkJobEntity.getDeployMode()) || Objects.equals(FlinkDeployModeEnum.YARN_PER, flinkJobEntity.getDeployMode()))) {
+                        && (Objects.equals(FlinkDeployModeEnum.YARN_APPLICATION, flinkJobEntity.getDeployMode())
+                        || Objects.equals(FlinkDeployModeEnum.YARN_PER, flinkJobEntity.getDeployMode()))) {
                     command.append(" -checkpointDir ").append(jobRunParamDTO.getFlinkCheckpointConfig());
                 }
-                command.append(" -jobType ").append(flinkJobEntity.getJobType());
+                command.append(" -sqlModel ").append(flinkJobEntity.getJobType());
                 break;
             case JAR:
                 command.append(" -c ").append(flinkJobEntity.getMainClassName());

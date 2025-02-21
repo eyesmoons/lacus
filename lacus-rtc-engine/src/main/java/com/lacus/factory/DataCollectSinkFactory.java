@@ -5,6 +5,7 @@ import com.lacus.sink.impl.BaseSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -14,7 +15,9 @@ import java.util.ServiceLoader;
  *
  * @created by shengyu on 2024/1/21 20:18
  */
-public class DataCollectSinkFactory {
+public class DataCollectSinkFactory implements Serializable {
+    private static final long serialVersionUID = 1L;
+
     private static final Logger logger = LoggerFactory.getLogger(DataCollectSinkFactory.class);
 
     private final Map<String, BaseSink> context = new HashMap<>();
