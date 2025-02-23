@@ -26,6 +26,7 @@ import org.apache.kafka.common.KafkaFuture;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
@@ -92,7 +93,7 @@ public class KafkaUtil {
                 newTopics.add(new NewTopic(topic, numPartitions, replicationFactor));
             }
             Set<String> topicList = listTopic(adminClient);
-            if (topicList.containsAll(topics)) {
+            if (Objects.nonNull(topicList) && topicList.containsAll(topics)) {
                 log.warn("topic[{}]已存在", topics);
             } else {
                 adminClient.createTopics(newTopics).all().get();

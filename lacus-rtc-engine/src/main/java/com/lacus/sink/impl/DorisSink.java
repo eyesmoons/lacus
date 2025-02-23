@@ -1,6 +1,7 @@
 package com.lacus.sink.impl;
 
 import com.alibaba.fastjson2.JSONArray;
+import com.google.auto.service.AutoService;
 import com.google.common.collect.Maps;
 import com.lacus.function.DorisSinkFunction;
 import com.lacus.function.DorisStreamLoad;
@@ -30,6 +31,7 @@ import static com.lacus.constant.ConnectorContext.DORIS_SINK;
  * @author shengyu
  * @date 2024/4/30 14:44
  */
+@AutoService(BaseSink.class)
 public class DorisSink extends BaseSink {
     private static final long serialVersionUID = 1L;
 

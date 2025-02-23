@@ -122,7 +122,7 @@ public class OracleDataSourcePlugin extends AbstractDataSourcePlugin {
 
         // 密码
         definitions.put("password", ParamDefinitionDTO.builder()
-            .required(true)
+            .required(false)
             .inputType("password")
             .displayName("密码")
             .description("数据库密码")

@@ -58,20 +58,20 @@
 
 ### 三、技术栈
 
-| 技术             | 说明            | 版本           |
-|----------------|---------------|--------------|
-| `java`         | java          | 1.8          |
-| `springboot`   | Java web框架    | 2.7          |
-| `druid`        | 数据库连接池        | 1.2.8        |
-| `mybatis-plus` | 数据库框架         | 3.5.2        |
-| `kafka`        | 消息队列          | 3.6.0        |
-| `flink`        | flink流处理框架    | 1.16.2       |
-| `flink-cdc`    | cdc connector | 2.3.0        |
-| `hadoop`       | hadoop        | 3.3.6        |
-| `zookeeper`    | 分布式协调服务       | 3.9.1        |
+| 技术             | 说明            | 版本          |
+|----------------|---------------|-------------|
+| `java`         | java          | 1.8         |
+| `springboot`   | Java web框架    | 2.7         |
+| `druid`        | 数据库连接池        | 1.2.8       |
+| `mybatis-plus` | 数据库框架         | 3.5.2       |
+| `kafka`        | 消息队列          | 3.6.0       |
+| `flink`        | flink流处理框架    | 1.16.2      |
+| `flink-cdc`    | cdc connector | 2.3.0       |
+| `hadoop`       | hadoop        | 2.8.5       |
+| `zookeeper`    | 分布式协调服务       | 3.9.1       |
 | `spark`        | spark批处理框架    | 2.4.5, 3.4.2 |
-| `doris`        | MPP数据库        | 2.1.2        |
-| `redis`        | redis缓存       | 最新版本         |
+| `doris`        | MPP数据库        | 2.1.2       |
+| `redis`        | redis缓存       | 最新版本        |
 
 ### 四、快速开始
 
@@ -90,7 +90,7 @@ docker部署：git clone https://github.com/eyesmoons/lacus-docker
 #### 2. flink 资源准备
 - hdfs 中上传`flink 1.16.2 `所需的jar包，目录为：`/flink/libs`；
 - flink配置文件目录：`/flink/conf`；
-- flink 任务所需的 jar 包目录为：`/flink/jobs/flink-jobs.jar`，此 jar 包由`lacus-rtc-engine`项目打包而来
+- flink 任务所需的 jar 包目录为：`/flink/jobs/lacus-rtc-engine.jar`，此 jar 包由`lacus-rtc-engine`项目打包而来
 目录结构如下所示。
 
 **如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.16.2 所有资源及配置文件放到了我的百度网盘中了。**

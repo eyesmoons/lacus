@@ -237,7 +237,7 @@ public class DataCollectorJobUtil {
             sourceJobConf.setBootStrapServer(CommonPropertyUtils.getString(KAFKA_SERVERS));
             sourceJobConf.setTopic(buildTopic(job.getJobId()));
             sourceJobConf.setSourceName(metaDatasource.getDatasourceName());
-            sourceJobConf.setDatasourceType(metaDatasource.getType().toLowerCase());
+            sourceJobConf.setDatasourceType(metaDatasource.getType());
             ConnectionParam connectionParam = JSON.parseObject(metaDatasource.getConnectionParams(), ConnectionParam.class);
             sourceJobConf.setHostname(connectionParam.getHost());
             sourceJobConf.setPort(String.valueOf(connectionParam.getPort()));
