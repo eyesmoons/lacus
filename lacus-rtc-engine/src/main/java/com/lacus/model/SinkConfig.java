@@ -13,5 +13,4 @@ public class SinkConfig implements Serializable {
     private static final long serialVersionUID = 6624054873451223148L;
     private SinkDataSource sinkDataSource;
     private Map<String, StreamLoadProperty> streamLoadPropertyMap;
-    private DynamicETL dynamicETL;
 }

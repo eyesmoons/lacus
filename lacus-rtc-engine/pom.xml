@@ -374,14 +374,6 @@
             <scope>${scope.setting}</scope>
         </dependency>
 
-        <!-- 动态代码清洗 -->
-        <!--        <dependency>-->
-        <!--            <groupId>com.qtone</groupId>-->
-        <!--            <artifactId>dynamic-etl</artifactId>-->
-        <!--            <version>${dynamic-etl.version}</version>-->
-        <!--            <scope>${scope.setting}</scope>-->
-        <!--        </dependency>-->
-
         <dependency>
             <groupId>cn.hutool</groupId>
             <artifactId>hutool-all</artifactId>
