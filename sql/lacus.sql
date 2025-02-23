@@ -708,7 +708,7 @@ INSERT INTO lacus.sys_menu
 VALUES(2032, '消息中心', 0, 6, 'message', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'message', 1, '2024-05-02 17:53:08', 1, '2024-05-02 17:57:41', '', 0);
 INSERT INTO lacus.sys_menu
 (menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2033, '配置中心', 0, 3, 'config', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'system', 1, '2024-05-02 17:54:44', 1, '2024-05-02 17:56:49', '', 0);
+VALUES(2033, '资源中心', 0, 3, 'config', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'system', 1, '2024-05-02 17:54:44', 1, '2024-05-02 17:56:49', '', 0);
 INSERT INTO lacus.sys_menu
 (menu_id,menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
 VALUES (2035,'flink开发', 0, 3, 'flink', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'example', 1, '2024-12-08 10:53:47', 1, '2024-12-08 13:17:37', '', 0);
