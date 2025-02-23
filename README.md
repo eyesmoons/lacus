@@ -88,9 +88,9 @@ docker部署：git clone https://github.com/eyesmoons/lacus-docker
 - 安装 kafka
 - 安装 hadoop
 #### 2. flink 资源准备
-- hdfs 中上传`flink 1.16.2 `所需的jar包，目录为：`/flink/libs`；
-- flink配置文件目录：`/flink/conf`；
-- flink 任务所需的 jar 包目录为：`/flink/jobs/lacus-rtc-engine.jar`，此 jar 包由`lacus-rtc-engine`项目打包而来
+- hdfs 中上传`flink 1.16.2 `所需的jar包，目录为：`/rtc/jars`；
+- flink配置文件目录：`/rtc/conf`；
+- flink 任务所需的 jar 包目录为：`/rtc/engine/lacus-rtc-engine.jar`，此 jar 包由`lacus-rtc-engine`项目打包而来
 目录结构如下所示。
 
 **如果嫌麻烦，不想一个一个的去寻找相关 jar 包，我将 flink 1.16.2 所有资源及配置文件放到了我的百度网盘中了。**
