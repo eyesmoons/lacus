@@ -43,7 +43,7 @@ public class JobMonitorBusiness {
 
     private final static String appType = "Apache Flink";
 
-    private final String flinkRestPrefix = CommonPropertyUtils.getString(YARN_RESTAPI_ADDRESS);
+    private final String yarnRestPrefix = CommonPropertyUtils.getString(YARN_RESTAPI_ADDRESS);
 
     public List<ApplicationModel> listFlinkJob() {
         return YarnUtil.listYarnRunningJob(CommonPropertyUtils.getString(FLINK_HDFS_COLLECTOR_CONF_PATH), appType);
@@ -74,7 +74,7 @@ public class JobMonitorBusiness {
     }
 
     public Object flinkJobOverview(String applicationId) {
-        String sb = flinkRestPrefix + applicationId + "/jobs/overview";
+        String sb = yarnRestPrefix + applicationId + "/jobs/overview";
         return restUtil.getForObject(sb);
     }
 
@@ -102,7 +102,7 @@ public class JobMonitorBusiness {
 
     private FlinkJobDetail getFlinkJobDetail(String applicationId, String flinkJobId) {
         FlinkJobDetail jobDetail;
-        String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId;
+        String sb = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId;
         try {
             Object result = restUtil.getForObject(sb);
             while (ObjectUtils.isEmpty(result)) {
@@ -119,7 +119,7 @@ public class JobMonitorBusiness {
     public String getFlinkJobId(String applicationId) {
         String flinkJobId;
         try {
-            String sb = flinkRestPrefix + applicationId + "/jobs/overview";
+            String sb = yarnRestPrefix + applicationId + "/jobs/overview";
             JSONObject result = restUtil.getForJsonObject(sb);
             log.info("[{}：尝试获取flink job id]，请求地址：{}；返回信息：{}", applicationId, sb, JSON.toJSONString(result));
             JSONArray jobs = JSON.parseObject(JSON.toJSONString(result)).getJSONArray("jobs");
@@ -147,26 +147,26 @@ public class JobMonitorBusiness {
         if (Objects.isNull(flinkJobId)) {
             throw new RuntimeException("flinkJobId为null");
         }
-        String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId;
+        String sb = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId;
         Object forObject = restUtil.getForObject(sb);
         return JSONObject.parseObject(JSON.toJSONString(forObject), FlinkJobDetail.class);
     }
 
     public Object flinkJobCheckpoint(String applicationId) {
         String flinkJobId = getFlinkJobId(applicationId);
-        String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId + "/checkpoints";
+        String sb = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId + "/checkpoints";
         return restUtil.getForObject(sb);
     }
 
     public Object flinkJobCheckpointConfig(String applicationId) {
         String flinkJobId = getFlinkJobId(applicationId);
-        String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId + "/checkpoints/config";
+        String sb = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId + "/checkpoints/config";
         return restUtil.getForObject(sb);
     }
 
     public Object flinkJobExceptions(String applicationId, String flinkJobId) {
         StringBuilder sb = new StringBuilder();
-        sb.append(flinkRestPrefix)
+        sb.append(yarnRestPrefix)
                 .append(applicationId)
                 .append("/jobs/")
                 .append(flinkJobId)
@@ -182,7 +182,7 @@ public class JobMonitorBusiness {
         List<String> vertices = vertices(applicationId, flinkJobId);
         if (ObjectUtils.isNotEmpty(vertices)) {
             String ver = vertices.get(0);
-            String sb = flinkRestPrefix +
+            String sb = yarnRestPrefix +
                     applicationId +
                     "/jobs/" +
                     flinkJobId +
@@ -217,7 +217,7 @@ public class JobMonitorBusiness {
         if (ObjectUtils.isEmpty(vertices)) {
             throw new ApiException(ErrorCode.Internal.UNKNOWN_ERROR, "获取Flink监控信息失败");
         }
-        String baseUrl = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId + "/vertices/";
+        String baseUrl = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId + "/vertices/";
         JSONArray rsLists = new JSONArray();
         for (int i = 0; i < vertices.size(); i++) {
             StringBuilder sbtmp = new StringBuilder();
@@ -249,7 +249,7 @@ public class JobMonitorBusiness {
         if (ObjectUtils.isEmpty(vertices)) {
             throw new ApiException(ErrorCode.Internal.UNKNOWN_ERROR, "获取Flink监控信息失败");
         }
-        String baseUrl = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId + "/vertices/";
+        String baseUrl = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId + "/vertices/";
         JSONArray rsLists = new JSONArray();
         for (int i = 0; i < vertices.size(); i++) {
             StringBuilder sbtmp = new StringBuilder();
@@ -277,7 +277,7 @@ public class JobMonitorBusiness {
     }
 
     public Object jobManagerMemory(String applicationId) {
-        Object rs = restUtil.getForObject(flinkRestPrefix + applicationId + "/jobmanager/metrics?get=Status.JVM.Memory.NonHeap.Committed,Status.JVM.Memory.Heap.Used,Status.JVM.Memory.Heap.Committed,Status.JVM.Memory.Direct.MemoryUsed,Status.JVM.Memory.Mapped.MemoryUsed");
+        Object rs = restUtil.getForObject(yarnRestPrefix + applicationId + "/jobmanager/metrics?get=Status.JVM.Memory.NonHeap.Committed,Status.JVM.Memory.Heap.Used,Status.JVM.Memory.Heap.Committed,Status.JVM.Memory.Direct.MemoryUsed,Status.JVM.Memory.Mapped.MemoryUsed");
         JSONArray jsonArray = JSON.parseArray(JSON.toJSONString(rs));
         for (int i = 0; i < jsonArray.size(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
@@ -296,7 +296,7 @@ public class JobMonitorBusiness {
     }
 
     public Object taskManagerMemory(String applicationId) {
-        String sb = flinkRestPrefix + applicationId +
+        String sb = yarnRestPrefix + applicationId +
                 "/taskmanagers/metrics?get=Status.JVM.Memory.NonHeap.Committed,Status.JVM.Memory.Heap.Used,Status.JVM.Memory.Heap.Committed,Status.JVM.Memory.Direct.MemoryUsed,Status.JVM.Memory.Mapped.MemoryUsed";
         Object rs = restUtil.getForObject(sb);
         //单位换算
@@ -320,7 +320,7 @@ public class JobMonitorBusiness {
 
     private List<String> vertices(String applicationId, String flinkJobId) {
         List<String> verticeIdList = new ArrayList<>();
-        String sb = flinkRestPrefix + applicationId + "/jobs/" + flinkJobId;
+        String sb = yarnRestPrefix + applicationId + "/jobs/" + flinkJobId;
         Object forObject = restUtil.getForObject(sb);
         log.debug("rest返回信息:{}", JSON.toJSONString(forObject));
         JSONObject flinkDetail = JSON.parseObject(JSON.toJSONString(forObject));
@@ -333,7 +333,7 @@ public class JobMonitorBusiness {
     }
 
     private JSONArray verticesDetail(String applicationId, String flinkJobId, String verticeId) {
-        String sb = flinkRestPrefix +
+        String sb = yarnRestPrefix +
                 applicationId +
                 "/jobs/" +
                 flinkJobId +

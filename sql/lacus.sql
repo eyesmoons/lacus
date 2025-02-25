@@ -445,279 +445,101 @@ CREATE TABLE `sys_menu` (
 -- Records of sys_menu
 -- ----------------------------
 BEGIN;
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(1, '平台管理', 0, 4, 'system', NULL, '', 0, 1, 1, 1, 1, '', 'system', 0, '2022-05-21 08:30:54', 1, '2024-05-02 17:57:14', '系统管理目录', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2, '系统监控', 0, 5, 'monitor', NULL, '', 0, 1, 1, 1, 1, '', 'monitor', 0, '2022-05-21 08:30:54', 1, '2024-05-02 17:57:30', '系统监控目录', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(3, '系统工具', 0, 4, 'tool', NULL, '', 0, 1, 1, 1, 1, '', 'tool', 0, '2022-05-21 08:30:54', 1, '2023-04-24 21:51:30', '系统工具目录', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(4, '官网文档', 0, 5, 'https://juejin.cn/column/7159946528827080734', NULL, '', 1, 1, 1, 1, 1, '', 'guide', 0, '2022-05-21 08:30:54', 1, '2023-04-26 09:14:48', 'pandora官网地址', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(5, '用户管理', 1, 1, 'user', 'system/user/index', '', 0, 1, 2, 1, 1, 'system:user:list', 'user', 0, '2022-05-21 08:30:54', NULL, NULL, '用户管理菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(6, '角色管理', 1, 2, 'role', 'system/role/index', '', 0, 1, 2, 1, 1, 'system:role:list', 'email', 0, '2022-05-21 08:30:54', 1, '2023-09-04 10:58:41', '角色管理菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(7, '菜单管理', 1, 3, 'menu', 'system/menu/index', '', 0, 1, 2, 1, 1, 'system:menu:list', 'tree-table', 0, '2022-05-21 08:30:54', NULL, NULL, '菜单管理菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(8, '部门管理', 1, 4, 'dept', 'system/dept/index', '', 0, 1, 2, 1, 1, 'system:dept:list', 'tree', 0, '2022-05-21 08:30:54', NULL, NULL, '部门管理菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(9, '岗位管理', 1, 5, 'post', 'system/post/index', '', 0, 1, 2, 1, 1, 'system:post:list', 'post', 0, '2022-05-21 08:30:54', NULL, NULL, '岗位管理菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(10, '参数设置', 1, 7, 'config', 'system/config/index', '', 0, 1, 2, 1, 1, 'system:config:list', 'edit', 0, '2022-05-21 08:30:54', NULL, NULL, '参数设置菜单', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(11, '通知公告', 2032, 8, 'notice', 'system/notice/index', '', 0, 1, 2, 1, 1, 'system:notice:list', 'message', 0, '2022-05-21 08:30:54', 1, '2024-05-02 17:53:42', '通知公告菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(12, '日志管理', 2, 9, 'log', '', '', 0, 1, 1, 1, 1, '', 'log', 0, '2022-05-21 08:30:54', 1, '2024-05-02 17:52:06', '日志管理菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(13, '在线用户', 2, 1, 'online', 'monitor/online/index', '', 0, 1, 2, 1, 1, 'monitor:online:list', 'online', 0, '2022-05-21 08:30:54', NULL, NULL, '在线用户菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(14, '数据监控', 2, 3, 'druid', 'monitor/druid/index', '', 0, 1, 2, 1, 1, 'monitor:druid:list', 'druid', 0, '2022-05-21 08:30:54', NULL, NULL, '数据监控菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(15, '服务监控', 2, 4, 'server', 'monitor/server/index', '', 0, 1, 2, 1, 1, 'monitor:server:list', 'server', 0, '2022-05-21 08:30:54', NULL, NULL, '服务监控菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(16, '缓存监控', 2, 5, 'cache', 'monitor/cache/index', '', 0, 1, 2, 1, 1, 'monitor:cache:list', 'redis', 0, '2022-05-21 08:30:54', NULL, NULL, '缓存监控菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(17, '系统接口', 3, 3, 'swagger', 'tool/swagger/index', '', 0, 1, 2, 1, 1, 'tool:swagger:list', 'swagger', 0, '2022-05-21 08:30:54', NULL, NULL, '系统接口菜单', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(18, '操作日志', 12, 1, 'operlog', 'monitor/operlog/index', '', 0, 1, 2, 1, 1, 'monitor:operlog:list', 'form', 0, '2022-05-21 08:30:54', NULL, NULL, '操作日志菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(19, '登录日志', 12, 2, 'logininfor', 'monitor/logininfor/index', '', 0, 1, 2, 1, 1, 'monitor:logininfor:list', 'logininfor', 0, '2022-05-21 08:30:54', NULL, NULL, '登录日志菜单', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(20, '用户查询', 5, 1, '', '', '', 0, 1, 3, 1, 1, 'system:user:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(21, '用户新增', 5, 2, '', '', '', 0, 1, 3, 1, 1, 'system:user:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(22, '用户修改', 5, 3, '', '', '', 0, 1, 3, 1, 1, 'system:user:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(23, '用户删除', 5, 4, '', '', '', 0, 1, 3, 1, 1, 'system:user:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(24, '用户导出', 5, 5, '', '', '', 0, 1, 3, 1, 1, 'system:user:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(25, '用户导入', 5, 6, '', '', '', 0, 1, 3, 1, 1, 'system:user:import', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(26, '重置密码', 5, 7, '', '', '', 0, 1, 3, 1, 1, 'system:user:resetPwd', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(27, '角色查询', 6, 1, '', '', '', 0, 1, 3, 1, 1, 'system:role:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(28, '角色新增', 6, 2, '', '', '', 0, 1, 3, 1, 1, 'system:role:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(29, '角色修改', 6, 3, '', '', '', 0, 1, 3, 1, 1, 'system:role:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(30, '角色删除', 6, 4, '', '', '', 0, 1, 3, 1, 1, 'system:role:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(31, '角色导出', 6, 5, '', '', '', 0, 1, 3, 1, 1, 'system:role:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(32, '菜单查询', 7, 1, '', '', '', 0, 1, 3, 1, 1, 'system:menu:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(33, '菜单新增', 7, 2, '', '', '', 0, 1, 3, 1, 1, 'system:menu:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(34, '菜单修改', 7, 3, '', '', '', 0, 1, 3, 1, 1, 'system:menu:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(35, '菜单删除', 7, 4, '', '', '', 0, 1, 3, 1, 1, 'system:menu:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(36, '部门查询', 8, 1, '', '', '', 0, 1, 3, 1, 1, 'system:dept:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(37, '部门新增', 8, 2, '', '', '', 0, 1, 3, 1, 1, 'system:dept:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(38, '部门修改', 8, 3, '', '', '', 0, 1, 3, 1, 1, 'system:dept:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(39, '部门删除', 8, 4, '', '', '', 0, 1, 3, 1, 1, 'system:dept:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(40, '岗位查询', 9, 1, '', '', '', 0, 1, 3, 1, 1, 'system:post:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(41, '岗位新增', 9, 2, '', '', '', 0, 1, 3, 1, 1, 'system:post:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(42, '岗位修改', 9, 3, '', '', '', 0, 1, 3, 1, 1, 'system:post:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(43, '岗位删除', 9, 4, '', '', '', 0, 1, 3, 1, 1, 'system:post:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(44, '岗位导出', 9, 5, '', '', '', 0, 1, 3, 1, 1, 'system:post:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(45, '参数查询', 10, 1, '#', '', '', 0, 1, 3, 1, 1, 'system:config:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(46, '参数新增', 10, 2, '#', '', '', 0, 1, 3, 1, 1, 'system:config:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(47, '参数修改', 10, 3, '#', '', '', 0, 1, 3, 1, 1, 'system:config:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(48, '参数删除', 10, 4, '#', '', '', 0, 1, 3, 1, 1, 'system:config:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(49, '参数导出', 10, 5, '#', '', '', 0, 1, 3, 1, 1, 'system:config:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(50, '公告查询', 11, 1, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(51, '公告新增', 11, 2, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(52, '公告修改', 11, 3, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(53, '公告删除', 11, 4, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(54, '操作查询', 18, 1, '#', '', '', 0, 1, 3, 1, 1, 'monitor:operlog:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(55, '操作删除', 18, 2, '#', '', '', 0, 1, 3, 1, 1, 'monitor:operlog:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(56, '日志导出', 18, 4, '#', '', '', 0, 1, 3, 1, 1, 'monitor:operlog:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(57, '登录查询', 19, 1, '#', '', '', 0, 1, 3, 1, 1, 'monitor:logininfor:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(58, '登录删除', 19, 2, '#', '', '', 0, 1, 3, 1, 1, 'monitor:logininfor:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(59, '日志导出', 19, 3, '#', '', '', 0, 1, 3, 1, 1, 'monitor:logininfor:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(60, '在线查询', 13, 1, '#', '', '', 0, 1, 3, 1, 1, 'monitor:online:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(61, '批量强退', 13, 2, '#', '', '', 0, 1, 3, 1, 1, 'monitor:online:batchLogout', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(62, '单条强退', 13, 3, '#', '', '', 0, 1, 3, 1, 1, 'monitor:online:forceLogout', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2009, '元数据', 0, 1, 'metadata', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'redis', 1, '2023-04-20 18:11:10', 1, '2024-05-02 17:56:30', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2010, '数据源定义', 2009, 1, 'datasource', 'metadata/datasource/index', NULL, 0, 0, 2, 1, 1, 'metadata:datasource:list', 'dict', 1, '2023-04-20 18:13:53', 1, '2024-03-23 19:58:29', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2011, '数据表查询', 2009, 2, 'table', 'metadata/table/index', NULL, 0, 0, 2, 1, 1, 'metadata:table:list', 'table', 1, '2023-04-24 17:58:27', 1, '2024-03-23 19:58:36', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2012, '数据采集', 0, 2, 'dataCollect', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'example', 1, '2023-05-10 17:36:09', 1, '2024-05-02 17:56:37', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2013, '任务分组', 2012, 1, 'catalog', 'dataCollect/catalog/index', NULL, 0, 0, 2, 1, 1, 'dataCollect:catalog:list', 'tool', 1, '2023-05-10 17:43:08', 1, '2024-03-04 14:48:39', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2014, '任务定义', 2012, 2, 'job', 'dataCollect/job/index', NULL, 0, 0, 2, 1, 1, 'dataCollect:job:list', 'select', 1, '2023-05-11 18:14:36', 1, '2024-02-26 20:25:02', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2015, '接口文档', 0, 7, 'tool', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'tool', 1, '2023-07-06 16:27:09', 1, '2024-05-02 17:57:45', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2016, '系统接口', 2015, 1, 'swagger', 'tool/swagger/index', NULL, 0, 1, 2, 1, 1, 'tool:swagger:list', 'swagger', 1, '2023-07-06 16:28:21', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2017, '新增数据源', 2010, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:datasource:add', 'build', 1, '2024-02-21 21:42:56', 1, '2024-02-21 21:46:00', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2018, '编辑数据源', 2010, 2, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:datasource:edit', 'log', 1, '2024-02-21 21:47:12', 1, '2024-03-23 19:59:18', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2019, '删除数据源', 2010, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:datasource:remove', 'checkbox', 1, '2024-02-21 21:48:31', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2020, '表详情', 2011, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:table:query', 'eye-open', 1, '2024-02-21 21:49:57', 1, '2024-03-23 19:59:31', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2021, '新增分组', 2013, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:catalog:add', 'button', 1, '2024-02-21 21:51:18', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2022, '编辑分组', 2013, 2, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:catalog:edit', 'checkbox', 1, '2024-02-21 21:51:37', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2023, '删除分组', 2013, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:catalog:remove', 'checkbox', 1, '2024-02-21 21:51:56', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2024, '新建任务', 2014, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:job:add', '#', 1, '2024-02-21 21:53:08', 1, '2024-03-03 12:36:34', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2025, '编辑任务', 2014, 2, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:job:edit', '#', 1, '2024-02-21 21:53:25', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2026, '删除任务', 2014, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:job:remove', '#', 1, '2024-02-21 21:53:48', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2027, '任务详情', 2014, 4, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:job:query', '#', 1, '2024-02-21 21:54:04', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2028, '任务实例', 2012, 3, 'jobInstance', 'dataCollect/instance/index', NULL, 0, 0, 2, 1, 1, 'dataCollect:instance:list', 'color', 1, '2024-02-29 21:58:39', 1, '2024-02-29 22:02:37', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2029, '任务监控', 2028, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'dataCollect:instance:query', 'button', 1, '2024-03-03 12:32:11', NULL, NULL, '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2030, '数据源类型', 2009, 0, 'datasourceType', 'metadata/datasourceType/index', '', 0, 0, 2, 1, 1, 'metadata:datasourceType:list', 'chart', 1, '2024-03-04 11:24:33', 1, '2024-03-23 19:55:23', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2031, '环境管理', 2033, 1, 'env', 'system/env/index', NULL, 0, 1, 2, 1, 1, 'system:env:list', 'skill', 1, '2024-05-02 17:11:53', 1, '2024-05-02 17:54:56', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2039, '资源管理', 2033, 1, 'resource', 'system/resource/index', NULL, 0, 1, 2, 1, 1, 'system:resource:list', 'skill', 1, '2024-05-02 17:11:53', 1, '2024-05-02 17:54:56', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2032, '消息中心', 0, 6, 'message', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'message', 1, '2024-05-02 17:53:08', 1, '2024-05-02 17:57:41', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id, menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES(2033, '资源中心', 0, 3, 'config', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'system', 1, '2024-05-02 17:54:44', 1, '2024-05-02 17:56:49', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id,menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES (2035,'flink开发', 0, 3, 'flink', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'example', 1, '2024-12-08 10:53:47', 1, '2024-12-08 13:17:37', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id,menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES (2036,'任务定义', 2035, 1, 'flink', 'flink/job/index', NULL, 0, 0, 2, 1, 1, 'flink:job:list', 'cascader', 1, '2024-12-08 11:51:52', 1, '2024-12-08 13:17:22', '', 0);
-INSERT INTO lacus.sys_menu
-(menu_id,menu_name, parent_id, order_num, `path`, component, query, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, updater_id, update_time, remark, deleted)
-VALUES (2038,'任务实例', 2035, 2, 'instance', 'flink/instance/index', NULL, 0, 0, 2, 1, 1, 'flink:job:list', 'button', 1, '2024-12-17 21:14:41', 1, '2024-12-17 21:18:13', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (1, '平台管理', 0, 6, 'system', NULL, '', 0, 1, 1, 1, 1, '', 'system', 0, '2022-05-21 08:30:54', 1, '2025-01-01 19:27:42', '系统管理目录', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2, '系统监控', 0, 8, 'monitor', NULL, '', 0, 1, 1, 1, 1, '', 'monitor', 0, '2022-05-21 08:30:54', 1, '2025-01-01 19:28:12', '系统监控目录', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (3, '系统工具', 0, 4, 'tool', NULL, '', 0, 1, 1, 1, 1, '', 'tool', 0, '2022-05-21 08:30:54', 1, '2023-04-24 21:51:30', '系统工具目录', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (4, '官网文档', 0, 5, 'https://juejin.cn/column/7159946528827080734', NULL, '', 1, 1, 1, 1, 1, '', 'guide', 0, '2022-05-21 08:30:54', 1, '2023-04-26 09:14:48', 'pandora官网地址', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (5, '用户管理', 1, 1, 'user', 'system/user/index', '', 0, 1, 2, 1, 1, 'system:user:list', 'user', 0, '2022-05-21 08:30:54', NULL, NULL, '用户管理菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (6, '角色管理', 1, 2, 'role', 'system/role/index', '', 0, 1, 2, 1, 1, 'system:role:list', 'email', 0, '2022-05-21 08:30:54', 1, '2023-09-04 10:58:41', '角色管理菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (7, '菜单管理', 1, 3, 'menu', 'system/menu/index', '', 0, 1, 2, 1, 1, 'system:menu:list', 'tree-table', 0, '2022-05-21 08:30:54', NULL, NULL, '菜单管理菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (8, '部门管理', 1, 4, 'dept', 'system/dept/index', '', 0, 1, 2, 1, 1, 'system:dept:list', 'tree', 0, '2022-05-21 08:30:54', NULL, NULL, '部门管理菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (9, '岗位管理', 1, 5, 'post', 'system/post/index', '', 0, 1, 2, 1, 1, 'system:post:list', 'post', 0, '2022-05-21 08:30:54', NULL, NULL, '岗位管理菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (10, '参数设置', 1, 7, 'config', 'system/config/index', '', 0, 1, 2, 1, 1, 'system:config:list', 'edit', 0, '2022-05-21 08:30:54', NULL, NULL, '参数设置菜单', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (11, '通知公告', 2032, 8, 'notice', 'system/notice/index', '', 0, 1, 2, 1, 1, 'system:notice:list', 'message', 0, '2022-05-21 08:30:54', 1, '2024-05-02 17:53:42', '通知公告菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (12, '日志管理', 2, 9, 'log', '', '', 0, 1, 1, 1, 1, '', 'log', 0, '2022-05-21 08:30:54', 1, '2024-05-02 17:52:06', '日志管理菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (13, '在线用户', 2, 1, 'online', 'monitor/online/index', '', 0, 1, 2, 1, 1, 'monitor:online:list', 'online', 0, '2022-05-21 08:30:54', NULL, NULL, '在线用户菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (14, '数据监控', 2, 3, 'druid', 'monitor/druid/index', '', 0, 1, 2, 1, 1, 'monitor:druid:list', 'druid', 0, '2022-05-21 08:30:54', NULL, NULL, '数据监控菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (15, '服务监控', 2, 4, 'server', 'monitor/server/index', '', 0, 1, 2, 1, 1, 'monitor:server:list', 'server', 0, '2022-05-21 08:30:54', NULL, NULL, '服务监控菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (16, '缓存监控', 2, 5, 'cache', 'monitor/cache/index', '', 0, 1, 2, 1, 1, 'monitor:cache:list', 'redis', 0, '2022-05-21 08:30:54', NULL, NULL, '缓存监控菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (17, '系统接口', 3, 3, 'swagger', 'tool/swagger/index', '', 0, 1, 2, 1, 1, 'tool:swagger:list', 'swagger', 0, '2022-05-21 08:30:54', NULL, NULL, '系统接口菜单', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (18, '操作日志', 12, 1, 'operlog', 'monitor/operlog/index', '', 0, 1, 2, 1, 1, 'monitor:operlog:list', 'form', 0, '2022-05-21 08:30:54', NULL, NULL, '操作日志菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (19, '登录日志', 12, 2, 'logininfor', 'monitor/logininfor/index', '', 0, 1, 2, 1, 1, 'monitor:logininfor:list', 'logininfor', 0, '2022-05-21 08:30:54', NULL, NULL, '登录日志菜单', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (20, '用户查询', 5, 1, '', '', '', 0, 1, 3, 1, 1, 'system:user:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (21, '用户新增', 5, 2, '', '', '', 0, 1, 3, 1, 1, 'system:user:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (22, '用户修改', 5, 3, '', '', '', 0, 1, 3, 1, 1, 'system:user:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (23, '用户删除', 5, 4, '', '', '', 0, 1, 3, 1, 1, 'system:user:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (24, '用户导出', 5, 5, '', '', '', 0, 1, 3, 1, 1, 'system:user:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (25, '用户导入', 5, 6, '', '', '', 0, 1, 3, 1, 1, 'system:user:import', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (26, '重置密码', 5, 7, '', '', '', 0, 1, 3, 1, 1, 'system:user:resetPwd', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (27, '角色查询', 6, 1, '', '', '', 0, 1, 3, 1, 1, 'system:role:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (28, '角色新增', 6, 2, '', '', '', 0, 1, 3, 1, 1, 'system:role:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (29, '角色修改', 6, 3, '', '', '', 0, 1, 3, 1, 1, 'system:role:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (30, '角色删除', 6, 4, '', '', '', 0, 1, 3, 1, 1, 'system:role:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (31, '角色导出', 6, 5, '', '', '', 0, 1, 3, 1, 1, 'system:role:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (32, '菜单查询', 7, 1, '', '', '', 0, 1, 3, 1, 1, 'system:menu:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (33, '菜单新增', 7, 2, '', '', '', 0, 1, 3, 1, 1, 'system:menu:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (34, '菜单修改', 7, 3, '', '', '', 0, 1, 3, 1, 1, 'system:menu:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (35, '菜单删除', 7, 4, '', '', '', 0, 1, 3, 1, 1, 'system:menu:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (36, '部门查询', 8, 1, '', '', '', 0, 1, 3, 1, 1, 'system:dept:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (37, '部门新增', 8, 2, '', '', '', 0, 1, 3, 1, 1, 'system:dept:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (38, '部门修改', 8, 3, '', '', '', 0, 1, 3, 1, 1, 'system:dept:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (39, '部门删除', 8, 4, '', '', '', 0, 1, 3, 1, 1, 'system:dept:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (40, '岗位查询', 9, 1, '', '', '', 0, 1, 3, 1, 1, 'system:post:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (41, '岗位新增', 9, 2, '', '', '', 0, 1, 3, 1, 1, 'system:post:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (42, '岗位修改', 9, 3, '', '', '', 0, 1, 3, 1, 1, 'system:post:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (43, '岗位删除', 9, 4, '', '', '', 0, 1, 3, 1, 1, 'system:post:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (44, '岗位导出', 9, 5, '', '', '', 0, 1, 3, 1, 1, 'system:post:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (45, '参数查询', 10, 1, '#', '', '', 0, 1, 3, 1, 1, 'system:config:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (46, '参数新增', 10, 2, '#', '', '', 0, 1, 3, 1, 1, 'system:config:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (47, '参数修改', 10, 3, '#', '', '', 0, 1, 3, 1, 1, 'system:config:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (48, '参数删除', 10, 4, '#', '', '', 0, 1, 3, 1, 1, 'system:config:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (49, '参数导出', 10, 5, '#', '', '', 0, 1, 3, 1, 1, 'system:config:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 1);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (50, '公告查询', 11, 1, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (51, '公告新增', 11, 2, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:add', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (52, '公告修改', 11, 3, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:edit', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (53, '公告删除', 11, 4, '#', '', '', 0, 1, 3, 1, 1, 'system:notice:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (54, '操作查询', 18, 1, '#', '', '', 0, 1, 3, 1, 1, 'monitor:operlog:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (55, '操作删除', 18, 2, '#', '', '', 0, 1, 3, 1, 1, 'monitor:operlog:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (56, '日志导出', 18, 4, '#', '', '', 0, 1, 3, 1, 1, 'monitor:operlog:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (57, '登录查询', 19, 1, '#', '', '', 0, 1, 3, 1, 1, 'monitor:logininfor:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (58, '登录删除', 19, 2, '#', '', '', 0, 1, 3, 1, 1, 'monitor:logininfor:remove', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (59, '日志导出', 19, 3, '#', '', '', 0, 1, 3, 1, 1, 'monitor:logininfor:export', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (60, '在线查询', 13, 1, '#', '', '', 0, 1, 3, 1, 1, 'monitor:online:query', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (61, '批量强退', 13, 2, '#', '', '', 0, 1, 3, 1, 1, 'monitor:online:batchLogout', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (62, '单条强退', 13, 3, '#', '', '', 0, 1, 3, 1, 1, 'monitor:online:forceLogout', '#', 0, '2022-05-21 08:30:54', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2009, '元数据', 0, 1, 'metadata', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'redis', 1, '2023-04-20 18:11:10', 1, '2024-05-02 17:56:30', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2010, '数据源定义', 2009, 1, 'datasource', 'metadata/datasource/index', NULL, 0, 0, 2, 1, 1, 'metadata:datasource:list', 'dict', 1, '2023-04-20 18:13:53', 1, '2024-03-23 19:58:29', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2011, '数据表查询', 2009, 2, 'table', 'metadata/table/index', NULL, 0, 0, 2, 1, 1, 'metadata:table:list', 'table', 1, '2023-04-24 17:58:27', 1, '2024-03-23 19:58:36', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2012, '数据采集', 0, 2, 'datasync', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'example', 1, '2023-05-10 17:36:09', 1, '2024-05-02 17:56:37', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2013, '任务分组', 2012, 1, 'catalog', 'datasync/catalog/index', NULL, 0, 0, 2, 1, 1, 'datasync:catalog:list', 'tool', 1, '2023-05-10 17:43:08', 1, '2024-03-04 14:48:39', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2014, '任务定义', 2012, 2, 'job', 'datasync/job/index', NULL, 0, 0, 2, 1, 1, 'datasync:job:list', 'select', 1, '2023-05-11 18:14:36', 1, '2024-02-26 20:25:02', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2015, '接口文档', 0, 9, 'tool', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'tool', 1, '2023-07-06 16:27:09', 1, '2025-01-01 19:28:16', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2016, '系统接口', 2015, 1, 'swagger', 'tool/swagger/index', NULL, 0, 1, 2, 1, 1, 'tool:swagger:list', 'swagger', 1, '2023-07-06 16:28:21', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2017, '新增数据源', 2010, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:datasource:add', 'build', 1, '2024-02-21 21:42:56', 1, '2024-02-21 21:46:00', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2018, '编辑数据源', 2010, 2, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:datasource:edit', 'log', 1, '2024-02-21 21:47:12', 1, '2024-03-23 19:59:18', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2019, '删除数据源', 2010, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:datasource:remove', 'checkbox', 1, '2024-02-21 21:48:31', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2020, '表详情', 2011, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'metadata:table:query', 'eye-open', 1, '2024-02-21 21:49:57', 1, '2024-03-23 19:59:31', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2021, '新增分组', 2013, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:catalog:add', 'button', 1, '2024-02-21 21:51:18', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2022, '编辑分组', 2013, 2, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:catalog:edit', 'checkbox', 1, '2024-02-21 21:51:37', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2023, '删除分组', 2013, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:catalog:remove', 'checkbox', 1, '2024-02-21 21:51:56', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2024, '新建任务', 2014, 1, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:job:add', '#', 1, '2024-02-21 21:53:08', 1, '2024-03-03 12:36:34', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2025, '编辑任务', 2014, 2, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:job:edit', '#', 1, '2024-02-21 21:53:25', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2026, '删除任务', 2014, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:job:remove', '#', 1, '2024-02-21 21:53:48', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2027, '任务详情', 2014, 4, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:job:query', '#', 1, '2024-02-21 21:54:04', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2028, '任务实例', 2012, 3, 'jobInstance', 'datasync/instance/index', NULL, 0, 0, 2, 1, 1, 'datasync:instance:list', 'color', 1, '2024-02-29 21:58:39', 1, '2024-02-29 22:02:37', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2029, '任务监控', 2028, 3, '', NULL, NULL, 0, 0, 3, 0, 1, 'datasync:instance:query', 'button', 1, '2024-03-03 12:32:11', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2030, '数据源类型', 2009, 0, 'datasourceType', 'metadata/datasourceType/index', '', 0, 0, 2, 1, 1, 'metadata:datasourceType:list', 'chart', 1, '2024-03-04 11:24:33', 1, '2024-03-23 19:55:23', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2031, '环境管理', 2033, 1, 'env', 'system/env/index', NULL, 0, 1, 2, 1, 1, 'system:env:list', 'skill', 1, '2024-05-02 17:11:53', 1, '2024-05-02 17:54:56', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2032, '消息中心', 0, 7, 'message', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'message', 1, '2024-05-02 17:53:08', 1, '2025-01-01 19:28:07', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2033, '资源中心', 0, 5, 'config', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'system', 1, '2024-05-02 17:54:44', 1, '2025-02-15 18:19:19', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2035, 'flink开发', 0, 3, 'flink', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'example', 1, '2024-12-08 10:53:47', 1, '2024-12-08 13:17:37', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2036, '任务定义', 2035, 1, 'flink', 'flink/job/index', NULL, 0, 0, 2, 1, 1, 'flink:job:list', 'cascader', 1, '2024-12-08 11:51:52', 1, '2024-12-08 13:17:22', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2038, '任务实例', 2035, 2, 'instance', 'flink/instance/index', NULL, 0, 0, 2, 1, 1, 'flink:job:list', 'button', 1, '2024-12-17 21:14:41', 1, '2024-12-17 21:18:13', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2039, '资源管理', 2033, 1, 'resource', 'system/resource/index', NULL, 0, 1, 2, 1, 1, 'system:resource:list', 'skill', 1, '2024-05-02 17:11:53', 1, '2024-05-02 17:54:56', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2040, 'spark开发', 0, 4, 'spark', NULL, NULL, 0, 0, 1, 1, 1, NULL, 'email', 1, '2025-01-01 17:56:40', 1, '2025-01-01 19:27:18', '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2041, '任务定义', 2040, 1, 'spark', 'spark/job/index', NULL, 0, 0, 2, 1, 1, NULL, 'button', 1, '2025-01-01 17:58:33', NULL, NULL, '', 0);
+INSERT INTO `sys_menu` (`menu_id`, `menu_name`, `parent_id`, `order_num`, `path`, `component`, `query`, `is_external`, `is_cache`, `menu_type`, `is_visible`, `status`, `perms`, `icon`, `creator_id`, `create_time`, `updater_id`, `update_time`, `remark`, `deleted`) VALUES (2042, '任务实例', 2040, 2, 'instance', 'spark/instance/index', NULL, 0, 0, 2, 1, 1, NULL, 'checkbox', 1, '2025-01-01 18:04:37', 1, '2025-01-01 18:04:52', '', 0);
+COMMIT;
 
 -- ----------------------------
 -- Table structure for sys_notice

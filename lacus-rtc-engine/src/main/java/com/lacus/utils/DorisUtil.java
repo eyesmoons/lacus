@@ -21,7 +21,7 @@ public class DorisUtil {
                 dataSource.getHostPort(),
                 dataSource.getDbName(),
                 dataSource.getUserName(),
-                PasswordUtil.decryptPwd(dataSource.getPassword()),
+                dataSource.getPassword(),
                 "show backends");
 
         for (JSONObject be : backends) {

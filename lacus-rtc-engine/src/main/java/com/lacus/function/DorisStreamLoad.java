@@ -43,7 +43,7 @@ public class DorisStreamLoad implements Serializable {
 
     public List<Header> buildHeaders() {
         List<Header> headers = new ArrayList<>();
-        String authEncoding = Base64.getEncoder().encodeToString(String.format("%s:%s", user, PasswordUtil.decryptPwd(passwd)).getBytes(StandardCharsets.UTF_8));
+        String authEncoding = Base64.getEncoder().encodeToString(String.format("%s:%s", user, passwd).getBytes(StandardCharsets.UTF_8));
         headers.add(new BasicHeader("Authorization", "Basic " + authEncoding));
         headers.add(new BasicHeader("Expect", "100-continue"));
         // 自定义参数
