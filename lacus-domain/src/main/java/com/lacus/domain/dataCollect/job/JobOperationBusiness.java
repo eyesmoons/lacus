@@ -87,7 +87,8 @@ public class JobOperationBusiness {
                     CommonPropertyUtils.getString(FLINK_HDFS_DIST_JAR_PATH));
 
             if (Objects.nonNull(applicationId)) {
-                instanceService.updateInstance(instance, applicationId);
+                String flinkJobId = monitorService.getFlinkJobIdWithRetry(applicationId);
+                instanceService.updateInstance(instance, applicationId, flinkJobId);
             } else {
                 log.error("任务提交失败");
             }

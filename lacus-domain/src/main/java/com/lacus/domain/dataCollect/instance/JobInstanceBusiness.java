@@ -46,13 +46,14 @@ public class JobInstanceBusiness {
     @Autowired
     private DataCollectorJobUtil dataCollectorJobUtil;
 
-    public void updateInstance(DataSyncJobInstanceEntity instance, String applicationId) {
+    public void updateInstance(DataSyncJobInstanceEntity instance, String applicationId, String flinkJobId) {
         try {
             if (Objects.isNull(applicationId)) {
                 instance.setFinishedTime(new Date());
                 instance.setStatus(FlinkStatusEnum.STOP.getStatus());
                 dataSyncJobInstanceService.saveOrUpdate(instance);
             }
+            instance.setFlinkJobId(flinkJobId);
             instance.setApplicationId(applicationId);
             FlinkJobDetail jobDetail = monitorService.flinkJobDetail(applicationId);
             instance.setSubmitTime(DateUtils.getDate(jobDetail.getStartTime()));
