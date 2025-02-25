@@ -67,8 +67,6 @@ public class Constants {
     public static final String DATA_BASEDIR_PATH = "data.basedir.path";
     public static final String RESOURCE_VIEW_SUFFIXES = "resource.view.suffixs";
     public static final String RESOURCE_VIEW_SUFFIXES_DEFAULT_VALUE = "txt,log,sh,bat,conf,cfg,py,java,sql,xml,hql,properties,json,yml,yaml,ini,js,csv,md";
-    public static final String SUDO_ENABLE = "sudo.enable";
-    public static final String RESOURCE_STORAGE_TYPE = "resource.storage.type";
     public static final String COMMA = ",";
     public static final String COLON = ":";
     public static final String DOUBLE_SLASH = "//";
@@ -76,7 +74,6 @@ public class Constants {
     public static final int HTTP_CONNECTION_REQUEST_TIMEOUT = 60 * 1000;
     public static final int SOCKET_TIMEOUT = 60 * 1000;
     public static final String UTF_8 = "UTF-8";
-    public static final String JAR = "jar";
     public static final String KERBEROS = "kerberos";
     public static final String JAVA_SECURITY_KRB5_CONF = "java.security.krb5.conf";
     public static final String JAVA_SECURITY_KRB5_CONF_PATH = "java.security.krb5.conf.path";
@@ -85,7 +82,6 @@ public class Constants {
     public static final String LOGIN_USER_KEY_TAB_USERNAME = "login.user.keytab.username";
     public static final String LOGIN_USER_KEY_TAB_PATH = "login.user.keytab.path";
     public static final int MAX_FILE_SIZE = 1024 * 1024 * 1024;
-    public static final String UDF = "UDF";
 
     public static final int RESOURCE_FULL_NAME_MAX_LENGTH = 128;
     public static final String PARAMETER_DATETIME = "system.datetime";

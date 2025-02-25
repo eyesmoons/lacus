@@ -15,7 +15,6 @@ import static com.lacus.common.constant.Constants.JAVA_SECURITY_KRB5_CONF_PATH;
 import static com.lacus.common.constant.Constants.KERBEROS;
 import static com.lacus.common.constant.Constants.LOGIN_USER_KEY_TAB_PATH;
 import static com.lacus.common.constant.Constants.LOGIN_USER_KEY_TAB_USERNAME;
-import static com.lacus.common.constant.Constants.RESOURCE_STORAGE_TYPE;
 
 /**
  * common utils
@@ -33,10 +32,7 @@ public class CommonUtils {
      * @return true if upload resource is HDFS and kerberos startup
      */
     public static boolean getKerberosStartupState() {
-        String resUploadStartupType = CommonPropertyUtils.getUpperCaseString(RESOURCE_STORAGE_TYPE);
-        ResUploadType resUploadType = ResUploadType.valueOf(resUploadStartupType);
-        Boolean kerberosStartupState = CommonPropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
-        return resUploadType == ResUploadType.HDFS && kerberosStartupState;
+        return CommonPropertyUtils.getBoolean(HADOOP_SECURITY_AUTHENTICATION_STARTUP_STATE, false);
     }
 
     /**

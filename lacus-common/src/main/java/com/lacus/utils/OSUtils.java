@@ -14,10 +14,12 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.management.ManagementFactory;
 import java.lang.management.RuntimeMXBean;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.StringTokenizer;
 import java.util.regex.Pattern;
-
-import static com.lacus.common.constant.Constants.SUDO_ENABLE;
 
 @Slf4j
 @UtilityClass
@@ -274,24 +276,6 @@ public class OSUtils {
         }
 
         return null;
-    }
-
-    /**
-     * get sudo command
-     *
-     * @param tenantCode tenantCode
-     * @param command    command
-     * @return result of sudo execute command
-     */
-    public static String getSudoCmd(String tenantCode, String command) {
-        if (!isSudoEnable() || StringUtils.isEmpty(tenantCode)) {
-            return command;
-        }
-        return String.format("sudo -u %s %s", tenantCode, command);
-    }
-
-    public static boolean isSudoEnable() {
-        return CommonPropertyUtils.getBoolean(SUDO_ENABLE, true);
     }
 
     /**
