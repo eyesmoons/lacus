@@ -112,4 +112,8 @@ public class Constants {
     public static final long DEFAULT_SUBMIT_TIMEOUT_MS = 300000L;
     public static final String SPARK_LOG_PATH = "spark.log.path";
     public static final String SPARK_SQL_FILE_DIR = "spark.sql.file.dir";
+
+    public static final String PAGE_NUM = "pageNum";
+
+    public static final String PAGE_SIZE = "pageSize";
 }

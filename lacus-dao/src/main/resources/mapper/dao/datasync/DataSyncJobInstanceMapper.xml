@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.lacus.dao.dataCollect.mapper.DataSyncJobInstanceMapper">
+<mapper namespace="com.lacus.dao.rtc.mapper.DataSyncJobInstanceMapper">
 
-    <resultMap id="jobInstanceMap" type="com.lacus.dao.dataCollect.entity.DataSyncJobInstanceEntity">
+    <resultMap id="jobInstanceMap" type="com.lacus.dao.rtc.entity.DataSyncJobInstanceEntity">
         <result column="instance_id" property="instanceId"/>
         <result column="job_id" property="jobId"/>
         <result column="application_id" property="applicationId"/>

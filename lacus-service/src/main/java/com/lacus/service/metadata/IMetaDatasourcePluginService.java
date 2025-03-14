@@ -2,12 +2,12 @@ package com.lacus.service.metadata;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.lacus.dao.entity.MetaDatasourcePlugin;
+import com.lacus.dao.metadata.entity.MetaDatasourcePlugin;
 
 import java.util.List;
 
 public interface IMetaDatasourcePluginService extends IService<MetaDatasourcePlugin> {
-    
+
     /**
      * 分页查询数据源插件
      *
@@ -34,4 +34,4 @@ public interface IMetaDatasourcePluginService extends IService<MetaDatasourcePlu
      * @return 数据源插件
      */
     MetaDatasourcePlugin getPluginByName(String name);
-} 
+}

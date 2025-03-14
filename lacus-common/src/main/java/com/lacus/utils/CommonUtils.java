@@ -1,6 +1,5 @@
 package com.lacus.utils;
 
-import com.lacus.enums.ResUploadType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.hadoop.conf.Configuration;

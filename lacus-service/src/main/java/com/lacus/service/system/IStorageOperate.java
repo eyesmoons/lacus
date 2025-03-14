@@ -1,7 +1,6 @@
 package com.lacus.service.system;
 
 import com.lacus.dao.system.entity.StorageEntity;
-import com.lacus.enums.ResUploadType;
 import com.lacus.enums.ResourceType;
 
 import java.io.IOException;

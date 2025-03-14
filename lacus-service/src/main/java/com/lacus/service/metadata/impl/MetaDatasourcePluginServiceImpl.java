@@ -3,8 +3,8 @@ package com.lacus.service.metadata.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.lacus.dao.entity.MetaDatasourcePlugin;
-import com.lacus.dao.mapper.MetaDatasourcePluginMapper;
+import com.lacus.dao.metadata.entity.MetaDatasourcePlugin;
+import com.lacus.dao.metadata.mapper.MetaDatasourcePluginMapper;
 import com.lacus.service.metadata.IMetaDatasourcePluginService;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -39,4 +39,4 @@ public class MetaDatasourcePluginServiceImpl extends ServiceImpl<MetaDatasourceP
         wrapper.eq(MetaDatasourcePlugin::getName, name);
         return this.getOne(wrapper);
     }
-} 
+}

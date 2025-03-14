@@ -2,8 +2,8 @@ package com.lacus.datasource.manager;
 
 import com.alibaba.fastjson2.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.lacus.dao.entity.MetaDatasourcePlugin;
-import com.lacus.dao.mapper.MetaDatasourcePluginMapper;
+import com.lacus.dao.metadata.entity.MetaDatasourcePlugin;
+import com.lacus.dao.metadata.mapper.MetaDatasourcePluginMapper;
 import com.lacus.datasource.api.DataSourcePlugin;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

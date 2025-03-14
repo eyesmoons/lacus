@@ -42,13 +42,13 @@ public class CodeGenerator {
     public static void main(String[] args) {
 
         CodeGenerator generator = CodeGenerator.builder()
-            .databaseUrl("jdbc:mysql://120.46.65.219:3306/lacus")
-            .username("lacus")
-            .password("S!JZ&*1m")
+            .databaseUrl("jdbc:mysql://127.0.0.1:3306/lacus")
+            .username("shengyu")
+            .password("123456")
             .author("casey")
             .module("/lacus-dao/target/generated-code")
             .parentPackage("com.lacus")
-            .tableName("sys_resources")
+            .tableName("one_api_info")
             // 决定是否继承基类
             .isExtendsFromBaseEntity(true)
             .build();
