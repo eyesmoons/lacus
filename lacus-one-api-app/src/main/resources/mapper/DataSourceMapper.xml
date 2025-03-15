@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.mapper.DataSourceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.lacus.dao.entity.DataSourceEntity">
+        <id column="id" property="id" />
+        <result column="database_type" property="databaseType" />
+        <result column="ip" property="ip" />
+        <result column="port" property="port" />
+        <result column="username" property="username" />
+        <result column="password" property="password" />
+        <result column="status" property="status" />
+    </resultMap>
+
+    <select id="getDatasourceById" resultType="com.lacus.dao.entity.DataSourceEntity">
+        select id,
+               name,
+               database_type,
+               ip,
+               port,
+               username,
+               password,
+               default_db_name,
+               status,
+               custom_params,
+               default_db_name
+        from `mid-platform`.md_data_source
+        where id = #{id}
+    </select>
+
+</mapper>

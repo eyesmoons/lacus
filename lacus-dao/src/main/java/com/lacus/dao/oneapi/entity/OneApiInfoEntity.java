@@ -12,14 +12,6 @@ import lombok.Setter;
 
 import java.io.Serializable;
 
-/**
- * <p>
- * api详情表
- * </p>
- *
- * @author casey
- * @since 2025-03-14
- */
 @Getter
 @Setter
 @TableName("one_api_info")

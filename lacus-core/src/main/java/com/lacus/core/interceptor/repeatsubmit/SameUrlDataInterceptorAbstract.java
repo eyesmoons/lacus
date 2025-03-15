@@ -35,7 +35,7 @@ public class SameUrlDataInterceptorAbstract extends AbstractRepeatSubmitIntercep
 
         // body参数为空，获取Parameter的数据
         if (StrUtil.isEmpty(nowParams)) {
-            // use jackson util to parse is more safe
+            // use jackson util to parser is more safe
             nowParams = JacksonUtil.to(request.getParameterMap());
         }
 

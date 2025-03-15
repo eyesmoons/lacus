@@ -149,7 +149,7 @@ public final class JSONUtils {
             CollectionType listType = objectMapper.getTypeFactory().constructCollectionType(ArrayList.class, clazz);
             return objectMapper.readValue(json, listType);
         } catch (Exception e) {
-            log.error("parse list exception!", e);
+            log.error("parser list exception!", e);
         }
 
         return Collections.emptyList();
@@ -259,7 +259,7 @@ public final class JSONUtils {
      * @param json json string
      * @param type type reference
      * @param <T>
-     * @return return parse object
+     * @return return parser object
      */
     public static <T> T parseObject(String json, TypeReference<T> type) {
         if (Strings.isNullOrEmpty(json)) {

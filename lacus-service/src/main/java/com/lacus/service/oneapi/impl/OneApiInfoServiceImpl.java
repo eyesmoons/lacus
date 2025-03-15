@@ -7,14 +7,6 @@ import com.lacus.dao.oneapi.mapper.OneApiInfoMapper;
 import com.lacus.service.oneapi.IOneApiInfoService;
 import org.springframework.stereotype.Service;
 
-/**
- * <p>
- * api详情表 服务实现类
- * </p>
- *
- * @author casey
- * @since 2025-03-14
- */
 @Service
 public class OneApiInfoServiceImpl extends ServiceImpl<OneApiInfoMapper, OneApiInfoEntity> implements IOneApiInfoService {
 

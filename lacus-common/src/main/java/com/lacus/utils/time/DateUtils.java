@@ -283,7 +283,7 @@ public class DateUtils extends org.apache.commons.lang3.time.DateUtils {
             LocalDateTime ldt = LocalDateTime.parse(date, DateTimeFormatter.ofPattern(format));
             return localDateTime2Date(ldt);
         } catch (Exception e) {
-            log.error("error while parse date:" + date, e);
+            log.error("error while parser date:" + date, e);
         }
         return null;
     }

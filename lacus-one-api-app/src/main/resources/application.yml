@@ -1,0 +1,66 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: lacus-one-api-app
+  profiles:
+    active: '@profileActive@'
+  mvc:
+    pathmatch:
+      matching-strategy: ant_path_matcher
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+  datasource:
+    druid:
+      filters: stat,log4j2
+      filter:
+        slf4j:
+          enabled: true
+        stat:
+          enabled: true
+          db-type: mysql
+          log-slow-sql: true            # 开启慢sql监控，超过2s 就认为是慢sql，记录到日志中
+          slow-sql-millis: 2000
+      stat-view-servlet:
+        enabled: true                   # 启用StatViewServlet
+        url-pattern: /ds/druid/*        # 访问内置监控页面的路径，内置监控页面的首页是/druid/index.html
+        reset-enable: false             # 不允许清空统计数据,重新计算
+        login-username: mid             # 配置监控页面访问密码
+        login-password: Mid#2023@
+
+mybatis-plus:
+  mapper-locations: classpath:/mapper/**/*.xml
+  global-config:
+    db-config:
+      id-type: auto
+  configuration:
+    auto-mapping-behavior: partial
+    map-underscore-to-camel-case: true
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  type-handlers-package: com.qtone.data.platform.modules.biz.typehandler
+
+
+redis:
+  database: mid-bigdata-bigdataService
+  key:
+    admin: 'ums:admin'
+    resourceList: 'ums:resourceList'
+  expire:
+    common: 86400 # 24小时
+
+feign:
+  client:
+    config:
+      default:
+        loggerLevel: basic
+
+
+logging:
+  level:
+    org:
+      apache:
+        kafka:
+          clients: ERROR

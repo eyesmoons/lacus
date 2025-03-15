@@ -10,12 +10,14 @@ import com.lacus.domain.oneapi.OneApiInfoBusiness;
 import com.lacus.domain.oneapi.command.ApiAddCommand;
 import com.lacus.domain.oneapi.command.ApiUpdateCommand;
 import com.lacus.domain.oneapi.dto.ApiInfoDTO;
+import com.lacus.domain.oneapi.dto.ApiParamsDTO;
 import com.lacus.domain.oneapi.dto.ApiParseDTO;
-import com.lacus.domain.oneapi.dto.RunningTestResponse;
+import com.lacus.domain.oneapi.dto.ApiTestResp;
 import com.lacus.domain.oneapi.query.OneApiInfoQuery;
 import com.lacus.enums.ColumnTypeEnum;
 import com.lacus.enums.dictionary.BusinessTypeEnum;
-import com.lacus.service.oneapi.dto.ApiParamsDTO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
@@ -33,9 +35,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Positive;
 import java.util.List;
 
-/**
- * 统一api
- */
+@Api(value = "统一API管理", tags = {"统一API管理"})
 @RestController
 @RequestMapping("/one/api")
 public class OneApiInfoController {
@@ -43,9 +43,7 @@ public class OneApiInfoController {
     @Autowired
     private OneApiInfoBusiness oneApiInfoBusiness;
 
-    /**
-     * 分页查询API列表
-     */
+    @ApiOperation("分页查询API列表")
     @PreAuthorize("@permission.has('oneapi:api:list')")
     @GetMapping("/list/paging")
     public ResponseDTO<PageDTO> list(OneApiInfoQuery query) {
@@ -53,9 +51,7 @@ public class OneApiInfoController {
         return ResponseDTO.ok(pageDTO);
     }
 
-    /**
-     * 新增API
-     */
+    @ApiOperation("新增API")
     @PreAuthorize("@permission.has('oneapi:api:add')")
     @AccessLog(title = "API", businessType = BusinessTypeEnum.ADD)
     @PostMapping
@@ -63,9 +59,7 @@ public class OneApiInfoController {
         return ResponseDTO.ok(oneApiInfoBusiness.addApi(addCommand));
     }
 
-    /**
-     * 修改API
-     */
+    @ApiOperation("修改API")
     @PreAuthorize("@permission.has('oneapi:api:edit')")
     @AccessLog(title = "API", businessType = BusinessTypeEnum.MODIFY)
     @PutMapping
@@ -74,18 +68,14 @@ public class OneApiInfoController {
         return ResponseDTO.ok();
     }
 
-    /**
-     * 根据API ID获取详细信息
-     */
+    @ApiOperation("获取API详细信息")
     @PreAuthorize("@permission.has('oneapi:api:query')")
     @GetMapping(value = "/{apiId}")
     public ResponseDTO<OneApiInfoEntity> getInfo(@PathVariable @NotNull @Positive Long apiId) {
         return ResponseDTO.ok(oneApiInfoBusiness.getApiInfo(apiId));
     }
 
-    /**
-     * 删除API
-     */
+    @ApiOperation("删除API")
     @PreAuthorize("@permission.has('oneapi:api:remove')")
     @AccessLog(title = "API", businessType = BusinessTypeEnum.DELETE)
     @DeleteMapping("/{apiIds}")
@@ -94,45 +84,34 @@ public class OneApiInfoController {
         return ResponseDTO.ok();
     }
 
-    /**
-     * 解析接口
-     */
+    @ApiOperation("解析SQL")
     @PreAuthorize("@permission.has('oneapi:api:list')")
     @PostMapping("/parse")
     public ResponseDTO<ApiParamsDTO> parse(@Validated @RequestBody ApiParseDTO parseDTO) {
         return ResponseDTO.ok(oneApiInfoBusiness.parse(parseDTO));
     }
 
-    /**
-     * 获取所有字段类型
-     */
+    @ApiOperation("获取所有字段类型")
     @GetMapping("/colTypeList")
     public ResponseDTO<List<JSONObject>> colTypeList() {
         return ResponseDTO.ok(ColumnTypeEnum.getList());
     }
 
-    /**
-     * 测试运行
-     */
-    @PostMapping("/testRun")
-    public ResponseDTO<RunningTestResponse> testRun(@Validated @RequestBody ApiInfoDTO apiDTO) {
-        return oneApiInfoBusiness.testRun(apiDTO);
+    @ApiOperation("测试API")
+    @PostMapping("/test")
+    public ResponseDTO<ApiTestResp> testRun(@Validated @RequestBody ApiInfoDTO apiDTO) {
+        return oneApiInfoBusiness.testApi(apiDTO);
     }
 
-    /**
-     * 在线测试运行
-     */
-    @PostMapping("onlineTestRun")
-    public ResponseDTO<RunningTestResponse> onlineTestRun(@RequestBody ApiInfoDTO apiInfoDTO) {
-        return oneApiInfoBusiness.onlineTestRun(apiInfoDTO);
+    @ApiOperation("在线测试API")
+    @PostMapping("/test/online")
+    public ResponseDTO<ApiTestResp> onlineTestRun(@RequestBody ApiInfoDTO apiInfoDTO) {
+        return oneApiInfoBusiness.onlineTest(apiInfoDTO);
     }
 
-    /**
-     * 更新状态
-     */
+    @ApiOperation("更新API状态")
     @GetMapping("/updateStatus")
     public ResponseDTO<Boolean> updateStatus(@RequestParam("id") Long id, @RequestParam("status") Integer status) {
         return ResponseDTO.ok(oneApiInfoBusiness.updateStatus(id, status));
     }
 }
-

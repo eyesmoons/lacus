@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 import static com.lacus.common.constant.Constants.*;
 
 /**
- * parameter parse utils
+ * parameter parser utils
  */
 public class ParameterUtils {
 

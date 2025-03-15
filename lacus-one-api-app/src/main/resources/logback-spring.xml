@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<configuration scan="false" scanPeriod="60 seconds" debug="false">
+
+    <!-- 项目名称 -->
+    <springProperty scope="context" name="PROJECT_NAME" source="spring.application.name" defaultValue="mid-platform"/>
+
+    <!--定义日志文件的存储地址-->
+    <property name="LOG_HOME" value="~/lacus/logs"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <!--<encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">-->
+        <!--<layout class="cn.px.hq.agency.MyLayout" />-->
+        <!--</encoder>-->
+
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] %highlight([%-5level] %logger{50} %line - %msg%n)</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 系统错误日志文件 -->
+    <appender name="SYSTEM_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/error.log</file>
+        <!-- 过滤器，只打印ERROR级别的日志 -->
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/error.%d{yyyy-MM-dd}.log</FileNamePattern>
+            <MaxHistory>30</MaxHistory>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{50} %line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 日志文件 -->
+    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/${PROJECT_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/${PROJECT_NAME}.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+            <!--日志文件最大的大小-->
+            <MaxFileSize>200MB</MaxFileSize>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{50} %line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="DRUID_FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_HOME}/druid.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!--日志文件输出的文件名-->
+            <FileNamePattern>${LOG_HOME}/druid.%d{yyyy-MM-dd}.%i.log</FileNamePattern>
+            <!--日志文件保留天数-->
+            <MaxHistory>30</MaxHistory>
+            <!--日志文件最大的大小-->
+            <MaxFileSize>200MB</MaxFileSize>
+        </rollingPolicy>
+        <append>true</append>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <!--格式化输出：%d表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度%msg：日志消息，%n是换行符-->
+            <pattern>[%d{yyyy-MM-dd HH:mm:ss.SSS}] [%thread] [%-5level] %logger{50} %line - %msg%n</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="ASYNC_SYSTEM_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref="SYSTEM_FILE"/>
+        <!-- add the following line -->
+        <includeCallerData>true</includeCallerData>
+    </appender>
+    <appender name="ASYNC_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref="FILE"/>
+        <!-- add the following line -->
+        <includeCallerData>true</includeCallerData>
+    </appender>
+    <appender name="ASYNC_DRUID_FILE"
+              class="ch.qos.logback.classic.AsyncAppender">
+        <discardingThreshold>0</discardingThreshold>
+        <queueSize>512</queueSize>
+        <appender-ref ref="DRUID_FILE"/>
+        <!-- add the following line -->
+        <includeCallerData>true</includeCallerData>
+    </appender>
+
+    <logger name="com.alibaba.nacos.client.config" level="warn"></logger>
+
+    <logger name="druid.sql.Statement" level="debug" additivity="false">
+        <appender-ref ref="ASYNC_DRUID_FILE"/>
+    </logger>
+
+    <logger name="com.qtone.data.platform.modules.metadata.support.interceptor.DynamicDataSourceInterceptor" level="debug">
+        <appender-ref ref="ASYNC_DRUID_FILE"/>
+    </logger>
+
+    <root level="info">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="ASYNC_SYSTEM_FILE"/>
+        <appender-ref ref="ASYNC_FILE"/>
+    </root>
+
+</configuration>

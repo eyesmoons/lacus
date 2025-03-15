@@ -15,20 +15,20 @@ import com.lacus.dao.oneapi.entity.OneApiInfoEntity;
 import com.lacus.domain.common.command.BulkOperationCommand;
 import com.lacus.domain.oneapi.command.ApiAddCommand;
 import com.lacus.domain.oneapi.command.ApiUpdateCommand;
+import com.lacus.domain.oneapi.dto.ApiConfigDTO;
 import com.lacus.domain.oneapi.dto.ApiInfoDTO;
+import com.lacus.domain.oneapi.dto.ApiParamsDTO;
 import com.lacus.domain.oneapi.dto.ApiParseDTO;
-import com.lacus.domain.oneapi.dto.RunningTestResponse;
-import com.lacus.domain.oneapi.feign.DsFeignClient;
+import com.lacus.domain.oneapi.dto.ApiTestResp;
+import com.lacus.domain.oneapi.dto.RequestParamsDTO;
+import com.lacus.domain.oneapi.dto.ReturnParamsDTO;
+import com.lacus.domain.oneapi.feign.OneApiFeignClient;
 import com.lacus.domain.oneapi.model.OneApiInfoModel;
 import com.lacus.domain.oneapi.model.OneApiInfoModelFactory;
 import com.lacus.domain.oneapi.parse.MySQLParseProcessor;
 import com.lacus.domain.oneapi.query.OneApiInfoQuery;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.oneapi.IOneApiInfoService;
-import com.lacus.service.oneapi.dto.ApiConfigDTO;
-import com.lacus.service.oneapi.dto.ApiParamsDTO;
-import com.lacus.service.oneapi.dto.RequestParamsDTO;
-import com.lacus.service.oneapi.dto.ReturnParamsDTO;
 import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,10 +42,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-/**
- * @author shengyu
- * @date 2025/3/14 21:08
- */
 @Service
 public class OneApiInfoBusiness {
 
@@ -56,12 +52,11 @@ public class OneApiInfoBusiness {
     private IMetaDataSourceService metaDataSourceService;
 
     @Autowired
-    private DsFeignClient dsFeignClient;
+    private OneApiFeignClient oneApiFeignClient;
 
     private static final Pattern SQL_COMMENT_REGEX = Pattern.compile("(/\\*+?[\\w\\W]+?\\*/)");
 
-    // sql在线运行测试后，将结果存储在数据库中的最大数据量
-    private static final Integer RESPONSE_DEFAULT_SIZE = 5;
+    private static final Integer RESPONSE_MAX_SIZE = 5;
 
     public PageDTO pageList(OneApiInfoQuery query) {
         Page<OneApiInfoEntity> page = oneApiInfoService.page(query.toPage(), query.toQueryWrapper());
@@ -71,20 +66,31 @@ public class OneApiInfoBusiness {
     public OneApiInfoModel addApi(ApiAddCommand addCommand) {
         checkApi(addCommand, true);
         OneApiInfoModel model = OneApiInfoModelFactory.loadFromAddCommand(addCommand, new OneApiInfoModel());
-        replaceResponse(addCommand);
-        model.insert();
+        extraResponse(addCommand);
+        boolean insert = model.insert();
+        if (insert) {
+            oneApiFeignClient.flushCache(model.getApiId(), model.getStatus());
+        }
         return model;
     }
 
     public void updateApi(ApiUpdateCommand updateCommand) {
         checkApi(updateCommand, false);
         OneApiInfoModel model = OneApiInfoModelFactory.loadFromDb(updateCommand.getApiId(), oneApiInfoService);
-        replaceResponse(updateCommand);
-        model.updateById();
+        extraResponse(updateCommand);
+        boolean update = model.updateById();
+        if (update) {
+            oneApiFeignClient.flushCache(model.getApiId(), model.getStatus());
+        }
     }
 
     public void deleteApi(BulkOperationCommand<Long> command) {
-        oneApiInfoService.removeBatchByIds(command.getIds());
+        boolean delete = oneApiInfoService.removeBatchByIds(command.getIds());
+        if (delete) {
+            for (Long id : command.getIds()) {
+                oneApiFeignClient.flushCache(id, 0);
+            }
+        }
     }
 
     public OneApiInfoEntity getApiInfo(Long apiId) {
@@ -119,19 +125,16 @@ public class OneApiInfoBusiness {
     }
 
     private void checkSqlScript(ApiConfigDTO apiConfig) {
-        String sqlScript = apiConfig.getSql().trim().toUpperCase();
-        if (sqlScript.startsWith("/*")) {
-            sqlScript = this.judgeSqlOffComment(sqlScript);
+        String sql = apiConfig.getSql().trim().toUpperCase();
+        if (sql.startsWith("/*")) {
+            sql = this.hasSqlComment(sql);
         }
-        if (!sqlScript.startsWith("SELECT")) {
+        if (!sql.startsWith("SELECT")) {
             throw new CustomException("只支持SELECT语句！");
         }
     }
 
-    /**
-     * 判断sql开头是否有注释信息
-     */
-    private String judgeSqlOffComment(String sqlScript) {
+    private String hasSqlComment(String sqlScript) {
         Matcher matcher = SQL_COMMENT_REGEX.matcher(sqlScript);
         if (matcher.find()) {
             String offCommentSql = matcher.group(0);
@@ -140,20 +143,15 @@ public class OneApiInfoBusiness {
         return sqlScript;
     }
 
-    private void replaceResponse(ApiAddCommand addCommand) {
+    private void extraResponse(ApiAddCommand addCommand) {
         String apiResponse = addCommand.getApiResponse();
-        String subResult = subResult(apiResponse);
-        addCommand.setApiResponse(subResult);
-    }
-
-    public String subResult(String response) {
-        JSONObject jsonObject = JSONObject.parseObject(response);
+        JSONObject jsonObject = JSONObject.parseObject(apiResponse);
         JSONArray list = jsonObject.getJSONArray("list");
-        if (list.size() > RESPONSE_DEFAULT_SIZE) {
-            List<Object> subList = list.subList(0, RESPONSE_DEFAULT_SIZE);
+        if (list.size() > RESPONSE_MAX_SIZE) {
+            List<Object> subList = list.subList(0, RESPONSE_MAX_SIZE);
             jsonObject.put("list", subList);
         }
-        return JSON.toJSONString(jsonObject, JSONWriter.Feature.PrettyFormat);
+        addCommand.setApiResponse(JSON.toJSONString(jsonObject, JSONWriter.Feature.PrettyFormat));
     }
 
     public ApiParamsDTO parse(ApiParseDTO parseDTO) {
@@ -194,7 +192,6 @@ public class OneApiInfoBusiness {
             }
 
             apiParamsDTO.setRequestParams(requestParams);
-
             Set<String> returnSet = resultMap.get("return");
             if (CollectionUtil.isNotEmpty(returnSet)) {
                 Map<String, ReturnParamsDTO> oldReturnMap = null;
@@ -219,13 +216,13 @@ public class OneApiInfoBusiness {
         }
     }
 
-    public ResponseDTO<RunningTestResponse> testRun(ApiInfoDTO apiDTO) {
-        ResponseDTO<RunningTestResponse> result = dsFeignClient.testRun(apiDTO);
+    public ResponseDTO<ApiTestResp> testApi(ApiInfoDTO apiDTO) {
+        ResponseDTO<ApiTestResp> result = oneApiFeignClient.testApi(apiDTO);
         if (result.getData().getCode() != 200) {
             return result;
         }
         Object data = result.getData();
-        RunningTestResponse response = JSONObject.parseObject(JSONObject.toJSONString(data), RunningTestResponse.class);
+        ApiTestResp response = JSONObject.parseObject(JSONObject.toJSONString(data), ApiTestResp.class);
         String formatResult = JSON.toJSONString(response.getData(), JSONWriter.Feature.PrettyFormat);
         response.setData(formatResult);
         result.setData(response);
@@ -236,10 +233,14 @@ public class OneApiInfoBusiness {
         OneApiInfoEntity entity = new OneApiInfoEntity();
         entity.setApiId(id);
         entity.setStatus(status);
-        return oneApiInfoService.updateById(entity);
+        boolean update = oneApiInfoService.updateById(entity);
+        if (update) {
+            oneApiFeignClient.flushCache(id, status);
+        }
+        return update;
     }
 
-    public ResponseDTO<RunningTestResponse> onlineTestRun(ApiInfoDTO apiInfoDTO) {
+    public ResponseDTO<ApiTestResp> onlineTest(ApiInfoDTO apiInfoDTO) {
         String apiUrl = apiInfoDTO.getApiUrl();
         OneApiInfoEntity apiInfo = oneApiInfoService.queryApiByUrl(apiUrl);
 
@@ -252,6 +253,6 @@ public class OneApiInfoBusiness {
         initApiConfig.setApiParams(apiParams);
         apiInfo.setApiConfig(JSONObject.toJSONString(initApiConfig));
         BeanUtils.copyProperties(apiInfo, apiInfoDTO);
-        return this.testRun(apiInfoDTO);
+        return this.testApi(apiInfoDTO);
     }
 }

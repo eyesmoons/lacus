@@ -71,7 +71,7 @@ public class SparkLauncherMonitor extends Thread {
                 }
                 SparkStatusEnum oldState = handle.getState();
                 SparkStatusEnum newState = oldState;
-                // parse state and appId
+                // parser state and appId
                 if (line.contains("state")) {
                     // 1. state
                     String state = regexGetState(line);
@@ -114,7 +114,7 @@ public class SparkLauncherMonitor extends Thread {
                             logger.error("wrong spark app state");
                     }
                 } else if (line.contains("queue") || line.contains("start time") || line.contains("final status")
-                        || line.contains("tracking URL") || line.contains("user")) { // parse other values
+                        || line.contains("tracking URL") || line.contains("user")) { // parser other values
                     String value = getValue(line);
                     if (!Strings.isNullOrEmpty(value)) {
                         try {
@@ -130,7 +130,7 @@ public class SparkLauncherMonitor extends Thread {
                                 handle.setUser(value);
                             }
                         } catch (IllegalArgumentException e) {
-                            logger.warn("parse log encounter an error, line: {}, msg: {}", line, e.getMessage());
+                            logger.warn("parser log encounter an error, line: {}, msg: {}", line, e.getMessage());
                         }
                     }
                 }

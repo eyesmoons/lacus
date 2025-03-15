@@ -299,7 +299,7 @@ public class TimePlaceholderUtils {
     private static String calculateTime(String expression, Date date) {
         // After N years: $[add_months(yyyyMMdd,12*N)], the first N months: $[add_months(yyyyMMdd,-N)], etc
         if (date == null) {
-            throw new IllegalArgumentException("Cannot parse the expression: " + expression + ", date is null");
+            throw new IllegalArgumentException("Cannot parser the expression: " + expression + ", date is null");
         }
         try {
             if (expression.startsWith(TIMESTAMP)) {

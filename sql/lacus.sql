@@ -861,7 +861,6 @@ CREATE TABLE `spark_job` (
   PRIMARY KEY (`job_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='spark任务表';
 
-
 -- ----------------------------
 -- Table structure for spark_job_instance
 -- ----------------------------
@@ -887,6 +886,57 @@ CREATE TABLE `spark_job_instance` (
   PRIMARY KEY (`instance_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='spark任务实例表';
 
+-- ----------------------------
+-- Table structure for one_api_info
+-- ----------------------------
+CREATE TABLE `one_api_info` (
+    `api_id` bigint NOT NULL AUTO_INCREMENT COMMENT '接口ID',
+    `api_name` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'api名称',
+    `api_url` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '接口url',
+    `group_id` int DEFAULT NULL COMMENT 'api分组id',
+    `api_type` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT 'api类型',
+    `datasource_id` bigint NOT NULL COMMENT '数据源id',
+    `query_timeout` tinyint NOT NULL DEFAULT '3' COMMENT '超时时间，默认3秒，最大10s',
+    `req_method` varchar(5) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '请求方式',
+    `limit_count` int NOT NULL DEFAULT '5000' COMMENT '最大返回条数',
+    `api_desc` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '接口描述',
+    `api_config` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT 'api配置',
+    `status` tinyint(1) NOT NULL DEFAULT '0' COMMENT '接口状态：0未发布状态，1发布状态',
+    `api_response` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin COMMENT 'api响应结果',
+    `online_edit` tinyint(1) NOT NULL DEFAULT '0' COMMENT '是否为在线编辑，0：下线编辑，1：在线编辑',
+    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `updater_id` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`api_id`) USING BTREE,
+    KEY `api_url` (`api_url`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api详情表';
+
+-- ----------------------------
+-- Table structure for one_api_call_history
+-- ----------------------------
+CREATE TABLE `one_api_call_history` (
+    `history_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `call_date` varchar(50) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '调用日期',
+    `call_ip` varchar(200) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '调用ip',
+    `api_url` varchar(200) DEFAULT NULL COMMENT 'api地址',
+    `call_status` varchar(10) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT '调用状态',
+    `call_code` bigint NOT NULL COMMENT '调用code',
+    `error_info` text CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL COMMENT '错误信息',
+    `call_delay` int NOT NULL DEFAULT '5000' COMMENT '调用延迟',
+    `call_time` timestamp DEFAULT NULL COMMENT '调用时间',
+    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `updater_id` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`history_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api调用历史表';
+
+-- ----------------------------
+-- quartz定时任务相关表
+-- ----------------------------
 -- 存储job详细信息
 CREATE TABLE QRTZ_JOB_DETAILS (
     SCHED_NAME VARCHAR(120) NOT NULL,

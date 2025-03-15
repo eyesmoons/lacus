@@ -15,9 +15,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * A base class for running a Unix command.
- * 
+ *
  * <code>AbstractShell</code> can be used to run unix commands like <code>du</code> or
- * <code>df</code>. It also offers facilities to gate commands by 
+ * <code>df</code>. It also offers facilities to gate commands by
  * time-intervals.
  */
 @Slf4j
@@ -172,7 +172,7 @@ public abstract class AbstractShell {
             log.warn("Illegal while starting the error and in thread", ise);
         }
         try {
-            // parse the output
+            // parser the output
             exitCode = process.waitFor();
             try {
                 // make sure that the error and in thread exits
