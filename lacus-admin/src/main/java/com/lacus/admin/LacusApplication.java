@@ -14,7 +14,7 @@ import org.springframework.context.event.EventListener;
 
 @SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
 @ComponentScan(basePackages = "com.lacus.*")
-@EnableFeignClients
+@EnableFeignClients(basePackages = {"com.lacus.domain.oneapi.feign"})
 @Slf4j
 public class LacusApplication {
 

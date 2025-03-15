@@ -3,7 +3,6 @@ package com.lacus.domain.oneapi.feign;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.domain.oneapi.dto.ApiInfoDTO;
 import com.lacus.domain.oneapi.dto.ApiTestResp;
-import com.lacus.domain.oneapi.fallback.DsClientFallbackFactory;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.PostMapping;

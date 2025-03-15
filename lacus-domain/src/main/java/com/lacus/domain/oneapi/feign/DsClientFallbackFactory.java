@@ -1,12 +1,11 @@
-package com.lacus.domain.oneapi.fallback;
+package com.lacus.domain.oneapi.feign;
 
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.exception.error.ErrorCode;
 import com.lacus.domain.oneapi.dto.ApiInfoDTO;
 import com.lacus.domain.oneapi.dto.ApiTestResp;
-import com.lacus.domain.oneapi.feign.OneApiFeignClient;
-import feign.hystrix.FallbackFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.cloud.openfeign.FallbackFactory;
 import org.springframework.stereotype.Component;
 
 @Slf4j
