@@ -60,6 +60,9 @@ public class OneApiInfoBusiness {
 
     public PageDTO pageList(OneApiInfoQuery query) {
         Page<OneApiInfoEntity> page = oneApiInfoService.page(query.toPage(), query.toQueryWrapper());
+        page.getRecords().forEach(item -> {
+            item.setDatasourceName(metaDataSourceService.getById(item.getDatasourceId()).getDatasourceName());
+        });
         return new PageDTO(page.getRecords(), page.getTotal());
     }
 
