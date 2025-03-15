@@ -1,10 +1,10 @@
 package com.lacus.core.provider;
 
-import com.lacus.common.exception.ResultCode;
-import com.lacus.common.exception.ApiException;
-import com.lacus.dao.entity.DataSourceEntity;
-import com.lacus.common.enums.DatabaseType;
 import com.lacus.common.annotation.ProviderName;
+import com.lacus.common.enums.DatabaseType;
+import com.lacus.common.exception.ApiException;
+import com.lacus.common.exception.ResultCode;
+import com.lacus.dao.entity.DataSourceEntity;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -43,6 +43,9 @@ public class ProviderManager implements ApplicationContextAware {
 
     public static AbstractProvider provide(DataSourceEntity datasource) {
         DatabaseType event = datasource.getDatabaseType();
+        if (event == null) {
+            event = DatabaseType.MySQL;
+        }
         try {
             AbstractProvider provider = providers.get(event);
             provider.initDatasource(datasource);

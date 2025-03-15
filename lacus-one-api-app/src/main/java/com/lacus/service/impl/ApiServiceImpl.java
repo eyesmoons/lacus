@@ -20,7 +20,6 @@ import com.lacus.service.dto.ApiConfigDTO;
 import com.lacus.service.dto.ApiInfoDTO;
 import com.lacus.dao.entity.ApiHistoryEntity;
 import com.lacus.dao.entity.ApiInfoEntity;
-import com.lacus.common.enums.ApiTypeEnum;
 import com.lacus.common.enums.CallStatusEnum;
 import com.lacus.dao.mapper.ApiMapper;
 import com.lacus.service.dto.DataResult;
@@ -156,13 +155,7 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
             BuriedFunc.addLog(LogsBuried.setError(String.format("当前接口请求地址未发布,接口名称：【%s】！", apiInfo.getApiName())));
             throw new BusinessException(ResultCode.API_STATUS_NOT_ONLINE);
         }
-        //目前只支持简单的api接口
-        if (Objects.equals(ApiTypeEnum.API.getName(), apiInfo.getApiType())) {
-            return exec(apiInfo, params, callType);
-        } else {
-            //TODO
-        }
-        return null;
+        return exec(apiInfo, params, callType);
     }
 
 
@@ -191,6 +184,7 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
             BuriedFunc.addLog(LogsBuried.setError(String.format("接口请求错误,接口名称:【%s】,错误原因: 【%s】！", apiInfo.getApiName(), aex.getMessage())));
             throw new ApiException(aex.getErrorCode(), String.format("接口调用失败:【%s】", aex.getMessage()));
         } catch (Exception e) {
+            e.printStackTrace();
             callHistoryEntity.callStatus(CallStatusEnum.FAIL).callCode(ResultCode.FAILED.getCode()).errorInfo(e.getMessage());
             throw new ApiException(ResultCode.FAILED, String.format("接口执行失败:【%s】！", e.getMessage()));
         } finally {
@@ -225,6 +219,4 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
         }
 
     }
-
-
 }

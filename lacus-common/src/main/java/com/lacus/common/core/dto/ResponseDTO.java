@@ -6,12 +6,14 @@ import com.lacus.common.exception.error.ErrorCodeInterface;
 import com.lacus.common.exception.ApiException;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * 响应信息主体
  */
 @Data
 @AllArgsConstructor
+@NoArgsConstructor
 public class ResponseDTO<T> {
 
     private Integer code;

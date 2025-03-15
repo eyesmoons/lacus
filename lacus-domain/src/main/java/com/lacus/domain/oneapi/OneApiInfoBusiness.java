@@ -29,11 +29,11 @@ import com.lacus.domain.oneapi.parse.MySQLParseProcessor;
 import com.lacus.domain.oneapi.query.OneApiInfoQuery;
 import com.lacus.service.metadata.IMetaDataSourceService;
 import com.lacus.service.oneapi.IOneApiInfoService;
-import org.apache.commons.compress.utils.Lists;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -159,13 +159,13 @@ public class OneApiInfoBusiness {
         String sqlScript = parseDTO.getSqlScript();
         OneApiInfoEntity oldApiInfo = oneApiInfoService.queryApiByUrl(apiUrl);
         ApiConfigDTO oldApiConfig = null;
-        List<RequestParamsDTO> requestParams = Lists.newArrayList();
+        List<RequestParamsDTO> requestParams = new ArrayList<>();
         if (Objects.nonNull(oldApiInfo)) {
             oldApiConfig = JSONObject.parseObject(oldApiInfo.getApiConfig(), ApiConfigDTO.class);
         }
         try {
             ApiParamsDTO apiParamsDTO = new ApiParamsDTO();
-            List<ReturnParamsDTO> returnParams = Lists.newArrayList();
+            List<ReturnParamsDTO> returnParams = new ArrayList<>();
             MySQLParseProcessor mySQLDynamicParseAdapter = new MySQLParseProcessor();
             Map<String, Set<String>> resultMap = mySQLDynamicParseAdapter.doParse(sqlScript);
             Set<String> reqSet = resultMap.get("req");
@@ -218,7 +218,7 @@ public class OneApiInfoBusiness {
 
     public ResponseDTO<ApiTestResp> testApi(ApiInfoDTO apiDTO) {
         ResponseDTO<ApiTestResp> result = oneApiFeignClient.testApi(apiDTO);
-        if (result.getData().getCode() != 200) {
+        if (result.getData().getCode() != 0) {
             return result;
         }
         Object data = result.getData();

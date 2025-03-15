@@ -9,51 +9,14 @@ import lombok.Setter;
 @Setter
 public class DataSourceEntity {
 
-    private Long id;
+    private Long datasourceId;
 
 
-    private String name;
+    private String datasourceName;
 
-    /**
-     * 数据源类型
-     */
-    private DatabaseType databaseType;
+    private String connectionParams;
 
-    /**
-     * ip/域名
-     */
-    private String ip;
-
-    /**
-     * port
-     */
-    private String port;
-
-    /**
-     * 用户名
-     */
-    private String username;
-
-    /**
-     * 密码
-     */
-    private String password;
-
-    /**
-     * 状态，0：未知，1：可用，2，不可用
-     */
-    private DataSourceStatusEnum status;
-
-    private String defaultDbName;
-
-
-    /**
-     * 自定义参数
-     */
-    private String customParams;
-
-
-
+    public DatabaseType databaseType;
 
     @Getter
     @Setter

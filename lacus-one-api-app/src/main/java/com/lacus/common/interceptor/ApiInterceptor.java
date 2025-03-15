@@ -18,7 +18,7 @@ public class ApiInterceptor implements HandlerInterceptor {
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
         ApiParser.parse(request);
-        request.getRequestDispatcher("/one/query").forward(request, response);
+        request.getRequestDispatcher("/one/api/query").forward(request, response);
         return false;
     }
 

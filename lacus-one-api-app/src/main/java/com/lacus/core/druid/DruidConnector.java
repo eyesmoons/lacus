@@ -3,13 +3,14 @@ package com.lacus.core.druid;
 import com.alibaba.druid.pool.DruidDataSource;
 import com.alibaba.druid.pool.DruidDataSourceFactory;
 import com.alibaba.druid.spring.boot.autoconfigure.DruidDataSourceBuilder;
+import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.google.common.collect.Maps;
-import com.lacus.common.exception.ResultCode;
-import com.lacus.common.exception.ApiException;
-import com.lacus.common.utils.DecryptUtils;
-import com.lacus.dao.entity.DataSourceEntity;
 import com.lacus.common.enums.DatabaseType;
+import com.lacus.common.exception.ApiException;
+import com.lacus.common.exception.ResultCode;
+import com.lacus.dao.entity.DataSourceEntity;
+import com.lacus.service.dto.ConnectionParamDTO;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
@@ -45,7 +46,7 @@ public class DruidConnector {
     public Connection getConnect(DataSourceEntity dataSourceInfo) {
         long start = System.currentTimeMillis();
         this.dataSourceInfo = dataSourceInfo;
-        Long datasourceId = dataSourceInfo.getId();
+        Long datasourceId = dataSourceInfo.getDatasourceId();
         DruidDataSource druidDataSource;
         if (datasourceMap.containsKey(datasourceId)) {
             druidDataSource = getDatasource(datasourceId);
@@ -70,27 +71,21 @@ public class DruidConnector {
     }
 
     private DruidDataSource createDatasource() {
-        JSONArray customParams = JSONArray.parse(dataSourceInfo.getCustomParams());
+        ConnectionParamDTO connectionParamDTO = JSON.parseObject(dataSourceInfo.getConnectionParams(), ConnectionParamDTO.class);
         Properties prop = null;
         Map<String, String> confMap = Maps.newHashMap();
-        if (!customParams.isEmpty()) {
-            Map<String, String> customParamPairs = customParams
-                    .toJavaList(DataSourceEntity
-                            .CustomParamPair.class)
-                    .stream()
-                    .collect(Collectors.toMap(DataSourceEntity.CustomParamPair::getKey, DataSourceEntity.CustomParamPair::getValue));
-            prop = new Properties();
-            prop.putAll(customParamPairs);
-        }
         DatabaseType databaseType = dataSourceInfo.getDatabaseType();
+        if(databaseType == null) {
+            databaseType = DatabaseType.MySQL;
+        }
         confMap.put(DruidDataSourceFactory.PROP_DRIVERCLASSNAME, databaseType.getDriverClassName());
         String urlFormat = databaseType.getUrlFormat();
-        String realUrl = String.format(urlFormat, dataSourceInfo.getIp(), dataSourceInfo.getPort(), dataSourceInfo.getDefaultDbName());
+        String realUrl = String.format(urlFormat, connectionParamDTO.getHost(), connectionParamDTO.getPort(), connectionParamDTO.getDatabase());
         confMap.put(DruidDataSourceFactory.PROP_URL, realUrl);
-        confMap.put(DruidDataSourceFactory.PROP_USERNAME, dataSourceInfo.getUsername());
-        String password = dataSourceInfo.getPassword();
+        confMap.put(DruidDataSourceFactory.PROP_USERNAME, connectionParamDTO.getUsername());
+        String password = connectionParamDTO.getPassword();
         if (StringUtils.isNotBlank(password)) {
-            confMap.put(DruidDataSourceFactory.PROP_PASSWORD, DecryptUtils.decryptPwd(password));
+            confMap.put(DruidDataSourceFactory.PROP_PASSWORD, password);
         }
         // 初始化链接数
         confMap.put(DruidDataSourceFactory.PROP_INITIALSIZE, "5");
@@ -116,8 +111,8 @@ public class DruidConnector {
             }
             druidDS.setBreakAfterAcquireFailure(true);
             druidDS.setConnectionErrorRetryAttempts(5);
-            druidDS.setName(dataSourceInfo.getName());
-            datasourceMap.put(dataSourceInfo.getId(), druidDS);
+            druidDS.setName(dataSourceInfo.getDatasourceName());
+            datasourceMap.put(dataSourceInfo.getDatasourceId(), druidDS);
             return druidDS;
         } catch (Exception e) {
             log.info("数据源连接池初始化失败:{}", e.getMessage());

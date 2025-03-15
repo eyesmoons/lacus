@@ -18,7 +18,7 @@ lacus:
   # 是否检查 i18n 资源文件（messages.properties）是否都有对应的键值对
   checkI18nKey: false
   one-api:
-    address: http://localhost:8080
+    address: http://localhost:8089
 # 日志配置
 logging:
   level:
