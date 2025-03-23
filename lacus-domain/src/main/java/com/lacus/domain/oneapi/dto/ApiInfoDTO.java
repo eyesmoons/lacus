@@ -1,9 +1,10 @@
 package com.lacus.domain.oneapi.dto;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.time.LocalDateTime;
+import java.util.Date;
 
 @Getter
 @Setter
@@ -83,15 +84,9 @@ public class ApiInfoDTO {
     private String apiResponse;
 
     /**
-     * 是否为在线编辑，0：下线编辑，1：在线编辑
-     */
-    private Integer onlineEdit;
-
-
-    /**
      * 创建时间
      */
-    private LocalDateTime createTime;
+    private Date createTime;
 
     /**
      * 创建人id
@@ -106,7 +101,7 @@ public class ApiInfoDTO {
     /**
      * 更新时间
      */
-    private LocalDateTime updateTime;
+    private Date updateTime;
 
     /**
      * 修改人id

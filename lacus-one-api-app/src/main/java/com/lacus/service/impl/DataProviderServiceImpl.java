@@ -66,7 +66,6 @@ public class DataProviderServiceImpl implements IDataProviderService {
         return ResultManager.push(result, asynResult, dataPage);
     }
 
-
     private List<Map<String, Object>> resultConvert(List<Map<String, Object>> dataList, List<ReturnParamsVO> returnColList) {
         Set<String> returnColSet = returnColList.stream().map(ReturnParamsVO::getColumnName).collect(Collectors.toSet());
         List<Map<String, Object>> result = Lists.newArrayList();

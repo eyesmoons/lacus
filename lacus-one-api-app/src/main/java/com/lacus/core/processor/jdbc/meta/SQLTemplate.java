@@ -62,7 +62,7 @@ public class SQLTemplate {
                     }
                     RequestParamsVO param = new RequestParamsVO();
                     param.setColumnName(content);
-                    param.setColumnDemo(value.toString());
+                    param.setValue(value.toString());
                     context.addParameter(param);
                     return "?";
                 });

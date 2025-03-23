@@ -105,10 +105,11 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
         String config = apiDTO.getApiConfig();
         ApiConfigDTO apiConfig = JSONObject.parseObject(config, ApiConfigDTO.class);
         List<RequestParamsVO> requestParams = apiConfig.getApiParams().getRequestParams();
-        Map<String, Object> paramMap = requestParams.stream().filter(req -> Objects.nonNull(req) && Objects.nonNull(req.getColumnDemo())).collect(Collectors.toMap(RequestParamsVO::getColumnName, RequestParamsVO::getColumnDemo));
+        Map<String, Object> paramMap = requestParams.stream().filter(req -> Objects.nonNull(req) && Objects.nonNull(req.getValue())).collect(Collectors.toMap(RequestParamsVO::getColumnName, RequestParamsVO::getValue));
         BuriedFunc.addLog(LogsBuried.setInfo(String.format("当前接口请求地址为:【%s】,请求参数列表为:【%s】！", apiDTO.getApiUrl(), paramMap)));
         ApiInfoEntity apiInfo = new ApiInfoEntity();
         BeanUtils.copyProperties(apiDTO, apiInfo);
+        apiInfo.setApiConfig(apiDTO.getApiConfig());
         TestResult response = new TestResult();
         try {
             CommonResult<DataResult> result = this.fetch(apiInfo, paramMap, null);
@@ -209,7 +210,7 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
     private void checkParams(String apiUrl, ApiConfigDTO apiConfig, Map<String, Object> params) {
         ApiParamsVO apiParams = apiConfig.getApiParams();
         List<RequestParamsVO> requestParams = apiParams.getRequestParams();
-        Set<String> mustColumnSet = requestParams.stream().filter(req -> Objects.equals(req.getIsMust(), 1)).map(RequestParamsVO::getColumnName).collect(Collectors.toSet());
+        Set<String> mustColumnSet = requestParams.stream().filter(req -> Objects.equals(req.getRequired(), 1)).map(RequestParamsVO::getColumnName).collect(Collectors.toSet());
         for (String col : mustColumnSet) {
             Object res = params.get(col);
             if (ObjectUtils.isEmpty(res)) {

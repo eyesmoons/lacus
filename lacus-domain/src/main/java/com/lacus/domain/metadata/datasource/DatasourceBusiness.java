@@ -66,7 +66,6 @@ public class DatasourceBusiness {
         if (ObjectUtils.isEmpty(processor)) {
             throw new CustomException("未找到合适的数据源适配器");
         }
-        MetaDatasource datasource = new MetaDatasource();
         try {
             boolean testConnection = processor.testConnection(updateCommand.getConnectionParams());
             if (testConnection) {

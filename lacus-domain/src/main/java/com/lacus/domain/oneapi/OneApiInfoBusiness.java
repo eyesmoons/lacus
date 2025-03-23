@@ -81,6 +81,7 @@ public class OneApiInfoBusiness {
         checkApi(updateCommand, false);
         OneApiInfoModel model = OneApiInfoModelFactory.loadFromDb(updateCommand.getApiId(), oneApiInfoService);
         extraResponse(updateCommand);
+        OneApiInfoModelFactory.loadFromAddCommand(updateCommand, model);
         boolean update = model.updateById();
         if (update) {
             oneApiFeignClient.flushCache(model.getApiId(), model.getStatus());
@@ -189,7 +190,7 @@ public class OneApiInfoBusiness {
                     }
                     RequestParamsDTO requestParamsVO = new RequestParamsDTO();
                     requestParamsVO.setColumnName(req);
-                    requestParamsVO.setIsMust(0);
+                    requestParamsVO.setRequired(0);
                     requestParams.add(requestParamsVO);
                 }
             }

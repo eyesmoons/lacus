@@ -13,13 +13,13 @@ public class RequestParamsVO {
     private String columnType;
 
     @ApiModelProperty("是否必填，默认0(false)，必填则为1(true)")
-    private Integer isMust;
+    private Integer required;
 
     @ApiModelProperty("字段描述")
-    private String columnDesc;
+    private String description;
 
     @ApiModelProperty("字段样例值")
-    private String columnDemo;
+    private String value;
 
 
 }
