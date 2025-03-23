@@ -26,17 +26,14 @@ public class SparkJobInstanceEntity extends BaseEntity<SparkJobInstanceEntity> {
     @TableField("job_id")
     private Long jobId;
 
-    @TableField("deploy_mode")
-    private SparkDeployModeEnum deployMode;
-
     @TableField("instance_name")
     private String instanceName;
 
+    @TableField("deploy_mode")
+    private SparkDeployModeEnum deployMode;
+
     @TableField("application_id")
     private String applicationId;
-
-    @TableField("spark_job_id")
-    private String sparkJobId;
 
     @TableField("job_script")
     private String jobScript;
@@ -47,8 +44,8 @@ public class SparkJobInstanceEntity extends BaseEntity<SparkJobInstanceEntity> {
     @TableField("finished_time")
     private Date finishedTime;
 
-    @TableField("status")
-    private SparkStatusEnum status;
+    @TableField("job_status")
+    private SparkStatusEnum jobStatus;
 
     @TableField(exist = false)
     private String jobName;

@@ -26,7 +26,7 @@ public class SparkJobInstanceServiceImpl extends ServiceImpl<SparkJobInstanceMap
         }
 
         // 更新状态
-        instance.setStatus(sparkStatusEnum);
+        instance.setJobStatus(sparkStatusEnum);
 
         // 如果是终态,设置完成时间
         if (isTerminalStatus(sparkStatusEnum)) {
@@ -45,7 +45,7 @@ public class SparkJobInstanceServiceImpl extends ServiceImpl<SparkJobInstanceMap
         }
 
         // 更新状态
-        instance.setStatus(sparkStatusEnum);
+        instance.setJobStatus(sparkStatusEnum);
 
         // 如果是终态,设置完成时间
         if (isTerminalStatus(sparkStatusEnum)) {
@@ -64,12 +64,12 @@ public class SparkJobInstanceServiceImpl extends ServiceImpl<SparkJobInstanceMap
         LambdaQueryWrapper<SparkJobInstanceEntity> wrapper =
                 new LambdaQueryWrapper<SparkJobInstanceEntity>()
                         .eq(SparkJobInstanceEntity::getJobId, jobId)
-                        .eq(SparkJobInstanceEntity::getStatus, SparkStatusEnum.RUNNING);
+                        .eq(SparkJobInstanceEntity::getJobStatus, SparkStatusEnum.RUNNING);
 
         List<SparkJobInstanceEntity> runningInstances = baseMapper.selectList(wrapper);
         if (ObjectUtils.isNotEmpty(runningInstances)) {
             for (SparkJobInstanceEntity instance : runningInstances) {
-                instance.setStatus(sparkStatusEnum);
+                instance.setJobStatus(sparkStatusEnum);
                 if (finishedTime != null) {
                     instance.setFinishedTime(finishedTime);
                 } else if (isTerminalStatus(sparkStatusEnum)) {

@@ -87,7 +87,7 @@ public class SparkOperationServiceImpl implements ISparkOperationService {
         instance.setJobId(job.getJobId());
         instance.setInstanceName(job.getJobName() + "_" + System.currentTimeMillis());
         instance.setDeployMode(job.getDeployMode());
-        instance.setStatus(SparkStatusEnum.RUNNING);
+        instance.setJobStatus(SparkStatusEnum.RUNNING);
         instance.setSubmitTime(DateUtils.getNowDate());
         instanceService.save(instance);
         return instance;

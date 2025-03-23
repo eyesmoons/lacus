@@ -25,8 +25,8 @@ public class SparkJobEntity extends BaseEntity<SparkJobEntity> {
     @TableField("job_name")
     private String jobName;
 
-    @TableField("app_id")
-    private String appId;
+    @TableField("application_id")
+    private String applicationId;
 
     @TableField("job_type")
     private SparkJobTypeEnum jobType;

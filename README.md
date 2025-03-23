@@ -21,16 +21,13 @@
 - 登录
 ![登录](images/login.png)
 - 首页
-![首页](images/index-1.png)
-![首页](images/index-2.png)
+![首页](images/index.png)
 - 元数据-数据源类型
 ![元数据-数据源类型](images/datasource-type.png)
 - 元数据-数据源定义
 ![元数据-数据源定义](images/datasource-define.png)
 - 元数据-数据表查询
 ![元数据-数据表查询](images/datasource_table.png)
-- 数据采集-任务分组
-![数据采集-任务分组](images/data-collect-job-catalog.png)
 - 数据采集-任务定义
 ![数据采集-任务定义](images/data-collect-job-define.png)
 - 数据采集-任务实例
@@ -40,11 +37,19 @@
 ![flink开发-任务定义](images/flink-job-edit.png)
 - flink开发-任务实例
 ![flink开发-任务实例](images/flink-job-instance.png)
-- 配置中心-环境管理
+- flink开发-任务定义
+![spark开发-任务定义](images/spark-job-define.png)
+![spark开发-任务定义](images/spark-job-edit.png)
+- spark开发-任务实例
+![spark开发-任务实例](images/spark-job-instance.png)
+- 统一API-API定义
+![统一API-API定义](images/oneApi.png)
+- 资源中心-环境管理
 ![配置中心-环境管理](images/system-env.png)
-- 配置中心-资源管理
+- 资源中心-资源管理
 ![配置中心-资源管理](images/system-resource.png)
-
+- 资源中心-分组管理
+![资源中心-分组管理](images/catalog.png)
 ### 二、开发环境
 
 - JDK

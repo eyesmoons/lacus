@@ -45,7 +45,7 @@ public class SparkJobServiceImpl extends ServiceImpl<SparkJobMapper, SparkJobEnt
         }
         sparkJobEntity.setJobStatus(sparkStatusEnum);
         if (ObjectUtils.isNotEmpty(appId)) {
-            sparkJobEntity.setAppId(appId);
+            sparkJobEntity.setApplicationId(appId);
         }
         baseMapper.updateById(sparkJobEntity);
     }
