@@ -29,7 +29,7 @@ spring:
         url-pattern: /ds/druid/*        # 访问内置监控页面的路径，内置监控页面的首页是/druid/index.html
         reset-enable: false             # 不允许清空统计数据,重新计算
         login-username: mid             # 配置监控页面访问密码
-        login-password: Mid#2023@
+        login-password: admin123
 
 mybatis-plus:
   mapper-locations: classpath:/mapper/**/*.xml
@@ -40,14 +40,12 @@ mybatis-plus:
     auto-mapping-behavior: partial
     map-underscore-to-camel-case: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
-  type-handlers-package: com.qtone.data.platform.modules.biz.typehandler
-
 
 redis:
-  database: mid-bigdata-bigdataService
+  database: data-api-service
   key:
-    admin: 'ums:admin'
-    resourceList: 'ums:resourceList'
+    admin: 'lacus:admin'
+    resourceList: 'lacus:resourceList'
   expire:
     common: 86400 # 24小时
 

@@ -22,7 +22,7 @@ public class Constant {
 
 
     //子查询别名
-    public static final String ALIAS = "qtong";
+    public static final String ALIAS = "lacus";
 
 
     public static final String CNT = "cnt";

@@ -107,10 +107,6 @@
         <appender-ref ref="ASYNC_DRUID_FILE"/>
     </logger>
 
-    <logger name="com.qtone.data.platform.modules.metadata.support.interceptor.DynamicDataSourceInterceptor" level="debug">
-        <appender-ref ref="ASYNC_DRUID_FILE"/>
-    </logger>
-
     <root level="info">
         <appender-ref ref="STDOUT"/>
         <appender-ref ref="ASYNC_SYSTEM_FILE"/>

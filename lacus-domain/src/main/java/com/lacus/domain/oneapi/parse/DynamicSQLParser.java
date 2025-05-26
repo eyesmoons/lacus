@@ -70,7 +70,7 @@ public class DynamicSQLParser {
             throw new CustomException("SQL语法错误，缺失From关键字");
         }
         String subSql = sqlScript.substring(0, lowerSql.indexOf("from")).replaceAll("\n", " ");
-        String finalSql = subSql + " from qtone";
+        String finalSql = subSql + " from lacus";
         return this.doParse(finalSql);
     }
 

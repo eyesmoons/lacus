@@ -15,7 +15,6 @@ spring:
 logging:
   level:
     root: info
-    com.qtone.data.ds: debug
 
 kafka:
   bootstrapServers: hadoop1:9092,hadoop2:9092,hadoop3:9092

@@ -197,13 +197,6 @@
             <version>${jakarta.version}</version>
         </dependency>
 
-        <!-- 埋点sdk-->
-        <dependency>
-            <groupId>com.qtong.buried</groupId>
-            <artifactId>mid-bigdata-buried-point-client</artifactId>
-            <version>${buried.version}</version>
-        </dependency>
-
     </dependencies>
 
     <profiles>

@@ -31,7 +31,7 @@ public class DruidSQLParser {
 
     @PostConstruct
     private void init() {
-        final String initSql = "select COUNT(1) as cnt from qtong;";
+        final String initSql = "select COUNT(1) as ct from lacus;";
         initCountQuery = (((SQLSelectStatement) parseStatements(initSql, JdbcConstants.MYSQL).iterator().next()).getSelect()).getQuery();
         initCountQueryBlock = (SQLSelectQueryBlock) initCountQuery;
     }

@@ -25,7 +25,6 @@ import com.lacus.dao.mapper.ApiMapper;
 import com.lacus.service.dto.DataResult;
 import com.lacus.service.dto.TestResult;
 import com.lacus.service.IApiService;
-import com.lacus.service.IBuriedFuncService;
 import com.lacus.service.vo.ApiParamsVO;
 import com.lacus.service.vo.RequestParamsVO;
 import lombok.RequiredArgsConstructor;
@@ -48,7 +47,6 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
 
     private final IRedisService IRedisService;
     private final IDataProviderService providerService;
-    private final IBuriedFuncService buriedFuncService;
 
     private static final ExecutorService executor = Executors.newSingleThreadExecutor();
     private static final String QUERY = "query";
@@ -185,7 +183,6 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
             BuriedFunc.addLog(LogsBuried.setError(String.format("接口请求错误,接口名称:【%s】,错误原因: 【%s】！", apiInfo.getApiName(), aex.getMessage())));
             throw new ApiException(aex.getErrorCode(), String.format("接口调用失败:【%s】", aex.getMessage()));
         } catch (Exception e) {
-            e.printStackTrace();
             callHistoryEntity.callStatus(CallStatusEnum.FAIL).callCode(ResultCode.FAILED.getCode()).errorInfo(e.getMessage());
             throw new ApiException(ResultCode.FAILED, String.format("接口执行失败:【%s】！", e.getMessage()));
         } finally {
@@ -194,7 +191,6 @@ public class ApiServiceImpl extends ServiceImpl<ApiMapper, ApiInfoEntity> implem
                     long end = System.currentTimeMillis();
                     callHistoryEntity.setCallDelay(end - start);
                     callHistoryEntity.setCallIp(ApiThreadLocal.get() == null ? LOCAL_HOST : ApiThreadLocal.get().getRemoteIp());
-                    buriedFuncService.buriedFunc(callHistoryEntity);
                 });
             }
         }
