@@ -37,12 +37,14 @@ import static com.lacus.common.constant.Constants.SPARK_CLIENT_HOME;
 import static com.lacus.common.constant.Constants.SPARK_LOG_PATH;
 import static com.lacus.common.constant.Constants.SPARK_SQL_FILE_DIR;
 import static com.lacus.common.constant.Constants.SPARK_SQL_JOB_JAR;
+import static com.lacus.enums.SparkDeployModeEnum.YARN_CLIENT;
+import static com.lacus.enums.SparkDeployModeEnum.YARN_CLUSTER;
 
 @Slf4j
 @Service
 public class SparkOperationServiceImpl implements ISparkOperationService {
 
-    private static final String SPARK_SQL_MAIN_CLASS = "com.lacus.manager.spark.SparkSqlMain";
+    private static final String SPARK_SQL_MAIN_CLASS = "com.lacus.SparkSqlJobApplication";
     private static final String APP_NAME_PREFIX = "SPARK_JOB_";
     private static final String SPARK_SQL_FILE_PREFIX = "spark_sql_";
     private static final String SQL_FILE_SUFFIX = ".sql";
@@ -132,7 +134,9 @@ public class SparkOperationServiceImpl implements ISparkOperationService {
         launcher.setMainClass(getMainClass(job));
         launcher.setAppResource(getMainJarPath(job));
         launcher.setMaster(master);
-        launcher.setDeployMode(job.getDeployMode().name());
+        if (YARN_CLIENT.name().equalsIgnoreCase(master) || YARN_CLUSTER.name().equalsIgnoreCase(master)) {
+            launcher.setDeployMode(job.getDeployMode().name());
+        }
         if (master.startsWith("yarn")) {
             launcher.setConf("spark.yarn.submit.waitAppCompletion", "true");
         }
