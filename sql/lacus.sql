@@ -937,6 +937,60 @@ CREATE TABLE `one_api_call_history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='api调用历史表';
 
 -- ----------------------------
+-- Table structure for st_job
+-- ----------------------------
+CREATE TABLE `st_job` (
+    `job_id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务ID',
+    `job_name` varchar(50) NOT NULL COMMENT '任务名称',
+    `env_id` bigint NOT NULL COMMENT '环境ID',
+    `engine_name` varchar(50) NOT NULL  COMMENT '引擎名称',
+    `status` tinyint NOT NULL DEFAULT '0' COMMENT '任务状态',
+    `description` varchar(200) COMMENT '任务描述',
+    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `updater_id` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`job_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='数据集成任务表';
+
+-- ----------------------------
+-- Table structure for st_task
+-- ----------------------------
+CREATE TABLE `st_task` (
+    `task_id` bigint NOT NULL AUTO_INCREMENT COMMENT '子任务ID',
+    `task_name` varchar(50) NOT NULL COMMENT '子任务名称',
+    `job_id` bigint NOT NULL COMMENT '任务ID',
+    `connector_type` varchar(50) NOT NULL COMMENT '连接器名称',
+    `datasource_id` bigint NOT NULL COMMENT '数据源id',
+    `task_config` text COMMENT '子任务配置',
+    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `updater_id` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`task_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='数据集成子任务表';
+
+-- ----------------------------
+-- Table structure for st_job_instance
+-- ----------------------------
+CREATE TABLE `st_job_instance` (
+    `instance_id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务实例ID',
+    `instance_name` varchar(50) NOT NULL COMMENT '任务实例名称',
+    `job_id` bigint NOT NULL COMMENT '任务ID',
+    `engine_name` varchar(50) NOT NULL  COMMENT '引擎名称',
+    `job_config` text COMMENT '任务配置',
+    `status` tinyint NOT NULL DEFAULT '0' COMMENT '任务状态',
+    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `updater_id` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`instance_id`) USING BTREE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='数据集成任务实例表';
+
+-- ----------------------------
 -- quartz定时任务相关表
 -- ----------------------------
 -- 存储job详细信息

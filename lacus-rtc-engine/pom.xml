@@ -38,7 +38,7 @@
         <commons-lang3.version>3.12.0</commons-lang3.version>
         <druid.version>1.2.18</druid.version>
         <hutool.version>5.8.25</hutool.version>
-        <flink-shaded-guava.version>30.1.1-jre-16.0</flink-shaded-guava.version>
+        <flink-shaded-guava.version>31.1-jre-17.0</flink-shaded-guava.version>
         <flink-shaded-curator.version>1.10.3</flink-shaded-curator.version>
         <connect-runtime.version>3.5.1</connect-runtime.version>
         <mysql-connector-j.version>8.2.0</mysql-connector-j.version>

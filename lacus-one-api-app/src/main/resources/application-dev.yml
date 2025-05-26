@@ -11,11 +11,9 @@ spring:
 #    password: # Redis服务器连接密码（默认为空）
     timeout: 10000ms # 连接超时时间（毫秒）
 
-
 logging:
   level:
     root: info
-    com.qtone.data.ds: debug
 
 kafka:
   bootstrapServers: hadoop1:9092,hadoop2:9092,hadoop3:9092

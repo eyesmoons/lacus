@@ -10,7 +10,7 @@
         <directory>src/main/resources</directory>
       </resource>
     </resources>
-    <finalName>flink-jobs</finalName>
+    <finalName>lacus-rtc-engine</finalName>
     <plugins>
       <plugin>
         <artifactId>maven-compiler-plugin</artifactId>
