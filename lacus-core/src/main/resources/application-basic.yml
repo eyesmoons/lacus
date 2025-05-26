@@ -57,6 +57,9 @@ spring:
     serialization:
       write-dates-as-timestamps: false
     date-format: yyyy-MM-dd HH:mm:ss
+  autoconfigure:
+    exclude:
+      - org.springframework.boot.autoconfigure.hazelcast.HazelcastAutoConfiguration
 
 # token配置
 token:
