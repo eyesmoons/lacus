@@ -3,6 +3,7 @@ package com.lacus.service.spark.impl;
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.spark.entity.SparkJobEntity;
 import com.lacus.dao.spark.entity.SparkJobInstanceEntity;
+import com.lacus.dao.system.entity.SysEnvEntity;
 import com.lacus.dao.system.entity.SysResourcesEntity;
 import com.lacus.enums.SparkJobTypeEnum;
 import com.lacus.enums.SparkStatusEnum;
@@ -11,6 +12,7 @@ import com.lacus.service.spark.ISparkJobService;
 import com.lacus.service.spark.ISparkOperationService;
 import com.lacus.service.spark.handler.SparkAppHandler;
 import com.lacus.service.spark.handler.SparkLauncherMonitor;
+import com.lacus.service.system.ISysEnvService;
 import com.lacus.service.system.ISysResourcesService;
 import com.lacus.utils.CommonPropertyUtils;
 import com.lacus.utils.time.DateUtils;
@@ -59,6 +61,9 @@ public class SparkOperationServiceImpl implements ISparkOperationService {
     @Autowired
     private ISysResourcesService resourcesService;
 
+    @Autowired
+    private static ISysEnvService envService;
+
     @Override
     public void start(Long jobId) {
         SparkJobEntity sparkJobEntity = validateAndGetJob(jobId);
@@ -66,10 +71,28 @@ public class SparkOperationServiceImpl implements ISparkOperationService {
 
         log.info("开始提交Spark任务: {}", jobId);
         try {
+            initSystemEnv(sparkJobEntity.getEnvId());
             String appId = submitSparkJob(sparkJobEntity);
             updateJobStatus(sparkJobEntity, instance, appId, SparkStatusEnum.RUNNING);
         } catch (Exception e) {
             handleSubmitError(sparkJobEntity, instance, e);
+        }
+    }
+
+    private void initSystemEnv(Long envId) {
+        SysEnvEntity envEntity = envService.getById(envId);
+        String config = envEntity.getConfig();
+        String[] envLines = config.split("\n");
+        for (String line : envLines) {
+            line = line.trim();
+            if (line.startsWith("export ") || line.startsWith("EXPORT ")) {
+                String[] parts = line.substring(7).split("=", 2);
+                if (parts.length == 2) {
+                    String key = parts[0].trim();
+                    String value = parts[1].trim();
+                    System.setProperty(key, value);
+                }
+            }
         }
     }
 
@@ -238,7 +261,7 @@ public class SparkOperationServiceImpl implements ISparkOperationService {
     }
 
     private static String getMaster(SparkJobEntity job) {
-        String master = job.getMaster();
+        String master = System.getProperty("spark_master");
         switch (job.getDeployMode()) {
             case LOCAL:
                 return "local[*]";
