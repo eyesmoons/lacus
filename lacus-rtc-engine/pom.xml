@@ -23,6 +23,7 @@
         <flink-connector-oracle-cdc.version>3.0.1</flink-connector-oracle-cdc.version>
         <flink-connector-postgres-cdc.version>3.0.1</flink-connector-postgres-cdc.version>
         <flink-connector-mongo-cdc.version>3.0.1</flink-connector-mongo-cdc.version>
+        <flink-connector-db2-cdc.version>3.4.0</flink-connector-db2-cdc.version>
         <lombok.version>1.18.26</lombok.version>
         <slf4j.version>2.0.7</slf4j.version>
         <flink.version>1.16.2</flink.version>
@@ -49,8 +50,8 @@
         <jose4j.version>0.9.4</jose4j.version>
         <wildfly.version>1.15.24.Final</wildfly.version>
         <avro.version>1.11.3</avro.version>
-        <scope.setting>provided</scope.setting>
-        <!--        <scope.setting>compile</scope.setting>-->
+        <!--        <scope.setting>provided</scope.setting>-->
+        <scope.setting>compile</scope.setting>
     </properties>
 
     <dependencyManagement>
@@ -432,6 +433,13 @@
             <groupId>com.ververica</groupId>
             <artifactId>flink-connector-mongodb-cdc</artifactId>
             <version>${flink-connector-mongo-cdc.version}</version>
+        </dependency>
+
+        <!-- flink db2 cdc -->
+        <dependency>
+            <groupId>org.apache.flink</groupId>
+            <artifactId>flink-connector-db2-cdc</artifactId>
+            <version>${flink-connector-db2-cdc.version}</version>
         </dependency>
 
         <dependency>

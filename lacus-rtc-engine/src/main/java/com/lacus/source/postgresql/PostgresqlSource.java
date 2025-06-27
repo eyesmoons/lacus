@@ -1,30 +1,31 @@
-package com.lacus.source.impl;
+package com.lacus.source.postgresql;
 
 import com.google.auto.service.AutoService;
+import com.lacus.function.CustomerDeserializationSchemaMysql;
 import com.lacus.model.JobConf;
 import com.lacus.model.SourceConfig;
+import com.lacus.source.BaseSource;
 import com.ververica.cdc.connectors.base.options.StartupOptions;
-import com.ververica.cdc.connectors.oracle.source.OracleSourceBuilder;
-import com.ververica.cdc.debezium.JsonDebeziumDeserializationSchema;
+import com.ververica.cdc.connectors.postgres.source.PostgresSourceBuilder;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
 
-import static com.lacus.constant.ConnectorContext.ORACLE_SOURCE;
+import static com.lacus.constant.ConnectorContext.POSTGRES_SOURCE;
 
 /**
- * oracle采集处理器
+ * pg采集处理器
  *
  * @created by shengyu on 2023/8/31 11:16
  */
 @Slf4j
 @AutoService(BaseSource.class)
-public class OracleSource extends BaseSource {
+public class PostgresqlSource extends BaseSource {
     private static final long serialVersionUID = 1L;
-    public OracleSource() {
-        super(ORACLE_SOURCE);
+    public PostgresqlSource() {
+        super(POSTGRES_SOURCE);
     }
 
     @Override
@@ -33,19 +34,20 @@ public class OracleSource extends BaseSource {
         List<String> databaseList = sourceConfig.getDatabaseList();
         List<String> tableList = sourceConfig.getTableList();
         StartupOptions startupOptions = getStartupOptions(sourceConfig.getSyncType(), sourceConfig.getTimeStamp());
-        return new OracleSourceBuilder<String>()
+        return PostgresSourceBuilder.PostgresIncrementalSource.<String>builder()
                 .hostname(sourceConfig.getHostname())
                 .port(Integer.parseInt(sourceConfig.getPort()))
-                .databaseList(databaseList.toArray(new String[0]))
-                .schemaList(databaseList.toArray(new String[0]))
-                .tableList(tableList.toArray(new String[0]))
                 .username(sourceConfig.getUsername())
                 .password(sourceConfig.getPassword())
-                .deserializer(new JsonDebeziumDeserializationSchema())
-                .includeSchemaChanges(true)
+                .database(databaseList.get(0))
+                .schemaList(databaseList.toArray(new String[0]))
+                .tableList(tableList.toArray(new String[0]))
+                .slotName("flink")
+                .decodingPluginName("decoderbufs") // use pgoutput for PostgreSQL 10+
+                .deserializer(new CustomerDeserializationSchemaMysql())
+                .includeSchemaChanges(true) // output the schema changes as well
+                .splitSize(2) // the split size of each snapshot split
                 .startupOptions(startupOptions)
-                .debeziumProperties(getDebeziumProperties())
-                .splitSize(2)
                 .build();
     }
 

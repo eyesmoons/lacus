@@ -1,9 +1,10 @@
-package com.lacus.source.impl;
+package com.lacus.source.sqlserver;
 
 import com.google.auto.service.AutoService;
 import com.lacus.function.CustomerDeserializationSchemaMysql;
 import com.lacus.model.JobConf;
 import com.lacus.model.SourceConfig;
+import com.lacus.source.BaseSource;
 import com.ververica.cdc.connectors.base.options.StartupOptions;
 import com.ververica.cdc.connectors.sqlserver.source.SqlServerSourceBuilder;
 import lombok.extern.slf4j.Slf4j;

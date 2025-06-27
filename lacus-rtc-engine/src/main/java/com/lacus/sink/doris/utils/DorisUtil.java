@@ -1,10 +1,11 @@
-package com.lacus.utils;
+package com.lacus.sink.doris.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONObject;
 import com.lacus.exception.CustomException;
 import com.lacus.model.StreamLoadResponse;
 import com.lacus.model.SinkDataSource;
+import com.lacus.utils.JdbcUtil;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.*;

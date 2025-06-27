@@ -1,7 +1,7 @@
 package com.lacus.factory;
 
 import com.lacus.sink.ISink;
-import com.lacus.sink.impl.BaseSink;
+import com.lacus.sink.BaseSink;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

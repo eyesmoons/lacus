@@ -1,9 +1,8 @@
-package com.lacus.function;
+package com.lacus.sink.doris;
 
 import com.lacus.exception.CustomException;
-import com.lacus.utils.BeUtil;
+import com.lacus.sink.doris.utils.BeUtil;
 import com.lacus.utils.HttpClientUtil;
-import com.lacus.utils.PasswordUtil;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;

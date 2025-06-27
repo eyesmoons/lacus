@@ -15,7 +15,7 @@ import java.util.Properties;
 import java.util.function.Consumer;
 
 @Slf4j
-public class MySqlDateTimeConverter implements CustomConverter<SchemaBuilder, RelationalColumn> {
+public class CustomDateTimeConverter implements CustomConverter<SchemaBuilder, RelationalColumn> {
     private DateTimeFormatter dateFormatter = DateTimeFormatter.ISO_DATE;
     private DateTimeFormatter timeFormatter = DateTimeFormatter.ISO_TIME;
     private DateTimeFormatter datetimeFormatter = DateTimeFormatter.ISO_DATE_TIME;
