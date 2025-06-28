@@ -1,6 +1,5 @@
-package com.lacus.source.impl;
+package com.lacus.source;
 
-import com.lacus.source.ISource;
 import com.ververica.cdc.connectors.base.options.StartupOptions;
 import lombok.Getter;
 
@@ -44,7 +43,7 @@ public abstract class BaseSource implements ISource, Serializable {
         Properties properties = new Properties();
         properties.setProperty("converters", "dateConverters");
         //根据类在那个包下面修改
-        properties.setProperty("dateConverters.type", "com.lacus.function.MySqlDateTimeConverter");
+        properties.setProperty("dateConverters.type", "com.lacus.function.CustomDateTimeConverter");
         properties.setProperty("dateConverters.format.date", "yyyy-MM-dd");
         properties.setProperty("dateConverters.format.time", "HH:mm:ss");
         properties.setProperty("dateConverters.format.datetime", "yyyy-MM-dd HH:mm:ss");

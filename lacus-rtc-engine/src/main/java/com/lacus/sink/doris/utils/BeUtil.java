@@ -1,4 +1,4 @@
-package com.lacus.utils;
+package com.lacus.sink.doris.utils;
 
 import java.util.ArrayList;
 import java.util.Map;

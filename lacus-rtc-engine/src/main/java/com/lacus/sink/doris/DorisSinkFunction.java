@@ -1,8 +1,8 @@
-package com.lacus.function;
+package com.lacus.sink.doris;
 
 import com.alibaba.fastjson2.JSON;
 import com.lacus.exception.StreamLoadException;
-import com.lacus.utils.DorisUtil;
+import com.lacus.sink.doris.utils.DorisUtil;
 import com.lacus.model.StreamLoadResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.flink.configuration.Configuration;

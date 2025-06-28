@@ -1,7 +1,7 @@
 package com.lacus.factory;
 
 import com.lacus.source.ISource;
-import com.lacus.source.impl.BaseSource;
+import com.lacus.source.BaseSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

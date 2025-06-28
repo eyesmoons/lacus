@@ -1,6 +1,5 @@
-package com.lacus.sink.impl;
+package com.lacus.sink;
 
-import com.lacus.sink.ISink;
 import lombok.Getter;
 
 import java.io.Serializable;

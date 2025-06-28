@@ -14,9 +14,13 @@ public class ConnectorContext implements Serializable {
     public static final String ORACLE_SOURCE = "ORACLE";
     public static final String POSTGRES_SOURCE = "POSTGRES";
     public static final String MONGODB_SOURCE = "MONGODB";
-    public static final String KAFKA_SOURCE = "KAFKA";
+    public static final String DB2_SOURCE = "DB2";
+    public static final String OCEANBASE_SOURCE = "OCEANBASE";
 
     public static final String DORIS_SINK = "DORIS";
     public static final String MYSQL_SINK = "MYSQL";
+    public static final String POSTGRES_SINK = "POSTGRES";
+    public static final String ORACLE_SINK = "ORACLE";
+    public static final String SQLSERVER_SINK = "SQLSERVER";
     public static final String CLICKHOUSE_SINK = "CLICKHOUSE";
 }

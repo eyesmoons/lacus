@@ -1,15 +1,14 @@
-package com.lacus.sink.impl;
+package com.lacus.sink.doris;
 
 import com.alibaba.fastjson2.JSONArray;
 import com.google.auto.service.AutoService;
 import com.google.common.collect.Maps;
-import com.lacus.function.DorisSinkFunction;
-import com.lacus.function.DorisStreamLoad;
 import com.lacus.model.JobConf;
 import com.lacus.model.SinkConfig;
 import com.lacus.model.SinkDataSource;
 import com.lacus.model.StreamLoadProperty;
-import com.lacus.utils.DorisUtil;
+import com.lacus.sink.BaseSink;
+import com.lacus.sink.doris.utils.DorisUtil;
 import org.apache.flink.streaming.api.functions.sink.RichSinkFunction;
 
 import java.util.Arrays;

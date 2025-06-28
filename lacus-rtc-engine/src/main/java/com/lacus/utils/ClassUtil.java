@@ -1,6 +1,6 @@
 package com.lacus.utils;
 
-import com.lacus.source.impl.BaseSource;
+import com.lacus.source.BaseSource;
 import com.lacus.factory.DataCollectSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
