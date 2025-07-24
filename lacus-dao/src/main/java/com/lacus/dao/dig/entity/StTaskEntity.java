@@ -7,6 +7,7 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.lacus.common.core.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import org.apache.seatunnel.common.constants.PluginType;
 
 /**
  * @author shengyu
@@ -25,11 +26,26 @@ public class StTaskEntity extends BaseEntity<StTaskEntity> {
     private Long jobId;
 
     @TableField("connector_type")
-    private String connectorType;
+    private PluginType connectorType;
+
+    @TableField("connector_name")
+    private String connectorName;
 
     @TableField("datasource_id")
     private Long datasourceId;
 
     @TableField("task_config")
     private String taskConfig;
+
+    @TableField("datasource_config")
+    private String datasourceConfig;
+
+    @TableField("source_fields_config")
+    private String sourceFieldsConfig;
+
+    @TableField("transform_config")
+    private String transformConfig;
+
+    @TableField("sink_fields_config")
+    private String sinkFieldsConfig;
 }

@@ -959,18 +959,39 @@ CREATE TABLE `st_job` (
 -- ----------------------------
 CREATE TABLE `st_task` (
     `task_id` bigint NOT NULL AUTO_INCREMENT COMMENT '子任务ID',
-    `task_name` varchar(50) NOT NULL COMMENT '子任务名称',
+    `task_name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '子任务名称',
     `job_id` bigint NOT NULL COMMENT '任务ID',
-    `connector_type` varchar(50) NOT NULL COMMENT '连接器名称',
+    `connector_type` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '连接器类型',
+    `connector_name` varchar(150) COLLATE utf8mb4_bin NOT NULL COMMENT '连接器名称',
     `datasource_id` bigint NOT NULL COMMENT '数据源id',
-    `task_config` text COMMENT '子任务配置',
+    `task_config` text COLLATE utf8mb4_bin COMMENT '子任务配置',
+    `datasource_config` text COLLATE utf8mb4_bin COMMENT '数据源配置，包括数据库，表',
+    `source_fields_config` text COLLATE utf8mb4_bin COMMENT '源字段配置',
+    `transform_config` text COLLATE utf8mb4_bin COMMENT '转换条件配置',
+    `sink_fields_config` text COLLATE utf8mb4_bin COMMENT '输出字段配置',
     `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
-    `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `creator_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
     `create_time` datetime NOT NULL COMMENT '创建时间',
-    `updater_id` varchar(128) COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `updater_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
     `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
-    PRIMARY KEY (`task_id`) USING BTREE
+    PRIMARY KEY (`task_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='数据集成子任务表';
+
+-- ----------------------------
+-- Table structure for st_task_relation
+-- ----------------------------
+CREATE TABLE `st_task_relation` (
+    `relation_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+    `job_id` bigint NOT NULL COMMENT '任务ID',
+    `source_task_id` bigint NOT NULL COMMENT '输入任务节点ID',
+    `sink_task_id` bigint NOT NULL COMMENT '输出任务节点ID',
+    `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+    `creator_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
+    `create_time` datetime NOT NULL COMMENT '创建时间',
+    `updater_id` varchar(128) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL COMMENT '修改人',
+    `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    PRIMARY KEY (`relation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin COMMENT='数据集成子任务关系表';
 
 -- ----------------------------
 -- Table structure for st_job_instance

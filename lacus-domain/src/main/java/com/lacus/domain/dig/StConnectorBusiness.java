@@ -56,17 +56,17 @@ public class StConnectorBusiness {
 
     public FormStructure getConnectorFormStructure(String pluginType, String connectorName) {
         Map<PluginType, LinkedHashMap<PluginIdentifier, OptionRule>> allConnectors = StPluginDiscoveryHelper.getAllConnectors();
-        if (PluginType.SOURCE.getType().equals(pluginType)) {
+        if (PluginType.SOURCE.name().equals(pluginType)) {
             ConcurrentMap<String, FormStructure> allDownloadedSourceFormStructures = StPluginDiscoveryHelper.getDownloadedConnectorFormStructures(allConnectors, PluginType.SOURCE);
             return allDownloadedSourceFormStructures.get(connectorName);
         }
 
-        if (PluginType.TRANSFORM.getType().equals(pluginType)) {
+        if (PluginType.TRANSFORM.name().equals(pluginType)) {
             ConcurrentMap<String, FormStructure> transformFormStructures = StPluginDiscoveryHelper.getTransformFormStructures(allConnectors);
             return transformFormStructures.get(connectorName);
         }
 
-        if (PluginType.SINK.getType().equals(pluginType)) {
+        if (PluginType.SINK.name().equals(pluginType)) {
             ConcurrentMap<String, FormStructure> downloadedSinkFormStructures = StPluginDiscoveryHelper.getDownloadedConnectorFormStructures(allConnectors, PluginType.SINK);
             return downloadedSinkFormStructures.get(connectorName);
         }
