@@ -42,7 +42,7 @@ public class StJobBusiness {
         model.updateById();
     }
 
-    public void deleteJob(String jobId) {
+    public void deleteJob(Long jobId) {
         stJobService.removeById(jobId);
         stTaskService.remove(new QueryWrapper<StTaskEntity>().eq("job_id", jobId));
     }

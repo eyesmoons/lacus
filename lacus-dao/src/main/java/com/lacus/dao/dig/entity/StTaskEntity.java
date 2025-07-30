@@ -17,7 +17,7 @@ import org.apache.seatunnel.common.constants.PluginType;
 @Data
 public class StTaskEntity extends BaseEntity<StTaskEntity> {
     @TableId(value = "task_id", type = IdType.AUTO)
-    private Long taskId;
+    private String taskId;
 
     @TableField("task_name")
     private String taskName;

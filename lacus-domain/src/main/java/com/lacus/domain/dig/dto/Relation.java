@@ -5,9 +5,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 public class Relation {
-    private Long sourceTaskId;
-    private Long sinkTaskId;
+    private String sourceTaskId;
+    private String sinkTaskId;
 }

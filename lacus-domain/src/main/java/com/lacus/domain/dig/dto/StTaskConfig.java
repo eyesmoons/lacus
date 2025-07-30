@@ -1,5 +1,6 @@
 package com.lacus.domain.dig.dto;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.util.Map;
 @Builder
 public class StTaskConfig {
 
-    private Long taskId;
+    private String taskId;
 
     private String taskName;
 
@@ -27,7 +28,7 @@ public class StTaskConfig {
 
     private Long datasourceId;
 
-    private String taskConfig;
+    private JSONObject taskConfig;
 
     private DatasourceConfig datasourceConfig;
 

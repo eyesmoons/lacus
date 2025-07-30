@@ -197,7 +197,7 @@ CREATE TABLE `meta_column` (
   `column_type` varchar(150) DEFAULT NULL COMMENT '字段类型',
   `numeric_precision` bigint(20) unsigned DEFAULT NULL,
   `numeric_scale` bigint(20) unsigned DEFAULT NULL,
-  `column_length` int(11) DEFAULT NULL COMMENT '字段长度',
+  `column_length` bigint(20) DEFAULT NULL COMMENT '字段长度',
   `comment` varchar(500) DEFAULT NULL COMMENT '字段描述',
   `is_nullable` varchar(30) NOT NULL COMMENT '是否非空',
   `column_default` varchar(60) DEFAULT NULL COMMENT '字段默认值',
@@ -942,8 +942,8 @@ CREATE TABLE `one_api_call_history` (
 CREATE TABLE `st_job` (
     `job_id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务ID',
     `job_name` varchar(50) NOT NULL COMMENT '任务名称',
-    `env_id` bigint NOT NULL COMMENT '环境ID',
-    `engine_name` varchar(50) NOT NULL  COMMENT '引擎名称',
+    `env_id` bigint DEFAULT NULL COMMENT '环境ID',
+    `engine_name` varchar(50) DEFAULT NULL  COMMENT '引擎名称',
     `status` tinyint NOT NULL DEFAULT '0' COMMENT '任务状态',
     `description` varchar(200) COMMENT '任务描述',
     `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
@@ -958,7 +958,7 @@ CREATE TABLE `st_job` (
 -- Table structure for st_task
 -- ----------------------------
 CREATE TABLE `st_task` (
-    `task_id` bigint NOT NULL AUTO_INCREMENT COMMENT '子任务ID',
+    `task_id` varchar(100) NOT NULL COMMENT '子任务ID',
     `task_name` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '子任务名称',
     `job_id` bigint NOT NULL COMMENT '任务ID',
     `connector_type` varchar(50) COLLATE utf8mb4_bin NOT NULL COMMENT '连接器类型',
@@ -983,8 +983,8 @@ CREATE TABLE `st_task` (
 CREATE TABLE `st_task_relation` (
     `relation_id` bigint NOT NULL AUTO_INCREMENT COMMENT '主键ID',
     `job_id` bigint NOT NULL COMMENT '任务ID',
-    `source_task_id` bigint NOT NULL COMMENT '输入任务节点ID',
-    `sink_task_id` bigint NOT NULL COMMENT '输出任务节点ID',
+    `source_task_id` varchar(100) NOT NULL COMMENT '输入任务节点ID',
+    `sink_task_id` varchar(100) NOT NULL COMMENT '输出任务节点ID',
     `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
     `creator_id` varchar(64) CHARACTER SET utf8mb4 COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
     `create_time` datetime NOT NULL COMMENT '创建时间',

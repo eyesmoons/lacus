@@ -43,7 +43,7 @@ public class StJobDefineController {
     }
 
     @ApiOperation("修改任务定义")
-    @PutMapping("/{jobId}")
+    @PutMapping
     public ResponseDTO<Void> updateJob(@RequestBody @Valid UpdateStJobCommand command) {
         stJobBusiness.updateJob(command);
         return ResponseDTO.ok();
@@ -51,7 +51,7 @@ public class StJobDefineController {
 
     @ApiOperation("删除任务定义")
     @DeleteMapping("/{jobId}")
-    public ResponseDTO<Void> deleteJob(@PathVariable String jobId) {
+    public ResponseDTO<Void> deleteJob(@PathVariable Long jobId) {
         stJobBusiness.deleteJob(jobId);
         return ResponseDTO.ok();
     }

@@ -1,5 +1,6 @@
 package com.lacus.domain.dig;
 
+import com.alibaba.fastjson2.JSON;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lacus.common.exception.CustomException;
@@ -35,38 +36,40 @@ public class StTaskBusiness {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
-    public void saveOrUpdateTask(StTaskConfig command) {
+    public StTaskEntity saveOrUpdateTask(StTaskConfig command) {
         try {
             StTaskEntity stTask = new StTaskEntity();
             String transformConfig = "";
             if (Objects.equals(command.getConnectorType(), PluginType.TRANSFORM)) {
                 transformConfig = OBJECT_MAPPER.writeValueAsString(command.getTransformConfig());
             }
+            stTask.setTaskId(command.getTaskId());
             stTask.setTaskName(command.getTaskName());
             stTask.setJobId(command.getJobId());
             stTask.setConnectorType(command.getConnectorType());
             stTask.setConnectorName(command.getConnectorName());
             stTask.setDatasourceId(command.getDatasourceId());
-            stTask.setTaskConfig(command.getTaskConfig());
+            stTask.setTaskConfig(JSON.toJSONString(command.getTaskConfig()));
             stTask.setDatasourceConfig(ObjectUtils.isEmpty(command.getDatasourceConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getDatasourceConfig()));
-            stTask.setDatasourceConfig(transformConfig);
-            stTask.setDatasourceConfig(ObjectUtils.isEmpty(command.getSinkFieldsConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getSinkFieldsConfig()));
+            stTask.setSourceFieldsConfig(ObjectUtils.isEmpty(command.getSourceFieldsConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getSourceFieldsConfig()));
+            stTask.setTransformConfig(transformConfig);
+            stTask.setSinkFieldsConfig(ObjectUtils.isEmpty(command.getSinkFieldsConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getSinkFieldsConfig()));
 
             if (ObjectUtils.isNotEmpty(command.getTaskId())) {
                 StTaskEntity stTaskEntity = stTaskService.getById(command.getTaskId());
                 if (ObjectUtils.isEmpty(stTaskEntity)) {
-                    throw new CustomException("任务节点 " + command.getTaskId() + " 不存在");
+                    stTaskService.save(stTask);
+                } else {
+                    stTaskService.updateById(stTask);
                 }
-                stTaskService.updateById(stTask);
-            } else {
-                stTaskService.save(stTask);
             }
+            return stTask;
         } catch (Exception e) {
             throw new CustomException("保存任务节点出错", e);
         }
     }
 
-    public StTaskConfig getTaskById(Long taskId) {
+    public StTaskConfig getTaskById(String taskId) {
         try {
             StTaskEntity task = stTaskService.getById(taskId);
             if (ObjectUtils.isEmpty(task)) {
@@ -86,7 +89,7 @@ public class StTaskBusiness {
             config.setConnectorType(task.getConnectorType());
             config.setConnectorName(task.getConnectorName());
             config.setDatasourceId(task.getDatasourceId());
-            config.setTaskConfig(task.getTaskConfig());
+            config.setTaskConfig(JSON.parseObject(task.getTaskConfig()));
             config.setDatasourceConfig(ObjectUtils.isEmpty(task.getDatasourceConfig()) ? null : OBJECT_MAPPER.readValue(task.getDatasourceConfig(), DatasourceConfig.class));
             config.setSourceFieldsConfig(ObjectUtils.isEmpty(task.getSourceFieldsConfig()) ? null : OBJECT_MAPPER.readValue(task.getSourceFieldsConfig(), SourceFieldsConfig.class));
             config.setTransformConfig(ObjectUtils.isEmpty(task.getTransformConfig()) ? null : OBJECT_MAPPER.readValue(task.getTransformConfig(), new TypeReference<Map<String, Object>>() {
@@ -99,7 +102,7 @@ public class StTaskBusiness {
         }
     }
 
-    public void deleteTask(Long taskId) {
+    public void deleteTask(String taskId) {
         try {
             StTaskEntity task = stTaskService.getById(taskId);
             if (ObjectUtils.isEmpty(task)) {
@@ -115,6 +118,7 @@ public class StTaskBusiness {
         try {
             List<StTaskRelationEntity> relations = dag.getRelations().stream().map(item -> {
                 StTaskRelationEntity relation = new StTaskRelationEntity();
+                relation.setJobId(dag.getJobId());
                 relation.setSourceTaskId(item.getSourceTaskId());
                 relation.setSinkTaskId(item.getSinkTaskId());
                 return relation;

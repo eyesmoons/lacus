@@ -1,6 +1,7 @@
 package com.lacus.admin.controller.dig;
 
 import com.lacus.common.core.dto.ResponseDTO;
+import com.lacus.dao.dig.entity.StTaskEntity;
 import com.lacus.domain.dig.StTaskBusiness;
 import com.lacus.domain.dig.dto.JobDag;
 import com.lacus.domain.dig.dto.JobTaskInfo;
@@ -26,20 +27,19 @@ public class StJobTaskController {
 
     @ApiOperation("新增或更新任务节点")
     @PostMapping
-    public ResponseDTO<?> saveOrUpdateTask(@RequestBody StTaskConfig command) {
-        stTaskBusiness.saveOrUpdateTask(command);
-        return ResponseDTO.ok();
+    public ResponseDTO<StTaskEntity> saveOrUpdateTask(@RequestBody StTaskConfig command) {
+        return ResponseDTO.ok(stTaskBusiness.saveOrUpdateTask(command));
     }
 
     @ApiOperation("根据任务节点Id获取节点信息")
     @GetMapping("/{taskId}")
-    public ResponseDTO<StTaskConfig> getTaskById(@PathVariable("taskId") Long taskId) {
+    public ResponseDTO<StTaskConfig> getTaskById(@PathVariable("taskId") String taskId) {
         return ResponseDTO.ok(stTaskBusiness.getTaskById(taskId));
     }
 
     @ApiOperation("删除任务节点")
     @DeleteMapping("/{taskId}")
-    public ResponseDTO<?> removeTask(@PathVariable("taskId") Long taskId) {
+    public ResponseDTO<?> removeTask(@PathVariable("taskId") String taskId) {
         stTaskBusiness.deleteTask(taskId);
         return ResponseDTO.ok();
     }

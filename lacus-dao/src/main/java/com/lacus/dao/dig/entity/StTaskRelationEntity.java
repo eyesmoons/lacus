@@ -19,8 +19,8 @@ public class StTaskRelationEntity extends BaseEntity<StTaskRelationEntity> {
     private Long jobId;
 
     @TableField("source_task_id")
-    private Long sourceTaskId;
+    private String sourceTaskId;
 
     @TableField("sink_task_id")
-    private Long sinkTaskId;
+    private String sinkTaskId;
 }
