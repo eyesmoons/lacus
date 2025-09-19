@@ -5,7 +5,6 @@ import com.lacus.sink.BaseSink;
 import com.lacus.sink.jdbc.JdbcSink;
 import lombok.extern.slf4j.Slf4j;
 
-import static com.lacus.constant.ConnectorContext.MYSQL_SINK;
 import static com.lacus.constant.ConnectorContext.SQLSERVER_SINK;
 
 /**

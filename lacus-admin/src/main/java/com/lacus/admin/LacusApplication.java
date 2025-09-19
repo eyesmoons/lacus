@@ -2,6 +2,7 @@ package com.lacus.admin;
 
 import cn.hutool.core.date.DateUtil;
 import com.lacus.datasource.manager.DataSourcePluginManager;
+import com.lacus.st.loader.StComponentLoader;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
@@ -20,6 +21,8 @@ public class LacusApplication {
 
     @Autowired
     private DataSourcePluginManager dataSourcePluginManager;
+    @Autowired
+    private StComponentLoader stComponentLoader;
 
     public static void main(String[] args) {
         SpringApplication.run(LacusApplication.class, args);
@@ -30,5 +33,7 @@ public class LacusApplication {
     public void run(ApplicationReadyEvent event) {
         log.info("开始注册数据源...");
         dataSourcePluginManager.registerAll();
+        log.info("开始注册ST组件...");
+        stComponentLoader.initialize();
     }
 }

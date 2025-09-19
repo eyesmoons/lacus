@@ -48,7 +48,7 @@ public class DorisSink extends BaseSink {
      *
      * @param sinkConfig sinkConfig
      */
-    private static Map<String, DorisStreamLoad> buildDorisStreamConfig(SinkConfig sinkConfig) {
+    private Map<String, DorisStreamLoad> buildDorisStreamConfig(SinkConfig sinkConfig) {
         Map<String, DorisStreamLoad> dorisStreamLoadMap = Maps.newHashMap();
         SinkDataSource sinkDataSource = sinkConfig.getSinkDataSource();
         String hostPort = sinkDataSource.getIp() + ":" + sinkDataSource.getPort();
@@ -85,7 +85,7 @@ public class DorisSink extends BaseSink {
     /**
      * 转换json path，添加 删除标识 和 落库时间
      */
-    private static String convertJsonPaths(String jsonpaths) {
+    private String convertJsonPaths(String jsonpaths) {
         JSONArray jsonArr = JSONArray.parseArray(jsonpaths);
         if (!jsonArr.contains("$." + DELETE_KEY)) {
             jsonArr.add("$." + DELETE_KEY);
@@ -96,7 +96,7 @@ public class DorisSink extends BaseSink {
         return jsonArr.toJSONString();
     }
 
-    private static String convertColumns(String columns) {
+    private String convertColumns(String columns) {
         List<String> columnList = Arrays.asList(columns.split(","));
         columnList = columnList.stream().map(column -> {
             String replaceColumn = column.trim().replace("`", "");

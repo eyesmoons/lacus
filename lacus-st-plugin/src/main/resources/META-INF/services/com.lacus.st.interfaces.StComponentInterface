@@ -1,0 +1,4 @@
+# ST组件SPI配置文件
+# 此文件用于自动发现和加载ST组件
+# 每个组件实现类都需要在此文件中注册
+com.lacus.st.source.JdbcSource

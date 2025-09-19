@@ -12,6 +12,7 @@ import org.apache.flink.api.connector.source.Source;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 
 import java.util.List;
+import java.util.Properties;
 
 import static com.lacus.constant.ConnectorContext.ORACLE_SOURCE;
 
@@ -24,6 +25,7 @@ import static com.lacus.constant.ConnectorContext.ORACLE_SOURCE;
 @AutoService(BaseSource.class)
 public class OracleSource extends BaseSource {
     private static final long serialVersionUID = 1L;
+
     public OracleSource() {
         super(ORACLE_SOURCE);
     }
@@ -37,7 +39,7 @@ public class OracleSource extends BaseSource {
         return new OracleSourceBuilder<String>()
                 .hostname(sourceConfig.getHostname())
                 .port(Integer.parseInt(sourceConfig.getPort()))
-                .databaseList(databaseList.toArray(new String[0]))
+                .databaseList(sourceConfig.getSchemaName())
                 .schemaList(databaseList.toArray(new String[0]))
                 .tableList(tableList.toArray(new String[0]))
                 .username(sourceConfig.getUsername())

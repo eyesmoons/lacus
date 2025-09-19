@@ -47,27 +47,6 @@
             <version>8.0.28</version>
         </dependency>
 
-        <!-- Oracle驱动 -->
-        <dependency>
-            <groupId>com.oracle.database.jdbc</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>${oracle.version}</version>
-        </dependency>
-
-        <!-- SQLServer驱动 -->
-        <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>mssql-jdbc</artifactId>
-            <version>${sqlserver.version}</version>
-        </dependency>
-
-        <!-- ClickHouse驱动 -->
-        <dependency>
-            <groupId>ru.yandex.clickhouse</groupId>
-            <artifactId>clickhouse-jdbc</artifactId>
-            <version>${clickhouse.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>com.alibaba</groupId>
             <artifactId>druid</artifactId>

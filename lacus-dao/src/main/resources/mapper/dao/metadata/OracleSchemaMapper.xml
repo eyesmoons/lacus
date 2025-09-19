@@ -32,27 +32,31 @@
 
     <select id="listAllSchemaDb" resultMap="schemaDbMap">
         select
-            username as schema_name
-        from dba_users WHERE DEFAULT_TABLESPACE = 'USERS'
+            tablespace_name as schema_name
+        from dba_tablespaces
     </select>
 
     <select id="listSchemaTable" resultMap="schemaTableMap">
         SELECT
-            OWNER AS table_schema,
-            table_name,
-            '' AS table_type,
-            '' AS engine,
-            0 AS table_rows,
-            0 AS data_length,
-            NULL AS create_time,
-            NULL AS table_comment
-        FROM all_tables
+        #{dbName} AS table_schema,
+        o.object_name AS table_name,
+        CASE o.object_type
+        WHEN 'TABLE' THEN 'BASE TABLE'
+        WHEN 'VIEW' THEN 'VIEW'
+        ELSE o.object_type
+        END AS table_type,
+        'ORACLE' AS engine,
+        t.num_rows AS table_rows,
+        t.blocks * (SELECT value FROM v$parameter WHERE name = 'db_block_size') AS data_length,
+        o.created AS create_time,
+        c.comments AS table_comment
+        FROM user_objects o
+        LEFT JOIN user_tables t ON o.object_name = t.table_name AND o.object_type = 'TABLE'
+        LEFT JOIN user_tab_comments c ON o.object_name = c.table_name
         <where>
-            <if test="dbName != null and dbName != ''">
-                AND OWNER = #{dbName}
-            </if>
+            o.object_name not like '%$%' and o.object_type = 'TABLE'
             <if test="tableName != null and tableName != ''">
-                AND table_name = #{tableName}
+                AND o.object_name = #{tableName}
             </if>
         </where>
     </select>

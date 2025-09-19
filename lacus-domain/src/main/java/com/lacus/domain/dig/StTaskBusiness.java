@@ -84,6 +84,7 @@ public class StTaskBusiness {
     private static StTaskConfig convertStTaskConfig(StTaskEntity task) {
         try {
             StTaskConfig config = new StTaskConfig();
+            config.setTaskId(task.getTaskId());
             config.setTaskName(task.getTaskName());
             config.setJobId(task.getJobId());
             config.setConnectorType(task.getConnectorType());
