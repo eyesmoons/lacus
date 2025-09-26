@@ -36,6 +36,12 @@
 
         <dependency>
             <groupId>com.lacus</groupId>
+            <artifactId>lacus-st-plugin</artifactId>
+            <version>${revision}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.lacus</groupId>
             <artifactId>lacus-common</artifactId>
         </dependency>
 

@@ -28,7 +28,7 @@ public class StTaskConfig {
 
     private Long datasourceId;
 
-    private JSONObject taskConfig;
+    private String taskConfig;
 
     private DatasourceConfig datasourceConfig;
 

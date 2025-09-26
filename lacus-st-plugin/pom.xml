@@ -55,6 +55,37 @@
         </dependencies>
     </dependencyManagement>
 
+    <dependencies>
+        <!-- 依赖common模块 -->
+        <dependency>
+            <groupId>com.lacus</groupId>
+            <artifactId>lacus-common</artifactId>
+        </dependency>
+
+        <!-- SPI相关依赖 -->
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service-annotations</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.auto.service</groupId>
+            <artifactId>auto-service</artifactId>
+        </dependency>
+
+        <!-- Lombok -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
+        <!-- Spring Boot -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+
     <build>
         <plugins>
             <plugin>

@@ -5,6 +5,8 @@ import com.lacus.st.abstracts.AbstractStSource;
 import com.lacus.st.annotation.StComponent;
 import com.lacus.st.annotation.StField;
 import com.lacus.st.interfaces.StComponentInterface;
+import com.lacus.st.annotation.StTag;
+import com.lacus.st.annotation.StTag.TagDefinition;
 import lombok.extern.slf4j.Slf4j;
 
 import java.sql.Connection;
@@ -18,18 +20,26 @@ import java.sql.SQLException;
 @Slf4j
 @StComponent(
         type = StComponent.ComponentType.SOURCE,
-        name = "jdbc",
-        displayName = "MySQL数据源",
-        description = "从MySQL数据库读取数据的组件",
+        name = "jdbc_source",
+        displayName = "JDBC数据源",
+        description = "从JDBC数据库读取数据的组件",
         version = "2.0.0",
         author = "lacus"
 )
+@StTag({
+        @TagDefinition(name = "数据源配置", displayName = "数据源配置", order = 1, description = "数据源选择和连接配置"),
+        @TagDefinition(name = "查询配置", displayName = "查询配置", order = 2, description = "数据查询相关配置"),
+        @TagDefinition(name = "性能配置", displayName = "性能配置", order = 3, description = "性能优化相关配置"),
+        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 4, description = "其他扩展配置")
+})
+
 @AutoService(StComponentInterface.class)
 public class JdbcSource extends AbstractStSource {
 
     // 数据源配置
     @StField(
             tag = "数据源配置",
+            order = 1,
             required = true,
             enName = "datasourceId",
             cnName = "数据源",
@@ -42,6 +52,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "数据源配置",
+            order = 2,
             required = true,
             enName = "database",
             cnName = "数据库名",
@@ -54,6 +65,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "数据源配置",
+            order = 3,
             required = true,
             enName = "table_list",
             cnName = "表名",
@@ -67,6 +79,7 @@ public class JdbcSource extends AbstractStSource {
     // 连接器配置
     @StField(
             tag = "连接器配置",
+            order = 4,
             required = true,
             enName = "query",
             cnName = "查询语句",
@@ -77,6 +90,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 5,
             required = false,
             enName = "connection_check_timeout_sec",
             cnName = "连接检查超时时间(秒)",
@@ -89,6 +103,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 6,
             required = false,
             enName = "partition_column",
             cnName = "分区列",
@@ -100,6 +115,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 7,
             required = false,
             enName = "partition_lower_bound",
             cnName = "分区下界",
@@ -111,6 +127,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 8,
             required = false,
             enName = "partition_upper_bound",
             cnName = "分区上界",
@@ -122,6 +139,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 9,
             required = false,
             enName = "partition_num",
             cnName = "作业并行度",
@@ -134,6 +152,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 10,
             required = false,
             enName = "fetch_size",
             cnName = "数据拉取大小",
@@ -147,6 +166,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 11,
             required = false,
             enName = "properties",
             cnName = "连接参数",
@@ -158,6 +178,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 12,
             required = false,
             enName = "table_path",
             cnName = "表的完整路径",
@@ -174,6 +195,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 13,
             required = false,
             enName = "where_condition",
             cnName = "where条件",
@@ -185,6 +207,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 14,
             required = false,
             enName = "split.size",
             cnName = "表的分片大小",
@@ -197,6 +220,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 15,
             required = false,
             enName = "split.even-distribution.factor.lower-bound",
             cnName = "分片键分布因子的下限",
@@ -209,6 +233,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 16,
             required = false,
             enName = "split.even-distribution.factor.upper-bound",
             cnName = "分片键分布因子的上线",
@@ -221,6 +246,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 17,
             required = false,
             enName = "split.sample-sharding.threshold",
             cnName = "样本分片阈值",
@@ -233,6 +259,7 @@ public class JdbcSource extends AbstractStSource {
 
     @StField(
             tag = "连接器配置",
+            order = 18,
             required = false,
             enName = "split.inverse-sampling.rate",
             cnName = "逆采样率",

@@ -71,6 +71,12 @@ public @interface StField {
     String[] dictEnum() default {};
     
     /**
+     * 字段排序，用于控制字段在表单中的显示顺序
+     * 数值越小越靠前，默认为0
+     */
+    int order() default 0;
+    
+    /**
      * 表单类型枚举
      */
     @Getter

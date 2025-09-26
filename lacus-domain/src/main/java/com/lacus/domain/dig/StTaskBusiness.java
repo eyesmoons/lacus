@@ -15,6 +15,7 @@ import com.lacus.domain.dig.dto.SourceFieldsConfig;
 import com.lacus.domain.dig.dto.StTaskConfig;
 import com.lacus.service.dig.IStTaskRelationService;
 import com.lacus.service.dig.IStTaskService;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.seatunnel.common.constants.PluginType;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class StTaskBusiness {
 
@@ -49,7 +51,7 @@ public class StTaskBusiness {
             stTask.setConnectorType(command.getConnectorType());
             stTask.setConnectorName(command.getConnectorName());
             stTask.setDatasourceId(command.getDatasourceId());
-            stTask.setTaskConfig(JSON.toJSONString(command.getTaskConfig()));
+            stTask.setTaskConfig(command.getTaskConfig());
             stTask.setDatasourceConfig(ObjectUtils.isEmpty(command.getDatasourceConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getDatasourceConfig()));
             stTask.setSourceFieldsConfig(ObjectUtils.isEmpty(command.getSourceFieldsConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getSourceFieldsConfig()));
             stTask.setTransformConfig(transformConfig);
@@ -73,7 +75,8 @@ public class StTaskBusiness {
         try {
             StTaskEntity task = stTaskService.getById(taskId);
             if (ObjectUtils.isEmpty(task)) {
-                throw new CustomException("任务节点 " + taskId + " 不存在");
+                log.error("任务节点 {} 不存在", taskId);
+                return null;
             }
             return convertStTaskConfig(task);
         } catch (Exception e) {
@@ -90,7 +93,7 @@ public class StTaskBusiness {
             config.setConnectorType(task.getConnectorType());
             config.setConnectorName(task.getConnectorName());
             config.setDatasourceId(task.getDatasourceId());
-            config.setTaskConfig(JSON.parseObject(task.getTaskConfig()));
+            config.setTaskConfig(task.getTaskConfig());
             config.setDatasourceConfig(ObjectUtils.isEmpty(task.getDatasourceConfig()) ? null : OBJECT_MAPPER.readValue(task.getDatasourceConfig(), DatasourceConfig.class));
             config.setSourceFieldsConfig(ObjectUtils.isEmpty(task.getSourceFieldsConfig()) ? null : OBJECT_MAPPER.readValue(task.getSourceFieldsConfig(), SourceFieldsConfig.class));
             config.setTransformConfig(ObjectUtils.isEmpty(task.getTransformConfig()) ? null : OBJECT_MAPPER.readValue(task.getTransformConfig(), new TypeReference<Map<String, Object>>() {

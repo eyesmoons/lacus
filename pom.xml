@@ -243,6 +243,13 @@
                 <version>${revision}</version>
             </dependency>
 
+            <!-- st-plugin模块-->
+            <dependency>
+                <groupId>com.lacus</groupId>
+                <artifactId>lacus-st-plugin</artifactId>
+                <version>${revision}</version>
+            </dependency>
+
             <!-- hutool common tools-->
             <dependency>
                 <groupId>cn.hutool</groupId>

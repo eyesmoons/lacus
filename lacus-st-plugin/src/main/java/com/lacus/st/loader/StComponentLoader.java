@@ -111,6 +111,13 @@ public class StComponentLoader {
      * @return 字段配置信息
      */
     private Map<String, Object> getFieldConfigs(Class<?> componentClass) {
+        Map<String, Object> result = new HashMap<>();
+        
+        // 获取标签配置信息
+        Map<String, Object> tagConfigs = getTagConfigs(componentClass);
+        result.put("tags", tagConfigs);
+        
+        // 获取字段配置信息
         Map<String, Object> fieldConfigs = new HashMap<>();
 
         java.lang.reflect.Field[] fields = componentClass.getDeclaredFields();
@@ -119,11 +126,13 @@ public class StComponentLoader {
             if (fieldAnnotation != null) {
                 Map<String, Object> fieldConfig = new HashMap<>();
                 fieldConfig.put("tag", fieldAnnotation.tag());
+                fieldConfig.put("order", fieldAnnotation.order()); // 添加字段order属性
                 fieldConfig.put("required", fieldAnnotation.required());
                 fieldConfig.put("enName", fieldAnnotation.enName());
                 fieldConfig.put("cnName", fieldAnnotation.cnName());
                 fieldConfig.put("defaultValue", fieldAnnotation.defaultValue());
                 fieldConfig.put("placeHolder", fieldAnnotation.placeHolder());
+                fieldConfig.put("description", fieldAnnotation.description()); // 添加描述
                 fieldConfig.put("formType", fieldAnnotation.formType().getValue());
                 fieldConfig.put("dictType", fieldAnnotation.dictType().getValue());
                 fieldConfig.put("dictUrl", fieldAnnotation.dictUrl());
@@ -133,8 +142,35 @@ public class StComponentLoader {
                 fieldConfigs.put(field.getName(), fieldConfig);
             }
         }
-
-        return fieldConfigs;
+        
+        result.put("fields", fieldConfigs);
+        return result;
+    }
+    
+    /**
+     * 获取标签配置信息
+     *
+     * @param componentClass 组件类
+     * @return 标签配置信息
+     */
+    private Map<String, Object> getTagConfigs(Class<?> componentClass) {
+        Map<String, Object> tagConfigs = new HashMap<>();
+        
+        com.lacus.st.annotation.StTag stTagAnnotation = componentClass.getAnnotation(com.lacus.st.annotation.StTag.class);
+        if (stTagAnnotation != null) {
+            com.lacus.st.annotation.StTag.TagDefinition[] tagDefinitions = stTagAnnotation.value();
+            for (com.lacus.st.annotation.StTag.TagDefinition tagDef : tagDefinitions) {
+                Map<String, Object> tagConfig = new HashMap<>();
+                tagConfig.put("name", tagDef.name());
+                tagConfig.put("displayName", tagDef.displayName());
+                tagConfig.put("order", tagDef.order()); // 添加标签order属性
+                tagConfig.put("description", tagDef.description());
+                
+                tagConfigs.put(tagDef.name(), tagConfig);
+            }
+        }
+        
+        return tagConfigs;
     }
 
     /**
