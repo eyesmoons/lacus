@@ -11,6 +11,8 @@
     </parent>
 
     <artifactId>lacus-one-api-app</artifactId>
+    <groupId>com.lacus</groupId>
+    <version>2.0.0</version>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
