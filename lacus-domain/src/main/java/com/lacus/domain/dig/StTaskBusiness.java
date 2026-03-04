@@ -193,10 +193,14 @@ public class StTaskBusiness {
     }
 
     public JobTaskInfo getDag(Long jobId) {
+        StJobEntity job = stJobService.getById(jobId);
+        String engineName = job.getEngineName();
+        String engineVersion = job.getEngineVersion();
+        String engineParam = job.getEngineParam();
         List<StTaskEntity> tasks = stTaskService.getTaskListByJobId(jobId);
         List<StTaskConfig> taskList = tasks.stream().map(StTaskBusiness::convertStTaskConfig).collect(Collectors.toList());
         List<StTaskRelationEntity> relations = stTaskRelationService.getTaskRelationsByJobId(jobId);
         List<Relation> relationList = relations.stream().map(item -> new Relation(item.getSourceTaskId(), item.getSinkTaskId())).collect(Collectors.toList());
-        return new JobTaskInfo(relationList, taskList);
+        return new JobTaskInfo(engineName, engineVersion, engineParam, relationList, taskList);
     }
 }

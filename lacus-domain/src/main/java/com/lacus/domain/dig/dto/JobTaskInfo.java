@@ -10,6 +10,9 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class JobTaskInfo {
+    private String engineName;
+    private String engineVersion;
+    private String engineParam;
     private List<Relation> edges;
     private List<StTaskConfig> plugins;
 }
