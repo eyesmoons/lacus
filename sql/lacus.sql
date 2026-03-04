@@ -1014,7 +1014,7 @@ CREATE TABLE `st_job_instance` (
     `engine_name` varchar(50) NOT NULL  COMMENT '引擎名称',
     `job_config` text COMMENT '任务配置',
     `status` tinyint NOT NULL DEFAULT '0' COMMENT '任务状态',
-    `log_info` text DEFAULT NULL COMMENT '日志信息',
+    `log_info` longtext DEFAULT NULL COMMENT '日志信息',
     `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
     `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
     `create_time` datetime NOT NULL COMMENT '创建时间',

@@ -80,8 +80,8 @@ public class ConsoleSink extends AbstractStSink {
     @Override
     public JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId) {
         JSONObject config = new JSONObject();
-        putIfNotEmpty(config, "log.print.data", connectionConfig.getBoolean("logPrintData"));
-        putIfNotEmpty(config, "log.print.delay.ms", connectionConfig.getBoolean("logPrintDelayMs"));
+        putIfNotEmpty(config, "log.print.data", connectionConfig.getBoolean("log_print_data"));
+        putIfNotEmpty(config, "log.print.delay.ms", connectionConfig.getInteger("log_print_delay_ms"));
         return config;
     }
 }
