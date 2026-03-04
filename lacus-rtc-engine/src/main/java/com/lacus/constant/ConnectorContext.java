@@ -18,6 +18,7 @@ public class ConnectorContext implements Serializable {
     public static final String OCEANBASE_SOURCE = "OCEANBASE";
 
     public static final String DORIS_SINK = "DORIS";
+    public static final String STARROCKS_SINK = "STARROCKS";
     public static final String MYSQL_SINK = "MYSQL";
     public static final String POSTGRES_SINK = "POSTGRES";
     public static final String ORACLE_SINK = "ORACLE";

@@ -34,14 +34,36 @@ spring:
     basename: i18n/messages
     # 有些版本的 IDEA  会自动设置properties的编码为IOS-8859-1 请在IDEA配置里设置成UTF8
     encoding: UTF-8
+  quartz:
+    job-store-type: jdbc # 使用数据库存储任务
+    properties:
+      org:
+        quartz:
+          scheduler:
+            instanceName: LacusScheduler
+            instanceId: AUTO
+          jobStore:
+            class: org.quartz.impl.jdbcjobstore.JobStoreTX
+            driverDelegateClass: org.quartz.impl.jdbcjobstore.StdJDBCDelegate
+            tablePrefix: QRTZ_
+            isClustered: true
+            clusterCheckinInterval: 10000
+            useProperties: false
+          threadPool:
+            class: org.quartz.simpl.SimpleThreadPool
+            threadCount: 10
+            threadPriority: 5
+            threadsInheritContextClassLoaderOfInitializingThread: true
+    jdbc:
+      initialize-schema: never # never/always 是否初始化Quartz表结构
 
   # 文件上传
   servlet:
     multipart:
       # 单个文件大小
-      max-file-size: 100MB
+      maxFileSize: 500MB
       # 设置总上传的文件大小
-      max-request-size: 100MB
+      maxRequestSize: 500MB
   # 服务模块
   devtools:
     restart:

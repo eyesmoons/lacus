@@ -94,6 +94,7 @@ public class DataCollectorJobUtil {
         source.setPort(sourceJobConf.getPort());
         source.setUsername(sourceJobConf.getUsername());
         source.setPassword(sourceJobConf.getPassword());
+        source.setSchemaName(sourceJobConf.getSchemaName());
         source.setDatabaseList(sourceJobConf.getDatabaseList());
         source.setTableList(sourceJobConf.getTableList());
         // 处理断点续传
@@ -240,6 +241,7 @@ public class DataCollectorJobUtil {
             sourceJobConf.setDatasourceType(metaDatasource.getType());
             ConnectionParam connectionParam = JSON.parseObject(metaDatasource.getConnectionParams(), ConnectionParam.class);
             sourceJobConf.setHostname(connectionParam.getHost());
+            sourceJobConf.setSchemaName(connectionParam.getDatabase());
             sourceJobConf.setPort(String.valueOf(connectionParam.getPort()));
             sourceJobConf.setUsername(connectionParam.getUsername());
             sourceJobConf.setPassword(connectionParam.getPassword());

@@ -8,4 +8,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class StJobInstanceServiceImpl extends ServiceImpl<StJobInstanceMapper, StJobInstanceEntity> implements IStJobInstanceService {
+
+    @Override
+    public void complete(Long jobInstanceId, Integer status, String errorMsg) {
+        StJobInstanceEntity jobInstance = this.getById(jobInstanceId);
+        jobInstance.setStatus(status);
+        jobInstance.setLogInfo(errorMsg);
+        this.updateById(jobInstance);
+    }
 }

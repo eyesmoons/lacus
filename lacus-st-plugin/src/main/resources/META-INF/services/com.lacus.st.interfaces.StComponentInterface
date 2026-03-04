@@ -1,0 +1,47 @@
+# ST组件SPI配置文件
+# 此文件用于自动发现和加载ST组件
+# 每个组件实现类都需要在此文件中注册
+
+# 通用JDBC组件
+com.lacus.st.source.JdbcSource
+
+# MySQL组件
+com.lacus.st.source.MysqlSource
+com.lacus.st.source.MysqlCdcSource
+
+# 消息队列组件
+com.lacus.st.source.KafkaSource
+
+# OLAP数据库组件
+com.lacus.st.source.DorisSource
+com.lacus.st.source.StarRocksSource
+com.lacus.st.source.ClickHouseSource
+
+# Oracle组件
+com.lacus.st.source.OracleSource
+com.lacus.st.source.OracleCdcSource
+
+# 其他关系型数据库组件
+com.lacus.st.source.SqlServerSource
+com.lacus.st.source.Db2Source
+com.lacus.st.source.PostgresqlSource
+
+# Transform转换组件
+com.lacus.st.transform.CopyTransform
+com.lacus.st.transform.FieldMapperTransform
+com.lacus.st.transform.MetadataTransform
+com.lacus.st.transform.FieldRenameTransform
+com.lacus.st.transform.ReplaceTransform
+com.lacus.st.transform.SplitTransform
+com.lacus.st.transform.SqlTransform
+
+# Sink输出组件
+com.lacus.st.sink.ConsoleSink
+com.lacus.st.sink.JdbcSink
+com.lacus.st.sink.MysqlSink
+com.lacus.st.sink.KafkaSink
+com.lacus.st.sink.ClickHouseSink
+com.lacus.st.sink.OracleSink
+com.lacus.st.sink.PostgreSqlSink
+com.lacus.st.sink.SqlServerSink
+com.lacus.st.sink.Db2Sink

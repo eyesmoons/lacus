@@ -14,6 +14,8 @@ import com.lacus.datasource.model.ConnectionParam;
 import com.lacus.datasource.model.ParamDefinitionDTO;
 import com.lacus.datasource.model.ParamValidation;
 import com.lacus.enums.DatasourceTypeEnum;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 /**
  * Oracle数据源插件
  */
+@Slf4j
 @AutoService(DataSourcePlugin.class)
 public class OracleDataSourcePlugin extends AbstractDataSourcePlugin {
 
@@ -64,7 +67,10 @@ public class OracleDataSourcePlugin extends AbstractDataSourcePlugin {
         druidDataSource.setUsername(connectionParam.getUsername());
         druidDataSource.setBreakAfterAcquireFailure(true);
         druidDataSource.setConnectionErrorRetryAttempts(1);
-        druidDataSource.setMaxWait(2000);
+        druidDataSource.setMaxWait(15000);
+        druidDataSource.setInitialSize(1);
+        druidDataSource.setMinIdle(1);
+        druidDataSource.setMaxActive(8);
         druidDataSource.setFailFast(true);
         if (StringUtils.isNotEmpty(connectionParam.getPassword())) {
             druidDataSource.setPassword(connectionParam.getPassword());
@@ -153,8 +159,12 @@ public class OracleDataSourcePlugin extends AbstractDataSourcePlugin {
         Integer port = connectionParam.getValue("port");
         String database = connectionParam.getValue("database");
         String params = connectionParam.getValue("params");
-
-        return String.format("jdbc:oracle:thin:@%s:%d:%s?%s", host, port, database, params);
+        String format = String.format("jdbc:oracle:thin:@//%s:%d/%s", host, port, database);
+        if (ObjectUtils.isNotEmpty(params)) {
+            format = format + "?" + params;
+        }
+        log.info("buildJdbcUrl: {}", format);
+        return format;
     }
 
     @Override

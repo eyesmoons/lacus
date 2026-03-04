@@ -16,6 +16,7 @@ public class SourceJobConf {
     private String port;
     private String username;
     private String password;
+    private String schemaName;
     private List<String> databaseList;
     private List<String> tableList;
     private String syncType;

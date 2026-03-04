@@ -15,6 +15,8 @@ public class SourceConfig implements Serializable {
     private String port;
     private String username;
     private String password;
+    private String schemaName;
+    private String tableName;
     private List<String> databaseList;
     private List<String> tableList;
     private String syncType;

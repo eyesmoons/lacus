@@ -24,12 +24,15 @@ public class StJobInstanceEntity extends BaseEntity<StJobInstanceEntity> {
     @TableField("job_id")
     private Long jobId;
 
-    @TableField("engine_name")
-    private String engineName;
-
     @TableField("job_config")
     private String jobConfig;
 
     @TableField("status")
     private Integer status;
+
+    @TableField("log_info")
+    private String logInfo;
+
+    @TableField(exist = false)
+    private String jobName;
 }

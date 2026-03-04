@@ -11,7 +11,7 @@ import static com.lacus.constant.ConnectorContext.CLICKHOUSE_SINK;
 @AutoService(BaseSink.class)
 public class ClickHouseSink extends JdbcSink {
 
-    public ClickHouseSink(String sinkName) {
+    public ClickHouseSink() {
         super(CLICKHOUSE_SINK, "clickhouse");
     }
 }

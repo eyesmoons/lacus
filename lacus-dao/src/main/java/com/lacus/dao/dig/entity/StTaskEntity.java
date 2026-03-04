@@ -16,7 +16,7 @@ import lombok.EqualsAndHashCode;
 @Data
 public class StTaskEntity extends BaseEntity<StTaskEntity> {
     @TableId(value = "task_id", type = IdType.AUTO)
-    private Long taskId;
+    private String taskId;
 
     @TableField("task_name")
     private String taskName;
@@ -27,9 +27,12 @@ public class StTaskEntity extends BaseEntity<StTaskEntity> {
     @TableField("connector_type")
     private String connectorType;
 
-    @TableField("datasource_id")
-    private Long datasourceId;
+    @TableField("connector_name")
+    private String connectorName;
 
-    @TableField("task_config")
-    private String taskConfig;
+    @TableField("connection_config")
+    private String connectionConfig;
+
+    @TableField("position")
+    private String position;
 }
