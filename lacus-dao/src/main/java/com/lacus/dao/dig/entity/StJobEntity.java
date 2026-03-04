@@ -27,6 +27,12 @@ public class StJobEntity extends BaseEntity<StJobEntity> {
     @TableField("engine_name")
     private String engineName;
 
+    @TableField("engine_version")
+    private String engineVersion;
+
+    @TableField("engine_param")
+    private String engineParam;
+
     @TableField("status")
     private Integer status;
 

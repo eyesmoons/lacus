@@ -1,29 +1,28 @@
 package com.lacus.domain.dig;
 
 import com.alibaba.fastjson2.JSON;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.JSONObject;
 import com.lacus.common.exception.CustomException;
+import com.lacus.dao.dig.entity.StJobEntity;
 import com.lacus.dao.dig.entity.StTaskEntity;
 import com.lacus.dao.dig.entity.StTaskRelationEntity;
-import com.lacus.domain.dig.dto.DatabaseTableSchema;
-import com.lacus.domain.dig.dto.DatasourceConfig;
 import com.lacus.domain.dig.dto.JobDag;
 import com.lacus.domain.dig.dto.JobTaskInfo;
+import com.lacus.domain.dig.dto.Node;
 import com.lacus.domain.dig.dto.Relation;
-import com.lacus.domain.dig.dto.SourceFieldsConfig;
 import com.lacus.domain.dig.dto.StTaskConfig;
+import com.lacus.service.dig.IStJobService;
 import com.lacus.service.dig.IStTaskRelationService;
 import com.lacus.service.dig.IStTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
-import org.apache.seatunnel.common.constants.PluginType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -31,31 +30,23 @@ import java.util.stream.Collectors;
 public class StTaskBusiness {
 
     @Autowired
+    private IStJobService stJobService;
+
+    @Autowired
     private IStTaskService stTaskService;
 
     @Autowired
     private IStTaskRelationService stTaskRelationService;
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
-
     public StTaskEntity saveOrUpdateTask(StTaskConfig command) {
         try {
             StTaskEntity stTask = new StTaskEntity();
-            String transformConfig = "";
-            if (Objects.equals(command.getConnectorType(), PluginType.TRANSFORM)) {
-                transformConfig = OBJECT_MAPPER.writeValueAsString(command.getTransformConfig());
-            }
             stTask.setTaskId(command.getTaskId());
             stTask.setTaskName(command.getTaskName());
             stTask.setJobId(command.getJobId());
             stTask.setConnectorType(command.getConnectorType());
             stTask.setConnectorName(command.getConnectorName());
-            stTask.setDatasourceId(command.getDatasourceId());
-            stTask.setTaskConfig(command.getTaskConfig());
-            stTask.setDatasourceConfig(ObjectUtils.isEmpty(command.getDatasourceConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getDatasourceConfig()));
-            stTask.setSourceFieldsConfig(ObjectUtils.isEmpty(command.getSourceFieldsConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getSourceFieldsConfig()));
-            stTask.setTransformConfig(transformConfig);
-            stTask.setSinkFieldsConfig(ObjectUtils.isEmpty(command.getSinkFieldsConfig()) ? null : OBJECT_MAPPER.writeValueAsString(command.getSinkFieldsConfig()));
+            stTask.setConnectionConfig(command.getConnectorConfig());
 
             if (ObjectUtils.isNotEmpty(command.getTaskId())) {
                 StTaskEntity stTaskEntity = stTaskService.getById(command.getTaskId());
@@ -92,20 +83,20 @@ public class StTaskBusiness {
             config.setJobId(task.getJobId());
             config.setConnectorType(task.getConnectorType());
             config.setConnectorName(task.getConnectorName());
-            config.setDatasourceId(task.getDatasourceId());
-            config.setTaskConfig(task.getTaskConfig());
-            config.setDatasourceConfig(ObjectUtils.isEmpty(task.getDatasourceConfig()) ? null : OBJECT_MAPPER.readValue(task.getDatasourceConfig(), DatasourceConfig.class));
-            config.setSourceFieldsConfig(ObjectUtils.isEmpty(task.getSourceFieldsConfig()) ? null : OBJECT_MAPPER.readValue(task.getSourceFieldsConfig(), SourceFieldsConfig.class));
-            config.setTransformConfig(ObjectUtils.isEmpty(task.getTransformConfig()) ? null : OBJECT_MAPPER.readValue(task.getTransformConfig(), new TypeReference<Map<String, Object>>() {
-            }));
-            config.setSinkFieldsConfig(ObjectUtils.isEmpty(task.getSinkFieldsConfig()) ? null : OBJECT_MAPPER.readValue(task.getSinkFieldsConfig(), new TypeReference<List<DatabaseTableSchema>>() {
-            }));
+            config.setConnectorConfig(task.getConnectionConfig());
+            config.setPosition(JSON.parseObject(task.getPosition()));
             return config;
         } catch (Exception e) {
             throw new CustomException("任务节点转换出错", e);
         }
     }
 
+    /**
+     * 删除指定ID的任务。
+     *
+     * @param taskId 任务的唯一标识符
+     * @throws CustomException 如果任务不存在或删除过程中发生错误，则抛出此异常
+     */
     public void deleteTask(String taskId) {
         try {
             StTaskEntity task = stTaskService.getById(taskId);
@@ -118,22 +109,87 @@ public class StTaskBusiness {
         }
     }
 
+    /**
+     * Saves the given JobDag to the system, updating both the job and its associated task relations.
+     * This method ensures that the task relations are up-to-date with the provided DAG, removing any
+     * outdated relations and adding new ones as necessary. It also updates the position of tasks within
+     * the job based on the provided plugins in the DAG.
+     *
+     * @param dag the JobDag object containing the job and its associated task plugins and relations to be saved
+     */
     public void saveDag(JobDag dag) {
         try {
+            Long jobId = dag.getJobId();
+            updateJob(dag, jobId);
+
+            List<Node> plugins = dag.getPlugins();
             List<StTaskRelationEntity> relations = dag.getRelations().stream().map(item -> {
                 StTaskRelationEntity relation = new StTaskRelationEntity();
-                relation.setJobId(dag.getJobId());
+                relation.setJobId(jobId);
                 relation.setSourceTaskId(item.getSourceTaskId());
                 relation.setSinkTaskId(item.getSinkTaskId());
                 return relation;
             }).collect(Collectors.toList());
 
+            stTaskRelationService.removeByJobId(jobId);
             if (ObjectUtils.isNotEmpty(relations)) {
                 stTaskRelationService.saveBatch(relations);
+            }
+            List<StTaskEntity> allTaskListByJobId = stTaskService.getTaskListByJobId(jobId);
+            List<String> allTaskId = allTaskListByJobId.stream()
+                    .map(StTaskEntity::getTaskId)
+                    .collect(Collectors.toList());
+            if (ObjectUtils.isNotEmpty(plugins)) {
+                List<StTaskEntity> taskEntityList = new ArrayList<>();
+                List<String> newTaskIds = new ArrayList<>();
+                for (Node plugin : plugins) {
+                    String taskId = plugin.getTaskId();
+                    JSONObject position = plugin.getPosition();
+                    StTaskEntity stTaskEntity = new StTaskEntity();
+                    stTaskEntity.setTaskId(taskId);
+                    stTaskEntity.setPosition(JSONObject.toJSONString(position));
+                    taskEntityList.add(stTaskEntity);
+                    newTaskIds.add(taskId);
+                }
+                Set<String> newTaskIdSet = new HashSet<>(newTaskIds);
+                List<String> notExistTaskIds = allTaskId.stream()
+                        .filter(id -> !newTaskIdSet.contains(id))
+                        .collect(Collectors.toList());
+                stTaskService.removeBatchByIds(notExistTaskIds);
+                stTaskService.updateBatchById(taskEntityList);
             }
         } catch (Exception e) {
             throw new CustomException("保存任务DAG出错", e);
         }
+    }
+
+    /**
+     * Updates the job information with the provided JobDag and job ID.
+     *
+     * @param dag   the JobDag containing the updated job information
+     * @param jobId the unique identifier of the job to be updated
+     * @throws CustomException if the job does not exist or an error occurs during the update process
+     */
+    private void updateJob(JobDag dag, Long jobId) {
+        String engineName = dag.getEngineName();
+        String engineVersion = dag.getEngineVersion();
+        String engineParam = dag.getEngineParam();
+        StJobEntity job = stJobService.getById(jobId);
+        if (ObjectUtils.isEmpty(job)) {
+            throw new CustomException("任务不存在：" + jobId);
+        }
+        job.setEngineName(engineName);
+        if (ObjectUtils.isNotEmpty(engineVersion)) {
+            job.setEngineVersion(engineVersion);
+        } else {
+            job.setEngineVersion(null);
+        }
+        if (ObjectUtils.isNotEmpty(engineParam)) {
+            job.setEngineParam(engineParam);
+        } else {
+            job.setEngineParam(null);
+        }
+        stJobService.updateById(job);
     }
 
     public JobTaskInfo getDag(Long jobId) {

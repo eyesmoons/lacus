@@ -1,8 +1,11 @@
 package com.lacus.st.abstracts;
 
+import com.alibaba.fastjson2.JSONArray;
+import com.alibaba.fastjson2.JSONObject;
 import com.lacus.st.annotation.StField;
 import com.lacus.st.interfaces.StSourceInterface;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -70,4 +73,37 @@ public abstract class AbstractStSource extends AbstractStComponent implements St
      * @return 连接是否正常
      */
     protected abstract boolean doCheckConnection();
+
+    protected JSONArray getDbTables(JSONObject connectionConfig) {
+        JSONArray dbTables = new JSONArray();
+        JSONObject outputModel = connectionConfig.getJSONObject("outputModel");
+        String database = connectionConfig.getString("database");
+        JSONArray tables = outputModel.getJSONArray("tables");
+        for (Object table : tables) {
+            dbTables.add(database + "." + table.toString());
+        }
+        return dbTables;
+    }
+
+    protected void addTableList(JSONObject config, JSONObject connectionConfig, String whereCondition) {
+        JSONArray table_list = new JSONArray();
+        JSONObject outputModel = connectionConfig.getJSONObject("outputModel");
+        JSONObject tableFields = outputModel.getJSONObject("tableFields");
+        String database = connectionConfig.getString("database");
+        for (Map.Entry<String, Object> entry : tableFields.entrySet()) {
+            String table = entry.getKey();
+            JSONArray fields = (JSONArray) entry.getValue();
+            JSONObject tableItem = new JSONObject();
+            String dbTable = database + "." + table;
+            tableItem.put("table_path", dbTable);
+            String fieldStr = String.join(",", fields.toJavaList(String.class));
+            String query = "select " + fieldStr + " from " + dbTable;
+            if (ObjectUtils.isNotEmpty(whereCondition)) {
+                query += " where " + whereCondition;
+            }
+            tableItem.put("query", query);
+            table_list.add(tableItem);
+        }
+        config.put("table_list", table_list);
+    }
 }

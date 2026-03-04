@@ -25,7 +25,8 @@ import java.sql.SQLException;
         displayName = "Kafka数据源",
         description = "从Apache Kafka消息队列读取数据，支持多种数据格式和消费模式",
         version = "2.0.0",
-        author = "lacus"
+        author = "lacus",
+        connectorKey = "Kafka"
 )
 @StTag({
         @TagDefinition(name = "基本配置", displayName = "基本配置", order = 1, description = "Kafka连接和主题配置"),

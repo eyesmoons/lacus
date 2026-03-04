@@ -1,5 +1,6 @@
 package com.lacus.st.sink;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.google.auto.service.AutoService;
 import com.lacus.st.abstracts.AbstractStSink;
 import com.lacus.st.annotation.StComponent;
@@ -7,14 +8,17 @@ import com.lacus.st.annotation.StField;
 import com.lacus.st.annotation.StTag;
 import com.lacus.st.annotation.StTag.TagDefinition;
 import com.lacus.st.interfaces.StComponentInterface;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 
 /**
  * ClickHouse Sink组件
  * ClickHouse数据库输出组件
- * 
+ *
  * @author lacus
  */
+@Setter
 @Slf4j
 @StComponent(
         type = StComponent.ComponentType.SINK,
@@ -22,82 +26,62 @@ import lombok.extern.slf4j.Slf4j;
         displayName = "ClickHouse数据库输出",
         description = "用于将数据写入ClickHouse，支持精准一次、CDC和多表写入",
         version = "2.0.0",
-        author = "lacus"
+        author = "lacus",
+        connectorKey = "ClickHouse"
 )
 @StTag({
-        @TagDefinition(name = "连接配置", displayName = "连接配置", order = 1, description = "ClickHouse连接相关配置"),
+        @TagDefinition(name = "数据源配置", displayName = "数据源配置", order = 1, description = "ClickHouse数据源相关配置"),
         @TagDefinition(name = "性能配置", displayName = "性能配置", order = 2, description = "性能优化相关配置"),
-        @TagDefinition(name = "CDC配置", displayName = "CDC配置", order = 3, description = "CDC相关配置"),
+        @TagDefinition(name = "数据配置", displayName = "数据配置", order = 3, description = "数据配置"),
         @TagDefinition(name = "表管理配置", displayName = "表管理配置", order = 4, description = "表结构和数据管理配置")
 })
 @AutoService(StComponentInterface.class)
 public class ClickHouseSink extends AbstractStSink {
 
-    // 连接配置
+    // 数据源配置
     @StField(
-            tag = "连接配置",
+            tag = "数据源配置",
             order = 1,
             required = true,
-            enName = "host",
-            cnName = "主机地址",
-            description = "ClickHouse集群地址，格式：host:port，支持多个hosts配置，用逗号分隔",
-            placeHolder = "localhost:8123",
-            formType = StField.FormType.TEXT
+            enName = "datasourceId",
+            cnName = "数据源",
+            placeHolder = "请选择数据源",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/datasource/list"
     )
-    private String host;
+    private String datasourceId;
 
     @StField(
-            tag = "连接配置",
+            tag = "数据源配置",
             order = 2,
             required = true,
             enName = "database",
-            cnName = "数据库名",
-            description = "ClickHouse数据库名称",
-            placeHolder = "default",
-            formType = StField.FormType.TEXT
+            cnName = "数据库",
+            placeHolder = "请选择数据库",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/db/list/{datasourceId}"
     )
     private String database;
 
     @StField(
-            tag = "连接配置",
+            tag = "数据源配置",
             order = 3,
             required = true,
             enName = "table",
-            cnName = "表名",
-            description = "目标表名，支持变量：${table_name}、${schema_name}",
-            placeHolder = "test_table",
-            formType = StField.FormType.TEXT
+            cnName = "数据表",
+            placeHolder = "请选择数据表",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/table/listTable"
     )
     private String table;
-
-    @StField(
-            tag = "连接配置",
-            order = 4,
-            required = true,
-            enName = "username",
-            cnName = "用户名",
-            description = "ClickHouse用户账号",
-            placeHolder = "default",
-            formType = StField.FormType.TEXT
-    )
-    private String username;
-
-    @StField(
-            tag = "连接配置",
-            order = 5,
-            required = true,
-            enName = "password",
-            cnName = "密码",
-            description = "ClickHouse用户密码",
-            placeHolder = "请输入密码",
-            formType = StField.FormType.PASSWORD
-    )
-    private String password;
 
     // 性能配置
     @StField(
             tag = "性能配置",
-            order = 6,
+            order = 1,
             required = false,
             enName = "bulk_size",
             cnName = "批量写入大小",
@@ -106,23 +90,25 @@ public class ClickHouseSink extends AbstractStSink {
             placeHolder = "20000",
             formType = StField.FormType.POSITIVE_NUMBER
     )
-    private Integer bulkSize;
+    private Integer bulk_size;
 
     @StField(
             tag = "性能配置",
-            order = 7,
+            order = 2,
             required = false,
             enName = "split_mode",
             cnName = "分片模式",
             defaultValue = "false",
             description = "仅支持Distributed引擎的表，将在seatunnel中拆分分布式表数据",
-            formType = StField.FormType.CHECKBOX
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"false", "true"}
     )
-    private Boolean splitMode;
+    private Boolean split_mode;
 
     @StField(
             tag = "性能配置",
-            order = 8,
+            order = 3,
             required = false,
             enName = "sharding_key",
             cnName = "分片键",
@@ -130,12 +116,12 @@ public class ClickHouseSink extends AbstractStSink {
             placeHolder = "user_id",
             formType = StField.FormType.TEXT
     )
-    private String shardingKey;
+    private String sharding_key;
 
     // CDC配置
     @StField(
-            tag = "CDC配置",
-            order = 9,
+            tag = "数据配置",
+            order = 1,
             required = false,
             enName = "primary_key",
             cnName = "主键",
@@ -143,11 +129,11 @@ public class ClickHouseSink extends AbstractStSink {
             placeHolder = "id",
             formType = StField.FormType.TEXT
     )
-    private String primaryKey;
+    private String primary_key;
 
     @StField(
-            tag = "CDC配置",
-            order = 10,
+            tag = "数据配置",
+            order = 2,
             required = false,
             enName = "support_upsert",
             cnName = "支持更新插入",
@@ -155,11 +141,11 @@ public class ClickHouseSink extends AbstractStSink {
             description = "支持按查询主键更新插入行",
             formType = StField.FormType.CHECKBOX
     )
-    private Boolean supportUpsert;
+    private Boolean support_upsert;
 
     @StField(
-            tag = "CDC配置",
-            order = 11,
+            tag = "数据配置",
+            order = 3,
             required = false,
             enName = "allow_experimental_lightweight_delete",
             cnName = "允许轻量级删除",
@@ -167,12 +153,12 @@ public class ClickHouseSink extends AbstractStSink {
             description = "允许基于MergeTree表引擎实验性轻量级删除",
             formType = StField.FormType.CHECKBOX
     )
-    private Boolean allowExperimentalLightweightDelete;
+    private Boolean allow_experimental_lightweight_delete;
 
     // 表管理配置
     @StField(
             tag = "表管理配置",
-            order = 12,
+            order = 1,
             required = false,
             enName = "schema_save_mode",
             cnName = "表结构保存模式",
@@ -182,11 +168,11 @@ public class ClickHouseSink extends AbstractStSink {
             dictType = StField.DictType.ENUM,
             dictEnum = {"RECREATE_SCHEMA", "CREATE_SCHEMA_WHEN_NOT_EXIST", "ERROR_WHEN_SCHEMA_NOT_EXIST", "IGNORE"}
     )
-    private String schemaSaveMode;
+    private String schema_save_mode;
 
     @StField(
             tag = "表管理配置",
-            order = 13,
+            order = 2,
             required = false,
             enName = "data_save_mode",
             cnName = "数据保存模式",
@@ -196,11 +182,11 @@ public class ClickHouseSink extends AbstractStSink {
             dictType = StField.DictType.ENUM,
             dictEnum = {"DROP_DATA", "APPEND_DATA", "CUSTOM_PROCESSING", "ERROR_WHEN_DATA_EXISTS"}
     )
-    private String dataSaveMode;
+    private String data_save_mode;
 
     @StField(
             tag = "表管理配置",
-            order = 14,
+            order = 3,
             required = false,
             enName = "custom_sql",
             cnName = "自定义SQL",
@@ -208,11 +194,11 @@ public class ClickHouseSink extends AbstractStSink {
             placeHolder = "TRUNCATE TABLE test_table",
             formType = StField.FormType.TEXT_AREA
     )
-    private String customSql;
+    private String custom_sql;
 
     @StField(
             tag = "表管理配置",
-            order = 15,
+            order = 4,
             required = false,
             enName = "save_mode_create_template",
             cnName = "建表模板",
@@ -220,231 +206,49 @@ public class ClickHouseSink extends AbstractStSink {
             placeHolder = "CREATE TABLE IF NOT EXISTS `${database}`.`${table}` (${rowtype_fields}) ENGINE = MergeTree() ORDER BY (${rowtype_primary_key})",
             formType = StField.FormType.TEXT_AREA
     )
-    private String saveModeCreateTemplate;
+    private String save_mode_create_template;
 
     // ClickHouse客户端配置
     @StField(
             tag = "客户端配置",
-            order = 16,
+            order = 1,
             required = false,
-            enName = "max_rows_to_read",
-            cnName = "最大读取行数",
-            description = "ClickHouse客户端配置：最大读取行数",
-            placeHolder = "100000",
-            formType = StField.FormType.POSITIVE_NUMBER
+            enName = "clickhouse_config",
+            cnName = "clickHouse客户端配置",
+            description = "clickHouse客户端配置",
+            formType = StField.FormType.TEXT_AREA
     )
-    private Integer maxRowsToRead;
-
-    @StField(
-            tag = "客户端配置",
-            order = 17,
-            required = false,
-            enName = "read_overflow_mode",
-            cnName = "读取溢出模式",
-            defaultValue = "throw",
-            description = "ClickHouse客户端配置：读取溢出处理模式",
-            formType = StField.FormType.SINGLE_SELECT,
-            dictType = StField.DictType.ENUM,
-            dictEnum = {"throw", "break", "any"}
-    )
-    private String readOverflowMode;
+    private Integer clickhouse_config;
 
     @Override
     protected boolean doCheckConnection() {
-        try {
-            // 验证必填字段
-            if (host == null || host.trim().isEmpty()) {
-                log.error("ClickHouse Sink配置错误：host不能为空");
-                return false;
-            }
+        return true;
+    }
 
-            if (database == null || database.trim().isEmpty()) {
-                log.error("ClickHouse Sink配置错误：database不能为空");
-                return false;
-            }
-
-            if (table == null || table.trim().isEmpty()) {
-                log.error("ClickHouse Sink配置错误：table不能为空");
-                return false;
-            }
-
-            if (username == null || username.trim().isEmpty()) {
-                log.error("ClickHouse Sink配置错误：username不能为空");
-                return false;
-            }
-
-            // 验证host格式
-            String[] hosts = host.split(",");
-            for (String hostStr : hosts) {
-                String trimmedHost = hostStr.trim();
-                if (!trimmedHost.contains(":")) {
-                    log.error("ClickHouse Sink配置错误：host格式不正确，应为host:port格式：{}", trimmedHost);
-                    return false;
-                }
-            }
-
-            // 验证split_mode和sharding_key的关系
-            boolean splitModeEnabled = splitMode != null && splitMode;
-            if (splitModeEnabled && (shardingKey == null || shardingKey.trim().isEmpty())) {
-                log.warn("ClickHouse Sink警告：启用split_mode时建议配置sharding_key");
-            }
-
-            // 验证CDC相关配置
-            boolean upsertEnabled = supportUpsert != null && supportUpsert;
-            if (upsertEnabled && (primaryKey == null || primaryKey.trim().isEmpty())) {
-                log.error("ClickHouse Sink配置错误：启用support_upsert时，primary_key不能为空");
-                return false;
-            }
-
-            // 验证批量大小
-            int bulkSizeValue = bulkSize != null ? bulkSize : 20000;
-            if (bulkSizeValue <= 0) {
-                log.error("ClickHouse Sink配置错误：bulk_size必须大于0");
-                return false;
-            }
-
-            log.info("ClickHouse Sink连接检查成功，host: {}, database: {}, table: {}", host, database, table);
-            return true;
-        } catch (Exception e) {
-            log.error("ClickHouse Sink连接检查失败", e);
-            return false;
+    @Override
+    public JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId) {
+        JSONObject config = new JSONObject();
+        String host = connectionConfig.getString("host");
+        Integer port = connectionConfig.getInteger("port");
+        if (ObjectUtils.isNotEmpty(host) && ObjectUtils.isNotEmpty(port)) {
+            config.put("host", host + ":" + port);
         }
-    }
-
-    // Getter and Setter methods
-    public String getHost() {
-        return host;
-    }
-
-    public void setHost(String host) {
-        this.host = host;
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public Integer getBulkSize() {
-        return bulkSize != null ? bulkSize : 20000;
-    }
-
-    public void setBulkSize(Integer bulkSize) {
-        this.bulkSize = bulkSize;
-    }
-
-    public Boolean getSplitMode() {
-        return splitMode != null ? splitMode : false;
-    }
-
-    public void setSplitMode(Boolean splitMode) {
-        this.splitMode = splitMode;
-    }
-
-    public String getShardingKey() {
-        return shardingKey;
-    }
-
-    public void setShardingKey(String shardingKey) {
-        this.shardingKey = shardingKey;
-    }
-
-    public String getPrimaryKey() {
-        return primaryKey;
-    }
-
-    public void setPrimaryKey(String primaryKey) {
-        this.primaryKey = primaryKey;
-    }
-
-    public Boolean getSupportUpsert() {
-        return supportUpsert != null ? supportUpsert : false;
-    }
-
-    public void setSupportUpsert(Boolean supportUpsert) {
-        this.supportUpsert = supportUpsert;
-    }
-
-    public Boolean getAllowExperimentalLightweightDelete() {
-        return allowExperimentalLightweightDelete != null ? allowExperimentalLightweightDelete : false;
-    }
-
-    public void setAllowExperimentalLightweightDelete(Boolean allowExperimentalLightweightDelete) {
-        this.allowExperimentalLightweightDelete = allowExperimentalLightweightDelete;
-    }
-
-    public String getSchemaSaveMode() {
-        return schemaSaveMode != null ? schemaSaveMode : "CREATE_SCHEMA_WHEN_NOT_EXIST";
-    }
-
-    public void setSchemaSaveMode(String schemaSaveMode) {
-        this.schemaSaveMode = schemaSaveMode;
-    }
-
-    public String getDataSaveMode() {
-        return dataSaveMode != null ? dataSaveMode : "APPEND_DATA";
-    }
-
-    public void setDataSaveMode(String dataSaveMode) {
-        this.dataSaveMode = dataSaveMode;
-    }
-
-    public String getCustomSql() {
-        return customSql;
-    }
-
-    public void setCustomSql(String customSql) {
-        this.customSql = customSql;
-    }
-
-    public String getSaveModeCreateTemplate() {
-        return saveModeCreateTemplate;
-    }
-
-    public void setSaveModeCreateTemplate(String saveModeCreateTemplate) {
-        this.saveModeCreateTemplate = saveModeCreateTemplate;
-    }
-
-    public Integer getMaxRowsToRead() {
-        return maxRowsToRead;
-    }
-
-    public void setMaxRowsToRead(Integer maxRowsToRead) {
-        this.maxRowsToRead = maxRowsToRead;
-    }
-
-    public String getReadOverflowMode() {
-        return readOverflowMode != null ? readOverflowMode : "throw";
-    }
-
-    public void setReadOverflowMode(String readOverflowMode) {
-        this.readOverflowMode = readOverflowMode;
+        putIfNotEmpty(config, "user", connectionConfig.getString("username"));
+        putIfNotEmpty(config, "password", connectionConfig.getString("password"));
+        putIfNotEmpty(config, "database", connectionConfig.getString("database"));
+        JSONObject outputModel = connectionConfig.getJSONObject("outputModel");
+        putIfNotEmpty(config, "database", outputModel.getString("tableName"));
+        putIfNotEmpty(config, "clickhouse.config", connectionConfig.getString("clickhouse_config"));
+        putIfNotEmpty(config, "bulk_size", connectionConfig.getString("bulk_size"));
+        putIfNotEmpty(config, "split_mode", connectionConfig.getString("split_mode"));
+        putIfNotEmpty(config, "sharding_key", connectionConfig.getString("sharding_key"));
+        putIfNotEmpty(config, "primary_key", connectionConfig.getString("primary_key"));
+        putIfNotEmpty(config, "support_upsert", connectionConfig.getBoolean("support_upsert"));
+        putIfNotEmpty(config, "allow_experimental_lightweight_delete", connectionConfig.getBoolean("allow_experimental_lightweight_delete"));
+        putIfNotEmpty(config, "schema_save_mode", connectionConfig.getString("schema_save_mode"));
+        putIfNotEmpty(config, "data_save_mode", connectionConfig.getString("data_save_mode"));
+        putIfNotEmpty(config, "custom_sql", connectionConfig.getString("custom_sql"));
+        putIfNotEmpty(config, "save_mode_create_template", connectionConfig.getString("save_mode_create_template"));
+        return config;
     }
 }

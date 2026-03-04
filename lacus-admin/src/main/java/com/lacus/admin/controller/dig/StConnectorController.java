@@ -6,12 +6,12 @@ import com.lacus.domain.dig.resp.StConnectorInfo;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.apache.seatunnel.common.utils.JsonUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.lacus.utils.JSONUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -49,6 +49,6 @@ public class StConnectorController {
             @ApiParam(value = "connector name", required = true) @RequestParam
             String connectorName) {
         Map<String, Object> formStructure = stComponentConnectorBusiness.getConnectorFormStructure(connectorType, connectorName);
-        return ResponseDTO.ok(JsonUtils.toJsonString(formStructure));
+        return ResponseDTO.ok(JSONUtils.toJsonString(formStructure));
     }
 }

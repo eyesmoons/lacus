@@ -1,5 +1,6 @@
 package com.lacus.st.source;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.google.auto.service.AutoService;
 import com.lacus.st.abstracts.AbstractStSource;
 import com.lacus.st.annotation.StComponent;
@@ -15,7 +16,7 @@ import java.sql.SQLException;
 
 /**
  * DB2数据源组件
- * 
+ *
  * @author lacus
  */
 @Slf4j
@@ -25,13 +26,15 @@ import java.sql.SQLException;
         displayName = "DB2数据源",
         description = "从IBM DB2数据库读取数据",
         version = "2.0.0",
-        author = "lacus"
+        author = "lacus",
+        connectorKey = "Jdbc"
 )
 @StTag({
         @TagDefinition(name = "数据源配置", displayName = "数据源配置", order = 1, description = "数据源选择和连接配置"),
         @TagDefinition(name = "查询配置", displayName = "查询配置", order = 2, description = "数据查询相关配置"),
         @TagDefinition(name = "性能配置", displayName = "性能配置", order = 3, description = "性能优化相关配置"),
-        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 4, description = "其他扩展配置")
+        @TagDefinition(name = "分区配置", displayName = "分区配置", order = 4, description = "分区配置"),
+        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 5, description = "其他配置")
 })
 
 @AutoService(StComponentInterface.class)
@@ -56,7 +59,7 @@ public class Db2Source extends AbstractStSource {
             order = 2,
             required = true,
             enName = "database",
-            cnName = "数据库名",
+            cnName = "数据库",
             placeHolder = "请选择数据库",
             formType = StField.FormType.SINGLE_SELECT,
             dictType = StField.DictType.URL,
@@ -68,67 +71,19 @@ public class Db2Source extends AbstractStSource {
             tag = "数据源配置",
             order = 3,
             required = true,
-            enName = "table_list",
-            cnName = "表名",
+            enName = "table",
+            cnName = "数据表",
             placeHolder = "请选择数据表",
-            formType = StField.FormType.MULTI_SELECT,
+            formType = StField.FormType.SINGLE_SELECT,
             dictType = StField.DictType.URL,
             dictUrl = "/metadata/table/listTable"
     )
-    private String tableList;
-
-    // 连接配置
-    @StField(
-            tag = "连接配置",
-            order = 4,
-            required = true,
-            enName = "url",
-            cnName = "JDBC连接URL",
-            description = "DB2数据库连接URL",
-            placeHolder = "jdbc:db2://localhost:50000/sample",
-            formType = StField.FormType.TEXT
-    )
-    private String url;
-
-    @StField(
-            tag = "连接配置",
-            order = 5,
-            required = true,
-            enName = "driver",
-            cnName = "驱动类名",
-            defaultValue = "com.ibm.db2.jcc.DB2Driver",
-            description = "DB2 JDBC驱动类名",
-            placeHolder = "com.ibm.db2.jcc.DB2Driver",
-            formType = StField.FormType.TEXT
-    )
-    private String driver;
-
-    @StField(
-            tag = "连接配置",
-            order = 6,
-            required = true,
-            enName = "user",
-            cnName = "用户名",
-            placeHolder = "请输入数据库用户名",
-            formType = StField.FormType.TEXT
-    )
-    private String user;
-
-    @StField(
-            tag = "连接配置",
-            order = 7,
-            required = true,
-            enName = "password",
-            cnName = "密码",
-            placeHolder = "请输入数据库密码",
-            formType = StField.FormType.PASSWORD
-    )
-    private String password;
+    private String table;
 
     // 查询配置
     @StField(
             tag = "查询配置",
-            order = 8,
+            order = 1,
             required = true,
             enName = "query",
             cnName = "查询语句",
@@ -138,22 +93,72 @@ public class Db2Source extends AbstractStSource {
     )
     private String query;
 
-    @StField(
-            tag = "查询配置",
-            order = 9,
-            required = false,
-            enName = "where_condition",
-            cnName = "WHERE条件",
-            description = "查询条件，会自动添加到查询语句中",
-            placeHolder = "id > 1000",
-            formType = StField.FormType.TEXT_AREA
-    )
-    private String whereCondition;
-
     // 性能配置
     @StField(
             tag = "性能配置",
-            order = 10,
+            order = 1,
+            required = false,
+            enName = "fetch_size",
+            cnName = "数据拉取大小",
+            defaultValue = "1000",
+            description = "单次获取的记录数量，影响内存使用和网络传输",
+            placeHolder = "1000",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer fetchSize;
+
+    @StField(
+            tag = "分区配置",
+            order = 1,
+            required = false,
+            enName = "partition_column",
+            cnName = "分区列名",
+            description = "并行分区的列名，只支持数值类型，只支持数字类型主键，只能配置一列。",
+            placeHolder = "并行分区的列名",
+            formType = StField.FormType.TEXT
+    )
+    private Integer partitionColumn;
+
+    @StField(
+            tag = "分区配置",
+            order = 2,
+            required = false,
+            enName = "partition_lower_bound",
+            cnName = "分区下限",
+            description = "扫描的partition_column最小值，如果未设置，SeaTunnel将查询数据库获取最小值。",
+            placeHolder = "分区下限",
+            formType = StField.FormType.TEXT
+    )
+    private Integer partitionLowerBound;
+
+    @StField(
+            tag = "分区配置",
+            order = 3,
+            required = false,
+            enName = "partition_upper_bound",
+            cnName = "分区上限",
+            description = "扫描的partition_column最大值，如果没有设置，SeaTunnel将查询数据库获取最大值。",
+            placeHolder = "分区上限",
+            formType = StField.FormType.TEXT
+    )
+    private Integer partitionUpperBound;
+
+    @StField(
+            tag = "分区配置",
+            order = 4,
+            required = false,
+            enName = "partition_num",
+            cnName = "分区数",
+            description = "分区计数的数量，只支持正整数。默认值是作业并行性",
+            placeHolder = "请输入分区数",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer partitionNum;
+
+    // 其他配置
+    @StField(
+            tag = "其他配置",
+            order = 1,
             required = false,
             enName = "connection_check_timeout_sec",
             cnName = "连接检查超时时间(秒)",
@@ -165,37 +170,37 @@ public class Db2Source extends AbstractStSource {
     private Integer connectionCheckTimeoutSec;
 
     @StField(
-            tag = "性能配置",
-            order = 11,
+            tag = "其他配置",
+            order = 2,
             required = false,
-            enName = "fetch_size",
-            cnName = "数据拉取大小",
-            defaultValue = "1000",
-            description = "单次获取的记录数量，影响内存使用和网络传输",
-            placeHolder = "1000",
-            formType = StField.FormType.POSITIVE_NUMBER
+            enName = "properties",
+            cnName = "其他连接配置参数",
+            description = "其他连接配置参数，当属性和URL具有相同的参数时，优先级由驱动程序的特定实现决定。例如，在MySQL中，属性优先于URL。",
+            placeHolder = "其他连接配置参数",
+            formType = StField.FormType.TEXT_AREA
     )
-    private Integer fetchSize;
-
-    private Connection connection;
+    private Integer properties;
 
     @Override
     protected boolean doCheckConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                return connection.isValid(connectionCheckTimeoutSec != null ? connectionCheckTimeoutSec : 30);
-            }
+       return true;
+    }
 
-            // 创建新连接进行测试
-            Class.forName(driver);
-            Connection testConnection = DriverManager.getConnection(url, user, password);
-            boolean isValid = testConnection.isValid(connectionCheckTimeoutSec != null ? connectionCheckTimeoutSec : 30);
-            testConnection.close();
-            
-            return isValid;
-        } catch (SQLException | ClassNotFoundException e) {
-            log.error("DB2连接检查失败", e);
-            return false;
-        }
+    @Override
+    public JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId) {
+        JSONObject config = new JSONObject();
+        putIfNotEmpty(config, "url", connectionConfig.getString("url"));
+        config.put("driver", "com.ibm.db2.jdbc.app.DB2Driver");
+        putIfNotEmpty(config, "user", connectionConfig.getString("username"));
+        putIfNotEmpty(config, "password", connectionConfig.getString("password"));
+        putIfNotEmpty(config, "query", connectionConfig.getString("query"));
+        putIfNotEmpty(config, "connection_check_timeout_sec", connectionConfig.getString("connection_check_timeout_sec"));
+        putIfNotEmpty(config, "partition_column", connectionConfig.getString("partition_column"));
+        putIfNotEmpty(config, "partition_lower_bound", connectionConfig.getString("partition_lower_bound"));
+        putIfNotEmpty(config, "partition_upper_bound", connectionConfig.getString("partition_upper_bound"));
+        putIfNotEmpty(config, "partition_num", connectionConfig.getString("partition_num"));
+        putIfNotEmpty(config, "fetch_size", connectionConfig.getString("fetch_size"));
+        putIfNotEmpty(config, "properties", connectionConfig.getString("properties"));
+        return config;
     }
 }

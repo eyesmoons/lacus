@@ -1,21 +1,18 @@
 package com.lacus.st.source;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.google.auto.service.AutoService;
 import com.lacus.st.abstracts.AbstractStSource;
 import com.lacus.st.annotation.StComponent;
 import com.lacus.st.annotation.StField;
-import com.lacus.st.interfaces.StComponentInterface;
 import com.lacus.st.annotation.StTag;
 import com.lacus.st.annotation.StTag.TagDefinition;
+import com.lacus.st.interfaces.StComponentInterface;
 import lombok.extern.slf4j.Slf4j;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 
 /**
  * MySQL CDC数据源组件
- * 
+ *
  * @author lacus
  */
 @Slf4j
@@ -25,13 +22,14 @@ import java.sql.SQLException;
         displayName = "MySQL CDC数据源",
         description = "从MySQL数据库读取变更数据捕获(CDC)流，支持实时数据同步",
         version = "2.0.0",
-        author = "lacus"
+        author = "lacus",
+        connectorKey = "Mysql-CDC"
 )
 @StTag({
         @TagDefinition(name = "数据源配置", displayName = "数据源配置", order = 1, description = "数据源选择和连接配置"),
-        @TagDefinition(name = "查询配置", displayName = "查询配置", order = 2, description = "数据查询相关配置"),
-        @TagDefinition(name = "性能配置", displayName = "性能配置", order = 3, description = "性能优化相关配置"),
-        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 4, description = "其他扩展配置")
+        @TagDefinition(name = "连接配置", displayName = "连接配置", order = 2, description = "连接配置"),
+        @TagDefinition(name = "CDC配置", displayName = "CDC配置", order = 3, description = "CDC配置"),
+        @TagDefinition(name = "快照配置", displayName = "快照配置", order = 4, description = "快照配置")
 })
 
 @AutoService(StComponentInterface.class)
@@ -55,78 +53,31 @@ public class MysqlCdcSource extends AbstractStSource {
             tag = "数据源配置",
             order = 2,
             required = true,
-            enName = "database_list",
-            cnName = "数据库列表",
-            description = "需要监控的数据库列表，支持多个数据库",
-            placeHolder = "db1,db2,db3",
-            formType = StField.FormType.TEXT
+            enName = "database",
+            cnName = "数据库",
+            placeHolder = "请选择数据库",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/db/list/{datasourceId}"
     )
-    private String databaseList;
+    private String database;
 
     @StField(
             tag = "数据源配置",
             order = 3,
             required = true,
-            enName = "table_list",
-            cnName = "表列表",
-            description = "需要监控的表列表，格式：database.table",
-            placeHolder = "db1.table1,db1.table2",
-            formType = StField.FormType.TEXT_AREA
+            enName = "table",
+            cnName = "数据表",
+            placeHolder = "请选择数据表",
+            formType = StField.FormType.MULTI_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/table/listTable"
     )
-    private String tableList;
-
-    // 连接配置
-    @StField(
-            tag = "连接配置",
-            order = 4,
-            required = true,
-            enName = "hostname",
-            cnName = "主机地址",
-            description = "MySQL服务器主机地址",
-            placeHolder = "localhost",
-            formType = StField.FormType.TEXT
-    )
-    private String hostname;
-
-    @StField(
-            tag = "连接配置",
-            order = 5,
-            required = true,
-            enName = "port",
-            cnName = "端口号",
-            defaultValue = "3306",
-            description = "MySQL服务器端口号",
-            placeHolder = "3306",
-            formType = StField.FormType.POSITIVE_NUMBER
-    )
-    private Integer port;
-
-    @StField(
-            tag = "连接配置",
-            order = 6,
-            required = true,
-            enName = "username",
-            cnName = "用户名",
-            description = "数据库用户名，需要具有REPLICATION SLAVE和REPLICATION CLIENT权限",
-            placeHolder = "root",
-            formType = StField.FormType.TEXT
-    )
-    private String username;
-
-    @StField(
-            tag = "连接配置",
-            order = 7,
-            required = true,
-            enName = "password",
-            cnName = "密码",
-            placeHolder = "请输入数据库密码",
-            formType = StField.FormType.PASSWORD
-    )
-    private String password;
+    private String table;
 
     // CDC配置
     @StField(
-            tag = "CDC配置",
+            tag = "连接配置",
             order = 1,
             required = true,
             enName = "server_id",
@@ -138,7 +89,7 @@ public class MysqlCdcSource extends AbstractStSource {
     private Integer serverId;
 
     @StField(
-            tag = "CDC配置",
+            tag = "连接配置",
             order = 2,
             required = false,
             enName = "server_time_zone",
@@ -151,7 +102,7 @@ public class MysqlCdcSource extends AbstractStSource {
     private String serverTimeZone;
 
     @StField(
-            tag = "CDC配置",
+            tag = "连接配置",
             order = 3,
             required = false,
             enName = "connect_timeout",
@@ -164,7 +115,7 @@ public class MysqlCdcSource extends AbstractStSource {
     private String connectTimeout;
 
     @StField(
-            tag = "CDC配置",
+            tag = "连接配置",
             order = 4,
             required = false,
             enName = "connect_max_retries",
@@ -176,182 +127,294 @@ public class MysqlCdcSource extends AbstractStSource {
     )
     private Integer connectMaxRetries;
 
-    // 快照配置
     @StField(
-            tag = "快照配置",
+            tag = "连接配置",
             order = 5,
             required = false,
-            enName = "snapshot_mode",
+            enName = "connection_pool_size",
+            cnName = "jdbc连接池大小",
+            defaultValue = "20",
+            description = "jdbc连接池大小",
+            placeHolder = "jdbc连接池大小",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer connection_pool_size;
+
+    // CDC配置
+    @StField(
+            tag = "CDC配置",
+            order = 1,
+            required = false,
+            enName = "startup_mode",
             cnName = "快照模式",
             defaultValue = "initial",
             description = "快照模式：initial(初始快照), when_needed(需要时), never(从不), schema_only(仅模式)",
             placeHolder = "initial",
             formType = StField.FormType.SINGLE_SELECT,
             dictType = StField.DictType.ENUM,
-            dictEnum = {"initial", "when_needed", "never", "schema_only"}
+            dictEnum = {"initial", "earliest", "latest", "specific", "timestamp"}
     )
-    private String snapshotMode;
+    private String startup_mode;
+
+    @StField(
+            tag = "CDC配置",
+            order = 2,
+            required = false,
+            enName = "startup_specific_offset_file",
+            cnName = "指定binlog文件",
+            description = "从指定的binlog日志文件名开始. 注意, 当使用 startup.mode 选项为 specific 时，此选项为必填项.",
+            placeHolder = "指定binlog文件",
+            formType = StField.FormType.TEXT
+    )
+    private Integer startup_specific_offset_file;
+
+    @StField(
+            tag = "CDC配置",
+            order = 3,
+            required = false,
+            enName = "startup_specific_offset_pos",
+            cnName = "指定binlog位置",
+            description = "从指定的binlog日志文件位置开始. 注意, 当使用 startup.mode 选项为 specific 时，此选项为必填项.",
+            placeHolder = "指定binlog位置",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer startup_specific_offset_pos;
+
+    @StField(
+            tag = "CDC配置",
+            order = 4,
+            required = false,
+            enName = "startup_timestamp",
+            cnName = "指定时间戳",
+            description = "从指定的binlog时间戳文件位置开始. 注意, 当使用 startup.mode 选项为 timestamp 时，此选项为必填项.",
+            placeHolder = "指定时间戳",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer startup_timestamp;
+
+    @StField(
+            tag = "CDC配置",
+            order = 5,
+            required = false,
+            enName = "stop_mode",
+            cnName = "MySQL CDC停止模式",
+            description = "MySQL CDC 消费者的可选停止模式",
+            placeHolder = "MySQL CDC停止模式",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"never", "latest", "specific"}
+    )
+    private Integer stop_mode;
+
+    @StField(
+            tag = "CDC配置",
+            order = 6,
+            required = false,
+            enName = "stop_specific_offset_file",
+            cnName = "指定binlog停止文件",
+            description = "从指定的binlog日志文件名停止. 注意, 当使用 stop.mode 选项为 specific 时，此选项为必填项.",
+            placeHolder = "指定binlog停止文件",
+            formType = StField.FormType.TEXT
+    )
+    private Integer stop_specific_offset_file;
+
+    @StField(
+            tag = "CDC配置",
+            order = 7,
+            required = false,
+            enName = "stop_specific_offset_pos",
+            cnName = "指定binlog停止位置",
+            description = "从指定的binlog日志文件位置停止. 注意, 当使用 stop.mode 选项为 specific 时，此选项为必填项.",
+            placeHolder = "指定binlog停止位置",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer stop_specific_offset_pos;
+
+    @StField(
+            tag = "CDC配置",
+            order = 8,
+            required = false,
+            enName = "exactly_once",
+            cnName = "启用精确一次语义",
+            description = "启用精确一次语义.",
+            placeHolder = "启用精确一次语义",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "false"
+    )
+    private Integer exactly_once;
+
+    @StField(
+            tag = "CDC配置",
+            order = 9,
+            required = false,
+            enName = "format",
+            cnName = "MySQL CDC 的可选输出格式",
+            description = "MySQL CDC 的可选输出格式, 有效的枚举值为 DEFAULT、COMPATIBLE_DEBEZIUM_JSON.",
+            placeHolder = "MySQL CDC 的可选输出格式",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"DEFAULT", "COMPATIBLE_DEBEZIUM_JSON"},
+            defaultValue = "DEFAULT"
+    )
+    private Integer format;
+
+    @StField(
+            tag = "CDC配置",
+            order = 10,
+            required = false,
+            enName = "schema_changes_enabled",
+            cnName = "启用模式演进",
+            description = "模式演进默认是禁用的. 当前我们只支持 add column、drop column、rename column 和 modify column..",
+            placeHolder = "启用模式演进",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "false"
+    )
+    private Integer schema_changes_enabled;
+
+    @StField(
+            tag = "CDC配置",
+            order = 11,
+            required = false,
+            enName = "debezium",
+            cnName = "debezium配置",
+            description = "传递 Debezium的属性 给Debezium嵌入式引擎, 该引擎用于捕获 MySQL 服务的数据变更.",
+            placeHolder = "debezium配置",
+            formType = StField.FormType.TEXT
+    )
+    private Integer debezium;
+
+    @StField(
+            tag = "CDC配置",
+            order = 12,
+            required = false,
+            enName = "int_type_narrowing",
+            cnName = "Int类型收窄",
+            description = "Int类型收窄，如果为 true，则 tinyint(1) 类型将被收窄为 boolean 类型（如果没有精度损失）。目前仅支持 MySQL。",
+            placeHolder = "Int类型收窄",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "true"
+    )
+    private Integer int_type_narrowing;
 
     @StField(
             tag = "快照配置",
-            order = 6,
+            order = 1,
             required = false,
             enName = "snapshot_split_size",
             cnName = "快照分片大小",
             defaultValue = "8096",
-            description = "表快照的分片大小，影响并行度",
-            placeHolder = "8096",
+            description = "表快照的分割大小（行数）,读取表的快照时,被捕获的表会被分割成多个分割块.",
+            placeHolder = "快照分片大小",
             formType = StField.FormType.POSITIVE_NUMBER
     )
-    private Integer snapshotSplitSize;
+    private Integer snapshot_split_size;
 
     @StField(
             tag = "快照配置",
-            order = 7,
+            order = 2,
             required = false,
             enName = "snapshot_fetch_size",
-            cnName = "快照获取大小",
+            cnName = "快照拉取数据量",
             defaultValue = "1024",
-            description = "快照读取每次fetch的行数",
-            placeHolder = "1024",
+            description = "每次轮询读取表快照时的最大获取大小.",
+            placeHolder = "快照拉取数据量",
             formType = StField.FormType.POSITIVE_NUMBER
     )
-    private Integer snapshotFetchSize;
+    private Integer snapshot_fetch_size;
 
-    // Binlog配置
     @StField(
-            tag = "Binlog配置",
-            order = 8,
+            tag = "块键配置",
+            order = 1,
             required = false,
-            enName = "binlog_filename",
-            cnName = "Binlog文件名",
-            description = "开始读取的binlog文件名，为空则从当前位置开始",
-            placeHolder = "mysql-bin.000001",
+            enName = "chunk_key_even_distribution_factor_upper_bound",
+            cnName = "块键分布因子的上限",
+            defaultValue = "100",
+            description = "块键分布因子的上限. 该因子用于确定表数据是否分布均匀. 如果分布式因子计算结果小于或等于此上限 (即., (MAX(id) - MIN(id) + 1) / row count), 表的分块将被优化以实现均匀分布. 否则, 如果分布因子大于此上限, 该表将被视为分布不均, 并且如果估计的分片数量超过 sample-sharding.threshold 所指定的值, 则将使用基于采样的分片策略. 默认值是100.0.",
+            placeHolder = "块键分布因子的上限",
             formType = StField.FormType.TEXT
     )
-    private String binlogFilename;
+    private Integer chunk_key_even_distribution_factor_upper_bound;
 
     @StField(
-            tag = "Binlog配置",
-            order = 9,
+            tag = "块键配置",
+            order = 2,
             required = false,
-            enName = "binlog_position",
-            cnName = "Binlog位置",
-            description = "开始读取的binlog位置",
-            placeHolder = "4",
-            formType = StField.FormType.NUMBER
-    )
-    private Long binlogPosition;
-
-    @StField(
-            tag = "Binlog配置",
-            order = 10,
-            required = false,
-            enName = "scan_startup_mode",
-            cnName = "启动模式",
-            defaultValue = "initial",
-            description = "启动模式：initial(全量+增量), earliest(最早), latest(最新), specific-offset(指定位置), timestamp(时间戳)",
-            placeHolder = "initial",
-            formType = StField.FormType.SINGLE_SELECT,
-            dictType = StField.DictType.ENUM,
-            dictEnum = {"initial", "earliest", "latest", "specific-offset", "timestamp"}
-    )
-    private String scanStartupMode;
-
-    @StField(
-            tag = "Binlog配置",
-            order = 11,
-            required = false,
-            enName = "scan_startup_timestamp_millis",
-            cnName = "启动时间戳",
-            description = "当启动模式为timestamp时，指定开始读取的时间戳(毫秒)",
-            placeHolder = "1640995200000",
-            formType = StField.FormType.NUMBER
-    )
-    private Long scanStartupTimestampMillis;
-
-    // 性能配置
-    @StField(
-            tag = "性能配置",
-            order = 12,
-            required = false,
-            enName = "heartbeat_interval",
-            cnName = "心跳间隔",
-            defaultValue = "30s",
-            description = "连接器向源数据库发送心跳的时间间隔",
-            placeHolder = "30s",
+            enName = "chunk_key_even_distribution_factor_lower_bound",
+            cnName = "块键分布因子的下限",
+            defaultValue = "0.05",
+            description = "块键分布因子的下限. 该因子用于确定表数据是否分布均匀. 如果计算得出的分布因子大于或等于此下限 (即., (MAX(id) - MIN(id) + 1) / row count), 表的分块将被优化以实现均匀分布. 否则, 如果分布因子小于此下限, 该表将被视为分布不均, 并且如果预估的分片数量超过了 sample-sharding.threshold 所指定的值，则将使用基于采样的分片策略. 默认值是 0.05.",
+            placeHolder = "块键分布因子的下限",
             formType = StField.FormType.TEXT
     )
-    private String heartbeatInterval;
+    private Integer chunk_key_even_distribution_factor_lower_bound;
 
     @StField(
-            tag = "性能配置",
-            order = 13,
+            tag = "块键配置",
+            order = 3,
             required = false,
-            enName = "debezium_properties",
-            cnName = "Debezium属性",
-            description = "额外的Debezium属性配置，格式：key1=value1;key2=value2",
-            placeHolder = "decimal.handling.mode=string",
-            formType = StField.FormType.TEXT_AREA
+            enName = "sample_sharding_threshold",
+            cnName = "采样分片阈值",
+            defaultValue = "1000",
+            description = "此配置指定了触发采样分片策略的预估分片数量阈值. 当分配因子超出由 chunk-key.even-distribution.factor.upper-bound 和 chunk-key.even-distribution.factor.lower-bound 所指定的范围时, 如果估计的分片数量 (按近似行数/块大小 计算) 超过此阈值, 则将使用样本分片策略. 这有助于更高效地处理大型数据集. 默认值为 1000 分片.",
+            placeHolder = "采样分片阈值",
+            formType = StField.FormType.POSITIVE_NUMBER
     )
-    private String debeziumProperties;
-
-    // 过滤配置
-    @StField(
-            tag = "过滤配置",
-            order = 14,
-            required = false,
-            enName = "table_excludes",
-            cnName = "排除表",
-            description = "需要排除的表，格式：database.table，支持正则表达式",
-            placeHolder = "test.temp_.*",
-            formType = StField.FormType.TEXT_AREA
-    )
-    private String tableExcludes;
+    private Integer sample_sharding_threshold;
 
     @StField(
-            tag = "过滤配置",
-            order = 15,
+            tag = "块键配置",
+            order = 4,
             required = false,
-            enName = "column_excludes",
-            cnName = "排除列",
-            description = "需要排除的列，格式：database.table.column",
-            placeHolder = "test.users.password",
-            formType = StField.FormType.TEXT_AREA
+            enName = "inverse_sampling_rate",
+            cnName = "采样率的倒数",
+            defaultValue = "1000",
+            description = "采样分片策略中使用的采样率的倒数. 例如, 如果该值设置为 1000, 则表示在采样过程中应用了 1/1000 的采样率. 此选项在控制采样的粒度方面提供了灵活性, 从而影响最终的分片数量. 在处理非常大的数据集时非常有用, 因为此时更倾向于使用较低的采样率. 默认值为 1000.",
+            placeHolder = "采样率的倒数",
+            formType = StField.FormType.POSITIVE_NUMBER
     )
-    private String columnExcludes;
-
-    private Connection connection;
+    private Integer inverse_sampling_rate;
 
     @Override
     protected boolean doCheckConnection() {
-        try {
-            if (connection != null && !connection.isClosed()) {
-                return connection.isValid(30);
-            }
+        return true;
+    }
 
-            // 构建连接URL
-            String url = String.format("jdbc:mysql://%s:%d/", hostname, port);
-            
-            // 创建连接进行测试
-            Class.forName("com.mysql.cj.jdbc.Driver");
-            Connection testConnection = DriverManager.getConnection(url, username, password);
-            
-            // 验证是否开启了binlog
-            boolean binlogEnabled = testConnection.createStatement()
-                    .executeQuery("SHOW VARIABLES LIKE 'log_bin'")
-                    .next();
-            
-            testConnection.close();
-            
-            if (!binlogEnabled) {
-                log.warn("MySQL binlog未开启，CDC功能可能无法正常工作");
-            }
-            
-            return true;
-        } catch (SQLException | ClassNotFoundException e) {
-            log.error("MySQL CDC连接检查失败", e);
-            return false;
-        }
+    @Override
+    public JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId) {
+        JSONObject config = new JSONObject();
+        putIfNotEmpty(config, "url", connectionConfig.getString("url"));
+        putIfNotEmpty(config, "user", connectionConfig.getString("username"));
+        putIfNotEmpty(config, "password", connectionConfig.getString("password"));
+        putIfNotEmpty(config, "table-names", getDbTables(connectionConfig));
+        putIfNotEmpty(config, "startup.mode", connectionConfig.getString("startup_mode"));
+        putIfNotEmpty(config, "startup.specific-offset.file", connectionConfig.getString("startup_specific_offset_file"));
+        putIfNotEmpty(config, "startup.specific-offset.pos", connectionConfig.getLong("startup_specific_offset_pos"));
+        putIfNotEmpty(config, "startup.timestamp", connectionConfig.getLong("startup_timestamp"));
+        putIfNotEmpty(config, "stop.mode", connectionConfig.getString("stop_mode"));
+        putIfNotEmpty(config, "stop.specific-offset.file", connectionConfig.getString("stop_specific_offset_file"));
+        putIfNotEmpty(config, "stop.specific-offset.pos", connectionConfig.getLong("stop_specific_offset_pos"));
+        putIfNotEmpty(config, "snapshot.split.size", connectionConfig.getInteger("snapshot_split_size"));
+        putIfNotEmpty(config, "snapshot.fetch.size", connectionConfig.getInteger("snapshot_fetch_size"));
+        putIfNotEmpty(config, "server-id", connectionConfig.getString("server_id"));
+        putIfNotEmpty(config, "server-time-zone", connectionConfig.getString("server_time_zone"));
+        putIfNotEmpty(config, "connect.timeout.ms", connectionConfig.getString("connect_timeout_ms"));
+        putIfNotEmpty(config, "connect.max-retries", connectionConfig.getInteger("connect_max_retries"));
+        putIfNotEmpty(config, "connection.pool.size", connectionConfig.getInteger("connection_pool_size"));
+        putIfNotEmpty(config, "chunk-key.even-distribution.factor.upper-bound", connectionConfig.getDouble("chunk_key_even_distribution_factor_upper_bound"));
+        putIfNotEmpty(config, "chunk-key.even-distribution.factor.lower-bound", connectionConfig.getDouble("chunk_key_even_distribution_factor_lower_bound"));
+        putIfNotEmpty(config, "sample-sharding.threshold", connectionConfig.getInteger("sample_sharding_threshold"));
+        putIfNotEmpty(config, "inverse-sampling.rate", connectionConfig.getInteger("inverse_sampling_rate"));
+        putIfNotEmpty(config, "exactly_once", connectionConfig.getBoolean("exactly_once"));
+        putIfNotEmpty(config, "format", connectionConfig.getString("format"));
+        putIfNotEmpty(config, "schema-changes.enabled", connectionConfig.getBoolean("schema_changes_enabled"));
+        putIfNotEmpty(config, "debezium", connectionConfig.getString("debezium"));
+        putIfNotEmpty(config, "int_type_narrowing", connectionConfig.getBoolean("int_type_narrowing"));
+        return config;
     }
 }

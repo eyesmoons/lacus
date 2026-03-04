@@ -29,7 +29,6 @@ com.lacus.st.source.PostgresqlSource
 # Transform转换组件
 com.lacus.st.transform.CopyTransform
 com.lacus.st.transform.FieldMapperTransform
-com.lacus.st.transform.FilterTransform
 com.lacus.st.transform.MetadataTransform
 com.lacus.st.transform.FieldRenameTransform
 com.lacus.st.transform.ReplaceTransform

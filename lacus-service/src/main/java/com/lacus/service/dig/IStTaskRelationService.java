@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface IStTaskRelationService extends IService<StTaskRelationEntity> {
     List<StTaskRelationEntity> getTaskRelationsByJobId(Long jobId);
+    void removeByJobId(Long jobId);
 }

@@ -46,6 +46,12 @@ public @interface StComponent {
      * 组件作者
      */
     String author() default "";
+
+    /**
+     * DAG 中连接器名称（生成 JSON 时 source/transform/sink 下的 key）。
+     * 为空则使用 name。例如 Jdbc、Replace、Kafka，与 SeaTunnel 配置名一致。
+     */
+    String connectorKey() default "";
     
     /**
      * 组件类型枚举

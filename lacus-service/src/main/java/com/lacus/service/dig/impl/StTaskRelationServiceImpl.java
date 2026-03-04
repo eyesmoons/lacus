@@ -19,4 +19,11 @@ public class StTaskRelationServiceImpl extends ServiceImpl<StTaskRelationMapper,
         wrapper.eq(StTaskRelationEntity::getJobId, jobId);
         return this.list(wrapper);
     }
+
+    @Override
+    public void removeByJobId(Long jobId) {
+        LambdaQueryWrapper<StTaskRelationEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(StTaskRelationEntity::getJobId, jobId);
+        this.remove(wrapper);
+    }
 }

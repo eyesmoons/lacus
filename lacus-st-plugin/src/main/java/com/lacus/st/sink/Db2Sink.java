@@ -1,5 +1,6 @@
 package com.lacus.st.sink;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.google.auto.service.AutoService;
 import com.lacus.st.abstracts.AbstractStSink;
 import com.lacus.st.annotation.StComponent;
@@ -7,19 +8,16 @@ import com.lacus.st.annotation.StField;
 import com.lacus.st.annotation.StTag;
 import com.lacus.st.annotation.StTag.TagDefinition;
 import com.lacus.st.interfaces.StComponentInterface;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
-
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
-import java.util.List;
 
 /**
  * DB2 Sink组件
  * DB2数据库输出组件
- * 
+ *
  * @author lacus
  */
+@Setter
 @Slf4j
 @StComponent(
         type = StComponent.ComponentType.SINK,
@@ -27,72 +25,64 @@ import java.util.List;
         displayName = "DB2数据库输出",
         description = "通过JDBC写入DB2数据库，支持批处理模式和流模式，支持精确一次语义",
         version = "2.0.0",
-        author = "lacus"
+        author = "lacus",
+        connectorKey = "Jdbc"
 )
 @StTag({
-        @TagDefinition(name = "连接配置", displayName = "连接配置", order = 1, description = "数据库连接相关配置"),
-        @TagDefinition(name = "数据配置", displayName = "数据配置", order = 2, description = "数据操作相关配置"),
+        @TagDefinition(name = "数据源配置", displayName = "数据源配置", order = 1, description = "数据源配置"),
+        @TagDefinition(name = "查询配置", displayName = "查询配置", order = 2, description = "查询配置"),
         @TagDefinition(name = "性能配置", displayName = "性能配置", order = 3, description = "性能优化相关配置"),
-        @TagDefinition(name = "DB2配置", displayName = "DB2配置", order = 4, description = "DB2特有配置"),
-        @TagDefinition(name = "事务配置", displayName = "事务配置", order = 5, description = "事务处理相关配置")
+        @TagDefinition(name = "表结构配置", displayName = "表结构配置", order = 4, description = "表结构配置"),
+        @TagDefinition(name = "事务配置", displayName = "事务配置", order = 5, description = "事务处理相关配置"),
+        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 6, description = "其他配置")
 })
 @AutoService(StComponentInterface.class)
 public class Db2Sink extends AbstractStSink {
 
-    // 连接配置
+    // 数据源配置
     @StField(
-            tag = "连接配置",
+            tag = "数据源配置",
             order = 1,
             required = true,
-            enName = "url",
-            cnName = "JDBC连接URL",
-            description = "DB2数据库连接URL",
-            placeHolder = "jdbc:db2://localhost:50000/testdb",
-            formType = StField.FormType.TEXT
+            enName = "datasourceId",
+            cnName = "数据源",
+            placeHolder = "请选择数据源",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/datasource/list"
     )
-    private String url;
+    private String datasourceId;
 
     @StField(
-            tag = "连接配置",
+            tag = "数据源配置",
             order = 2,
             required = true,
-            enName = "driver",
-            cnName = "驱动类名",
-            defaultValue = "com.ibm.db2.jcc.DB2Driver",
-            description = "DB2 JDBC驱动类名",
-            placeHolder = "com.ibm.db2.jcc.DB2Driver",
-            formType = StField.FormType.TEXT
+            enName = "database",
+            cnName = "数据库",
+            placeHolder = "请选择数据库",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/db/list/{datasourceId}"
     )
-    private String driver;
+    private String database;
 
     @StField(
-            tag = "连接配置",
+            tag = "数据源配置",
             order = 3,
             required = true,
-            enName = "user",
-            cnName = "用户名",
-            description = "DB2数据库用户名",
-            placeHolder = "db2inst1",
-            formType = StField.FormType.TEXT
+            enName = "table",
+            cnName = "数据表",
+            placeHolder = "请选择数据表",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.URL,
+            dictUrl = "/metadata/table/listTable"
     )
-    private String user;
-
-    @StField(
-            tag = "连接配置",
-            order = 4,
-            required = true,
-            enName = "password",
-            cnName = "密码",
-            description = "DB2数据库密码",
-            placeHolder = "请输入密码",
-            formType = StField.FormType.PASSWORD
-    )
-    private String password;
+    private String table;
 
     // 数据配置
     @StField(
-            tag = "数据配置",
-            order = 5,
+            tag = "查询配置",
+            order = 1,
             required = false,
             enName = "query",
             cnName = "SQL查询语句",
@@ -103,32 +93,8 @@ public class Db2Sink extends AbstractStSink {
     private String query;
 
     @StField(
-            tag = "数据配置",
-            order = 6,
-            required = false,
-            enName = "database",
-            cnName = "数据库名",
-            description = "目标DB2数据库名称",
-            placeHolder = "TESTDB",
-            formType = StField.FormType.TEXT
-    )
-    private String database;
-
-    @StField(
-            tag = "数据配置",
-            order = 7,
-            required = false,
-            enName = "table",
-            cnName = "表名",
-            description = "目标DB2表名称，格式：schema.table",
-            placeHolder = "DB2INST1.TEST_TABLE",
-            formType = StField.FormType.TEXT
-    )
-    private String table;
-
-    @StField(
-            tag = "数据配置",
-            order = 8,
+            tag = "查询配置",
+            order = 2,
             required = false,
             enName = "primary_keys",
             cnName = "主键字段",
@@ -138,10 +104,24 @@ public class Db2Sink extends AbstractStSink {
     )
     private String primaryKeys;
 
+    @StField(
+            tag = "查询配置",
+            order = 2,
+            required = false,
+            enName = "generate_sink_sql",
+            cnName = "自动生成SQL",
+            defaultValue = "true",
+            description = "根据要写入的DB2表结构生成SQL语句",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"false", "true"}
+    )
+    private Boolean generateSinkSql;
+
     // 性能配置
     @StField(
             tag = "性能配置",
-            order = 9,
+            order = 1,
             required = false,
             enName = "batch_size",
             cnName = "批处理大小",
@@ -154,7 +134,20 @@ public class Db2Sink extends AbstractStSink {
 
     @StField(
             tag = "性能配置",
-            order = 10,
+            order = 2,
+            required = false,
+            enName = "max_retries",
+            cnName = "提交失败的重试次数",
+            defaultValue = "0",
+            description = "提交失败的重试次数 (执行批处理)",
+            placeHolder = "提交失败的重试次数",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer max_retries;
+
+    @StField(
+            tag = "性能配置",
+            order = 3,
             required = false,
             enName = "connection_check_timeout_sec",
             cnName = "连接检查超时时间(秒)",
@@ -165,22 +158,10 @@ public class Db2Sink extends AbstractStSink {
     )
     private Integer connectionCheckTimeoutSec;
 
-    // DB2特有配置
+    // 表结构配置
     @StField(
-            tag = "DB2配置",
-            order = 11,
-            required = false,
-            enName = "generate_sink_sql",
-            cnName = "自动生成SQL",
-            defaultValue = "false",
-            description = "根据要写入的DB2表结构生成SQL语句",
-            formType = StField.FormType.CHECKBOX
-    )
-    private Boolean generateSinkSql;
-
-    @StField(
-            tag = "DB2配置",
-            order = 12,
+            tag = "表结构配置",
+            order = 1,
             required = false,
             enName = "field_ide",
             cnName = "字段名大小写",
@@ -193,8 +174,8 @@ public class Db2Sink extends AbstractStSink {
     private String fieldIde;
 
     @StField(
-            tag = "DB2配置",
-            order = 13,
+            tag = "表结构配置",
+            order = 2,
             required = false,
             enName = "schema_save_mode",
             cnName = "表结构保存模式",
@@ -207,8 +188,8 @@ public class Db2Sink extends AbstractStSink {
     private String schemaSaveMode;
 
     @StField(
-            tag = "DB2配置",
-            order = 14,
+            tag = "表结构配置",
+            order = 3,
             required = false,
             enName = "data_save_mode",
             cnName = "数据保存模式",
@@ -223,19 +204,62 @@ public class Db2Sink extends AbstractStSink {
     // 事务配置
     @StField(
             tag = "事务配置",
-            order = 15,
+            order = 1,
+            required = false,
+            enName = "auto_commit",
+            cnName = "启用自动事务提交",
+            defaultValue = "true",
+            description = "默认情况下启用自动事务提交",
+            placeHolder = "启用自动事务提交",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"false", "true"}
+    )
+    private Integer auto_commit;
+
+    @StField(
+            tag = "事务配置",
+            order = 2,
+            required = false,
+            enName = "max_commit_attempts",
+            cnName = "事务提交失败的重试次数",
+            defaultValue = "3",
+            description = "事务提交失败的重试次数",
+            placeHolder = "事务提交失败的重试次数",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer max_commit_attempts;
+
+    @StField(
+            tag = "事务配置",
+            order = 3,
+            required = false,
+            enName = "transaction_timeout_sec",
+            cnName = "事务打开后的超时",
+            defaultValue = "-1",
+            description = "事务打开后的超时，默认值为-1（永不超时）. 请注意，设置超时可能会影响精确一次语义",
+            placeHolder = "事务打开后的超时，默认值为-1（永不超时）",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private Integer transaction_timeout_sec;
+
+    @StField(
+            tag = "事务配置",
+            order = 4,
             required = false,
             enName = "is_exactly_once",
             cnName = "精确一次语义",
             defaultValue = "false",
             description = "是否启用精确一次语义，使用XA事务保证",
-            formType = StField.FormType.CHECKBOX
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"false", "true"}
     )
     private Boolean isExactlyOnce;
 
     @StField(
-            tag = "事务配置",
-            order = 16,
+            tag = "其他配置",
+            order = 1,
             required = false,
             enName = "xa_data_source_class_name",
             cnName = "XA数据源类名",
@@ -246,204 +270,44 @@ public class Db2Sink extends AbstractStSink {
     )
     private String xaDataSourceClassName;
 
+    @StField(
+            tag = "其他配置",
+            order = 2,
+            required = false,
+            enName = "properties",
+            cnName = "附加连接配置参数",
+            description = "附加连接配置参数，当属性和URL具有相同的参数时，优先级由驱动程序的特定实现决定. 例如，在MySQL中，属性优先于URL.",
+            placeHolder = "附加连接配置参数",
+            formType = StField.FormType.TEXT
+    )
+    private String properties;
+
     @Override
     protected boolean doCheckConnection() {
-        try {
-            // 验证必填字段
-            if (url == null || url.trim().isEmpty()) {
-                log.error("DB2 Sink配置错误：url不能为空");
-                return false;
-            }
-
-            if (user == null || user.trim().isEmpty()) {
-                log.error("DB2 Sink配置错误：user不能为空");
-                return false;
-            }
-
-            // 验证驱动类
-            String driverClass = driver != null ? driver.trim() : "com.ibm.db2.jcc.DB2Driver";
-            try {
-                Class.forName(driverClass);
-            } catch (ClassNotFoundException e) {
-                log.error("DB2 Sink配置错误：找不到DB2驱动类 {}", driverClass, e);
-                return false;
-            }
-
-            // 验证SQL查询或database+table配置
-            boolean hasQuery = query != null && !query.trim().isEmpty();
-            boolean hasDbTable = (database != null && !database.trim().isEmpty()) && 
-                                (table != null && !table.trim().isEmpty());
-            
-            if (!hasQuery && !hasDbTable) {
-                log.error("DB2 Sink配置错误：必须配置query查询语句或者database+table组合");
-                return false;
-            }
-
-            // 验证URL格式
-            if (!url.toLowerCase().contains("db2")) {
-                log.warn("DB2 Sink警告：URL中未包含db2关键字，请确认URL格式正确");
-            }
-
-            // 测试DB2连接
-            try (Connection connection = DriverManager.getConnection(url.trim(), user.trim(), password)) {
-                if (connection != null && !connection.isClosed()) {
-                    log.info("DB2 Sink数据库连接测试成功");
-                    return true;
-                } else {
-                    log.error("DB2 Sink数据库连接失败：连接为空或已关闭");
-                    return false;
-                }
-            } catch (SQLException e) {
-                log.error("DB2 Sink数据库连接测试失败", e);
-                return false;
-            }
-
-        } catch (Exception e) {
-            log.error("DB2 Sink连接检查失败", e);
-            return false;
-        }
+        return true;
     }
 
-    /**
-     * 获取主键字段列表
-     */
-    public List<String> getPrimaryKeysList() {
-        if (primaryKeys == null || primaryKeys.trim().isEmpty()) {
-            return null;
-        }
-        String[] keys = primaryKeys.split(",");
-        return java.util.Arrays.stream(keys)
-                .map(String::trim)
-                .filter(key -> !key.isEmpty())
-                .collect(java.util.stream.Collectors.toList());
-    }
-
-    // Getter and Setter methods
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public String getDriver() {
-        return driver != null ? driver : "com.ibm.db2.jcc.DB2Driver";
-    }
-
-    public void setDriver(String driver) {
-        this.driver = driver;
-    }
-
-    public String getUser() {
-        return user;
-    }
-
-    public void setUser(String user) {
-        this.user = user;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public String getQuery() {
-        return query;
-    }
-
-    public void setQuery(String query) {
-        this.query = query;
-    }
-
-    public String getDatabase() {
-        return database;
-    }
-
-    public void setDatabase(String database) {
-        this.database = database;
-    }
-
-    public String getTable() {
-        return table;
-    }
-
-    public void setTable(String table) {
-        this.table = table;
-    }
-
-    public String getPrimaryKeys() {
-        return primaryKeys;
-    }
-
-    public void setPrimaryKeys(String primaryKeys) {
-        this.primaryKeys = primaryKeys;
-    }
-
-    public Integer getBatchSize() {
-        return batchSize != null ? batchSize : 1000;
-    }
-
-    public void setBatchSize(Integer batchSize) {
-        this.batchSize = batchSize;
-    }
-
-    public Integer getConnectionCheckTimeoutSec() {
-        return connectionCheckTimeoutSec != null ? connectionCheckTimeoutSec : 30;
-    }
-
-    public void setConnectionCheckTimeoutSec(Integer connectionCheckTimeoutSec) {
-        this.connectionCheckTimeoutSec = connectionCheckTimeoutSec;
-    }
-
-    public Boolean getGenerateSinkSql() {
-        return generateSinkSql != null ? generateSinkSql : false;
-    }
-
-    public void setGenerateSinkSql(Boolean generateSinkSql) {
-        this.generateSinkSql = generateSinkSql;
-    }
-
-    public String getFieldIde() {
-        return fieldIde != null ? fieldIde : "UPPERCASE";
-    }
-
-    public void setFieldIde(String fieldIde) {
-        this.fieldIde = fieldIde;
-    }
-
-    public String getSchemaSaveMode() {
-        return schemaSaveMode != null ? schemaSaveMode : "CREATE_SCHEMA_WHEN_NOT_EXIST";
-    }
-
-    public void setSchemaSaveMode(String schemaSaveMode) {
-        this.schemaSaveMode = schemaSaveMode;
-    }
-
-    public String getDataSaveMode() {
-        return dataSaveMode != null ? dataSaveMode : "APPEND_DATA";
-    }
-
-    public void setDataSaveMode(String dataSaveMode) {
-        this.dataSaveMode = dataSaveMode;
-    }
-
-    public Boolean getIsExactlyOnce() {
-        return isExactlyOnce != null ? isExactlyOnce : false;
-    }
-
-    public void setIsExactlyOnce(Boolean isExactlyOnce) {
-        this.isExactlyOnce = isExactlyOnce;
-    }
-
-    public String getXaDataSourceClassName() {
-        return xaDataSourceClassName != null ? xaDataSourceClassName : "com.ibm.db2.jcc.DB2XADataSource";
-    }
-
-    public void setXaDataSourceClassName(String xaDataSourceClassName) {
-        this.xaDataSourceClassName = xaDataSourceClassName;
+    @Override
+    public JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId) {
+        JSONObject config = new JSONObject();
+        putIfNotEmpty(config, "url", connectionConfig.getString("url"));
+        config.put("driver", "com.ibm.db2.jdbc.app.DB2Driver");
+        putIfNotEmpty(config, "user", connectionConfig.getString("username"));
+        putIfNotEmpty(config, "password", connectionConfig.getString("password"));
+        putIfNotEmpty(config, "query", connectionConfig.getString("query"));
+        putIfNotEmpty(config, "database", connectionConfig.getString("database"));
+        putIfNotEmpty(config, "table", connectionConfig.getString("table"));
+        putIfNotEmpty(config, "primary_keys", connectionConfig.getString("primary_keys"));
+        putIfNotEmpty(config, "connection_check_timeout_sec", connectionConfig.getString("connection_check_timeout_sec"));
+        putIfNotEmpty(config, "max_retries", connectionConfig.getString("max_retries"));
+        putIfNotEmpty(config, "batch_size", connectionConfig.getString("batch_size"));
+        putIfNotEmpty(config, "is_exactly_once", connectionConfig.getBoolean("is_exactly_once"));
+        putIfNotEmpty(config, "generate_sink_sql", connectionConfig.getBoolean("generate_sink_sql"));
+        putIfNotEmpty(config, "xa_data_source_class_name", connectionConfig.getString("xa_data_source_class_name"));
+        putIfNotEmpty(config, "max_commit_attempts", connectionConfig.getString("max_commit_attempts"));
+        putIfNotEmpty(config, "transaction_timeout_sec", connectionConfig.getString("transaction_timeout_sec"));
+        putIfNotEmpty(config, "auto_commit", connectionConfig.getBoolean("auto_commit"));
+        putIfNotEmpty(config, "properties", connectionConfig.getString("properties"));
+        return config;
     }
 }

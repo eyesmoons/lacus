@@ -90,6 +90,7 @@ public class StComponentLoader {
             metadata.put("author", annotation.author());
             metadata.put("type", annotation.type().getValue());
             metadata.put("className", component.getClass().getName());
+            metadata.put("connectorKey", annotation.connectorKey());
 
             // 获取字段配置信息
             Map<String, Object> fieldConfigs = getFieldConfigs(component.getClass());

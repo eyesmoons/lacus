@@ -1,18 +1,14 @@
 package com.lacus.st.source;
 
+import com.alibaba.fastjson2.JSONObject;
 import com.google.auto.service.AutoService;
 import com.lacus.st.abstracts.AbstractStSource;
 import com.lacus.st.annotation.StComponent;
 import com.lacus.st.annotation.StField;
-import com.lacus.st.interfaces.StComponentInterface;
 import com.lacus.st.annotation.StTag;
 import com.lacus.st.annotation.StTag.TagDefinition;
+import com.lacus.st.interfaces.StComponentInterface;
 import lombok.extern.slf4j.Slf4j;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 /**
  * MySQL数据源组件
@@ -24,13 +20,18 @@ import java.sql.SQLException;
         displayName = "JDBC数据源",
         description = "从JDBC数据库读取数据的组件",
         version = "2.0.0",
-        author = "lacus"
+        author = "lacus",
+        connectorKey = "Jdbc"
 )
 @StTag({
         @TagDefinition(name = "数据源配置", displayName = "数据源配置", order = 1, description = "数据源选择和连接配置"),
-        @TagDefinition(name = "查询配置", displayName = "查询配置", order = 2, description = "数据查询相关配置"),
-        @TagDefinition(name = "性能配置", displayName = "性能配置", order = 3, description = "性能优化相关配置"),
-        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 4, description = "其他扩展配置")
+        @TagDefinition(name = "查询配置", displayName = "查询配置", order = 2, description = "查询配置"),
+        @TagDefinition(name = "连接器配置", displayName = "连接器配置", order = 3, description = "连接器配置"),
+        @TagDefinition(name = "分片配置", displayName = "分片配置", order = 4, description = "分片配置"),
+        @TagDefinition(name = "分区配置", displayName = "分区配置", order = 5, description = "分区配置"),
+        @TagDefinition(name = "性能配置", displayName = "性能配置", order = 6, description = "性能优化相关配置"),
+        @TagDefinition(name = "数据类型转换配置", displayName = "数据类型转换配置", order = 7, description = "数据类型转换配置"),
+        @TagDefinition(name = "其他配置", displayName = "其他配置", order = 8, description = "其他扩展配置")
 })
 
 @AutoService(StComponentInterface.class)
@@ -55,7 +56,7 @@ public class JdbcSource extends AbstractStSource {
             order = 2,
             required = true,
             enName = "database",
-            cnName = "数据库名",
+            cnName = "数据库",
             placeHolder = "请选择数据库",
             formType = StField.FormType.SINGLE_SELECT,
             dictType = StField.DictType.URL,
@@ -67,67 +68,170 @@ public class JdbcSource extends AbstractStSource {
             tag = "数据源配置",
             order = 3,
             required = true,
-            enName = "table_list",
-            cnName = "表名",
+            enName = "table",
+            cnName = "数据表",
             placeHolder = "请选择数据表",
-            formType = StField.FormType.MULTI_SELECT,
+            formType = StField.FormType.SINGLE_SELECT,
             dictType = StField.DictType.URL,
             dictUrl = "/metadata/table/listTable"
     )
-    private String tableList;
+    private String table;
+
+    @StField(
+            tag = "查询配置",
+            order = 1,
+            required = false,
+            enName = "where_condition",
+            cnName = "过滤条件",
+            description = "适用于所有表或查询的通用行过滤条件，必须以 WHERE 开头。例如：WHERE id > 100",
+            placeHolder = "过滤条件，例如：id > 100",
+            formType = StField.FormType.TEXT_AREA
+    )
+    private Integer where_condition;
 
     // 连接器配置
     @StField(
             tag = "连接器配置",
-            order = 4,
-            required = true,
-            enName = "query",
-            cnName = "查询语句",
-            placeHolder = "请输入查询语句",
-            formType = StField.FormType.TEXT_AREA
+            order = 1,
+            required = false,
+            enName = "compatible_mode",
+            cnName = "数据库的兼容模式",
+            defaultValue = "mysql",
+            description = "数据库的兼容模式。当数据库支持多种兼容模式时需要设置该参数。例如：使用 OceanBase 数据库时，需要设置为 mysql 或 oracle；使用 StarRocks 数据库时，需要设置为 starrocks。",
+            placeHolder = "请输入数据库的兼容模式",
+            formType = StField.FormType.TEXT
     )
-    private String query;
+    private Integer compatibleMode;
 
     @StField(
             tag = "连接器配置",
-            order = 5,
+            order = 2,
+            required = false,
+            enName = "dialect",
+            cnName = "SQL 方言",
+            description = "指定的 SQL 方言。如果未指定或指定的方言不存在，则仍会根据 URL 自动识别获取；该参数的优先级高于 URL。例如：使用 StarRocks 时，需要将其设置为 starrocks。",
+            placeHolder = "SQL 方言",
+            formType = StField.FormType.TEXT
+    )
+    private String dialect;
+
+    @StField(
+            tag = "连接器配置",
+            order = 3,
             required = false,
             enName = "connection_check_timeout_sec",
-            cnName = "连接检查超时时间(秒)",
-            defaultValue = "30",
-            description = "验证数据库连接所使用的操作完成的等待时间（秒）。",
-            placeHolder = "请输入连接检查超时时间",
-            formType = StField.FormType.POSITIVE_NUMBER
+            cnName = "验证连接超时时间（单位：秒）",
+            description = "用于验证连接的数据库操作的超时时间（单位：秒）。",
+            placeHolder = "验证连接超时时间（单位：秒）",
+            formType = StField.FormType.TEXT
     )
-    private Integer connectionCheckTimeoutSec;
+    private String connectionCheckTimeoutSec;
 
     @StField(
-            tag = "连接器配置",
+            tag = "分片配置",
+            order = 1,
+            required = false,
+            enName = "split_size",
+            cnName = "分片大小（行数）",
+            description = "每个分片包含的行数。在读取表数据时，被采集的表会根据该参数拆分为多个分片。注意： 该参数仅在使用 table_path 参数时生效，使用 query 参数时不生效。",
+            placeHolder = "分片大小（行数）",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private String split_size;
+
+    @StField(
+            tag = "分片配置",
+            order = 2,
+            required = false,
+            enName = "split_even_distribution_factor_upper_bound",
+            cnName = "分片上限",
+            description = "分片上限",
+            placeHolder = "分片上限",
+            formType = StField.FormType.POSITIVE_NUMBER,
+            defaultValue = "0.05"
+    )
+    private String splitUpperBound;
+
+    @StField(
+            tag = "分片配置",
+            order = 3,
+            required = false,
+            enName = "split_even_distribution_factor_lower_bound",
+            cnName = "分片下限",
+            description = "分片下限",
+            placeHolder = "分片下限",
+            formType = StField.FormType.POSITIVE_NUMBER,
+            defaultValue = "0.05"
+    )
+    private String splitLowerBound;
+
+    @StField(
+            tag = "分片配置",
+            order = 4,
+            required = false,
+            enName = "split_sample_sharding_threshold",
+            cnName = "分片数量阈值",
+            description = "分片数量阈值",
+            placeHolder = "分片数量阈值",
+            formType = StField.FormType.POSITIVE_NUMBER,
+            defaultValue = "1000"
+    )
+    private String splitThreshold;
+
+    @StField(
+            tag = "分片配置",
+            order = 5,
+            required = false,
+            enName = "split_inverse_sampling_rate",
+            cnName = "采样率倒数",
+            description = "采样分片策略中使用的采样率倒数。",
+            placeHolder = "采样率倒数",
+            formType = StField.FormType.POSITIVE_NUMBER,
+            defaultValue = "1000"
+    )
+    private String splitInverseRate;
+
+    @StField(
+            tag = "分片配置",
             order = 6,
             required = false,
-            enName = "partition_column",
-            cnName = "分区列",
-            description = "用于并行度分区的列名，仅支持数字类型，仅支持数字类型的主键，并且只能配置一列。",
-            placeHolder = "请输入分区列",
+            enName = "split_string_split_mode",
+            cnName = "字符串分片算法",
+            description = "支持多种字符串分片算法。默认使用 sample 算法，通过对字符串值进行采样来确定分片边界。也可以切换为 charset_based，以启用基于字符集的字符串分片算法。当设置为 charset_based 时，算法假定分区列中的字符位于 ASCII 32–126 范围内，该范围覆盖了大多数基于字符的分片场景。。",
+            placeHolder = "字符串分片算法",
+            formType = StField.FormType.POSITIVE_NUMBER,
+            defaultValue = "1000"
+    )
+    private String split_string_split_mode;
+
+    @StField(
+            tag = "分片配置",
+            order = 7,
+            required = false,
+            enName = "split_string_split_mode_collate",
+            cnName = "排序规则",
+            description = "当 string_split_mode 设置为 charset_based 且表使用了特殊排序规则（collation）时，用于指定所采用的排序规则。如果未指定该参数，则使用数据库的默认排序规则。",
+            placeHolder = "排序规则",
             formType = StField.FormType.TEXT
+    )
+    private String split_string_split_mode_collate;
+
+    @StField(
+            tag = "分区配置",
+            order = 1,
+            required = false,
+            enName = "partition_column",
+            cnName = "分区字段",
+            placeHolder = "请输入分区字段",
+            formType = StField.FormType.TEXT,
+            description = "分区字段"
     )
     private String partitionColumn;
 
-    @StField(
-            tag = "连接器配置",
-            order = 7,
-            required = false,
-            enName = "partition_lower_bound",
-            cnName = "分区下界",
-            description = "扫描时 partition_column 的最小值，如果未设置，SeaTunnel 将查询数据库以获取最小值。",
-            placeHolder = "请输入分区下界",
-            formType = StField.FormType.POSITIVE_NUMBER
-    )
-    private String partitionLowerBound;
 
     @StField(
-            tag = "连接器配置",
-            order = 8,
+            tag = "分区配置",
+            order = 2,
             required = false,
             enName = "partition_upper_bound",
             cnName = "分区上界",
@@ -138,159 +242,149 @@ public class JdbcSource extends AbstractStSource {
     private String partitionUpperBound;
 
     @StField(
-            tag = "连接器配置",
-            order = 9,
+            tag = "分区配置",
+            order = 3,
+            required = false,
+            enName = "partition_lower_bound",
+            cnName = "分区下界",
+            description = "扫描时 partition_column 的最小值，如果未设置，SeaTunnel 将查询数据库以获取最小值。",
+            placeHolder = "请输入分区下界",
+            formType = StField.FormType.POSITIVE_NUMBER
+    )
+    private String partitionLowerBound;
+
+    @StField(
+            tag = "分区配置",
+            order = 4,
             required = false,
             enName = "partition_num",
-            cnName = "作业并行度",
+            cnName = "分区数量",
             description = "分区数量，仅支持正整数。默认值为作业并行度。",
-            placeHolder = "请输入作业并行度",
-            formType = StField.FormType.POSITIVE_NUMBER,
-            defaultValue = "1000"
+            placeHolder = "请输入分区数量",
+            formType = StField.FormType.POSITIVE_NUMBER
     )
     private String partitionNum;
 
     @StField(
-            tag = "连接器配置",
+            tag = "数据类型转换配置",
             order = 10,
             required = false,
-            enName = "fetch_size",
-            cnName = "数据拉取大小",
-            placeHolder = "请输入排序字段，例如：id DESC",
-            formType = StField.FormType.POSITIVE_NUMBER,
-            defaultValue = "0",
-            description = "对于返回大量对象的查询， 可以通过配置查询中使用的行获取大小(row fetch size)来提高性能， 这样可以减少满足选择条件所需的数据库访问次数。 " +
-                    "值为零表示使用JDBC的值为零表示使用JDBC的默认值。"
+            enName = "decimal_type_narrowing",
+            cnName = "Decimal 类型收窄开关",
+            placeHolder = "Decimal 类型收窄开关",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "false",
+            description = "Decimal 类型收窄开关。当该参数为 true 时，如果在不损失精度的情况下，decimal 类型将被收窄为 int 或 long 类型。目前仅支持 Oracle。"
     )
-    private String fetchSize;
+    private String decimalTypeNarrowing;
 
     @StField(
-            tag = "连接器配置",
-            order = 11,
+            tag = "数据类型转换配置",
+            order = 1,
+            required = false,
+            enName = "int_type_narrowing",
+            cnName = "int 类型收窄开关",
+            placeHolder = "int 类型收窄开关",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "false",
+            description = "Int 类型收窄开关。当该参数为 true 时，如果在不损失精度的情况下，tinyint(1) 类型将被收窄为 boolean 类型。目前仅支持 MySQL。"
+    )
+    private String int_type_narrowing;
+
+    @StField(
+            tag = "数据类型转换配置",
+            order = 2,
+            required = false,
+            enName = "handle_blob_as_string",
+            cnName = "BLOB 是否转为 STRING",
+            placeHolder = "BLOB 是否转为 STRING",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "false",
+            description = "当该参数为 true 时，BLOB 类型将被转换为 STRING 类型。仅支持 Oracle 数据库。该参数适用于处理 Oracle 中超过默认大小限制的大型 BLOB 字段。在将 Oracle 的 BLOB 字段传输到 Doris 等系统时，将该参数设置为 true 可以提高数据传输效率。"
+    )
+    private String handle_blob_as_string;
+
+    @StField(
+            tag = "性能配置",
+            order = 1,
+            required = false,
+            enName = "use_select_count",
+            cnName = "是否启用SELECT COUNT统计",
+            description = "在动态分片拆分阶段，使用 SELECT COUNT 来获取表记录数，而不是采用其他统计方式。该功能目前仅支持 jdbc-oracle。在某些场景下，当通过 ANALYZE TABLE 等方式更新统计信息较慢时，直接使用 SELECT COUNT 会更高效。",
+            placeHolder = "是否启用SELECT COUNT统计",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "false"
+    )
+    private String use_select_count;
+
+    @StField(
+            tag = "性能配置",
+            order = 2,
+            required = false,
+            enName = "skip_analyze",
+            cnName = "是否跳过表记录数分析",
+            description = "在动态分片拆分阶段跳过表记录数的统计分析。该功能目前仅支持 jdbc-oracle。适用于以下场景：已通过定时执行 ANALYZE TABLE 等 SQL 来周期性更新相关表的统计信息；或表数据变更不频繁。",
+            placeHolder = "是否跳过表记录数分析",
+            formType = StField.FormType.SINGLE_SELECT,
+            dictType = StField.DictType.ENUM,
+            dictEnum = {"true", "false"},
+            defaultValue = "true"
+    )
+    private String skip_analyze;
+
+    @StField(
+            tag = "其他配置",
+            order = 1,
             required = false,
             enName = "properties",
-            cnName = "连接参数",
-            description = "额外的连接配置参数，当属性和 URL 中有相同的参数时，优先级由驱动程序的具体实现决定。例如，在 MySQL 中，属性优先于 URL。",
-            placeHolder = "请输入连接参数",
-            formType = StField.FormType.TEXT_AREA
+            cnName = "额外的连接配置参数",
+            description = "额外的连接配置参数。当 properties 与 URL 中存在相同参数时，其优先级由具体的 JDBC 驱动实现决定。例如，在 MySQL 中，properties 的优先级高于 URL。",
+            placeHolder = "额外的连接配置参数",
+            formType = StField.FormType.TEXT
     )
-    private String properties;
-
-    @StField(
-            tag = "连接器配置",
-            order = 12,
-            required = false,
-            enName = "table_path",
-            cnName = "表的完整路径",
-            description = "表的完整路径，您可以使用此配置代替 query。\n" +
-                    "示例：\n" +
-                    "mysql: \"testdb.table1\"\n" +
-                    "oracle: \"test_schema.table1\"\n" +
-                    "sqlserver: \"testdb.test_schema.table1\"\n" +
-                    "postgresql: \"testdb.test_schema.table1\"",
-            placeHolder = "请输入表的完整路径",
-            formType = StField.FormType.TEXT_AREA
-    )
-    private String tablePath;
-
-    @StField(
-            tag = "连接器配置",
-            order = 13,
-            required = false,
-            enName = "where_condition",
-            cnName = "where条件",
-            placeHolder = "请输入where条件",
-            description = "所有表/查询的通用行过滤条件，必须以 where 开头。例如 where id > 100。",
-            formType = StField.FormType.TEXT_AREA
-    )
-    private String whereCondition;
-
-    @StField(
-            tag = "连接器配置",
-            order = 14,
-            required = false,
-            enName = "split.size",
-            cnName = "表的分片大小",
-            description = "表的分割大小（行数），当读取表时，捕获的表会被分割成多个分片。",
-            placeHolder = "请输入表的分片大小",
-            defaultValue = "8096",
-            formType = StField.FormType.POSITIVE_NUMBER
-    )
-    private Integer splitSize;
-
-    @StField(
-            tag = "连接器配置",
-            order = 15,
-            required = false,
-            enName = "split.even-distribution.factor.lower-bound",
-            cnName = "分片键分布因子的下限",
-            description = "分片键分布因子的下限。该因子用于判断表数据的分布是否均匀。如果计算得到的分布因子大于或等于该下限（即，(MAX(id) - MIN(id) + 1) / 行数），则会对表的分片进行优化，以确保数据的均匀分布。反之，如果分布因子较低，则表数据将被视为分布不均匀。如果估算的分片数量超过 sample-sharding.threshold 所指定的值，则会采用基于采样的分片策略。默认值为 0.05。",
-            placeHolder = "请输入分片键分布因子的下限",
-            defaultValue = "0.05",
-            formType = StField.FormType.NUMBER
-    )
-    private Integer splitEvenDistributionFactorLowerBound;
-
-    @StField(
-            tag = "连接器配置",
-            order = 16,
-            required = false,
-            enName = "split.even-distribution.factor.upper-bound",
-            cnName = "分片键分布因子的上线",
-            description = "分片键分布因子的上限。该因子用于判断表数据的分布是否均匀。如果计算得到的分布因子小于或等于该上限（即，(MAX(id) - MIN(id) + 1) / 行数），则会对表的分片进行优化，以确保数据的均匀分布。反之，如果分布因子较大，则表数据将被视为分布不均匀，并且如果估算的分片数量超过 sample-sharding.threshold 所指定的值，则会采用基于采样的分片策略。默认值为 100.0。",
-            placeHolder = "请输入分片键分布因子的上线",
-            defaultValue = "100",
-            formType = StField.FormType.NUMBER
-    )
-    private Integer splitEvenDistributionFactorUpperBound;
-
-    @StField(
-            tag = "连接器配置",
-            order = 17,
-            required = false,
-            enName = "split.sample-sharding.threshold",
-            cnName = "样本分片阈值",
-            description = "此配置指定了触发样本分片策略的估算分片数阈值。当分布因子超出由 chunk-key.even-distribution.factor.upper-bound 和 chunk-key.even-distribution.factor.lower-bound 指定的范围，并且估算的分片数量（计算方法为大致行数 / 分片大小）超过此阈值时，将使用样本分片策略。此配置有助于更高效地处理大型数据集。默认值为 1000 个分片。",
-            placeHolder = "请输入样本分片阈值",
-            defaultValue = "10000",
-            formType = StField.FormType.POSITIVE_NUMBER
-    )
-    private Integer splitSampleShardingThreshold;
-
-    @StField(
-            tag = "连接器配置",
-            order = 18,
-            required = false,
-            enName = "split.inverse-sampling.rate",
-            cnName = "逆采样率",
-            description = "样本分片策略中使用的采样率的倒数。例如，如果该值设置为 1000，则表示在采样过程中应用 1/1000 的采样率。此选项提供了灵活性，可以控制采样的粒度，从而影响最终的分片数量。特别适用于处理非常大的数据集，在这种情况下通常会选择较低的采样率。默认值为 1000。",
-            placeHolder = "请输入逆采样率",
-            defaultValue = "1000",
-            formType = StField.FormType.POSITIVE_NUMBER
-    )
-    private Integer splitInverseSamplingRate;
-
-    // 内部变量
-    private Connection connection;
-    private PreparedStatement statement;
-    private ResultSet resultSet;
+    private Integer properties;
 
     @Override
     protected boolean doCheckConnection() {
-        try {
-            if (connection == null || connection.isClosed()) {
-                return false;
-            }
+        return true;
+    }
 
-            // 执行简单查询测试连接
-            PreparedStatement testStatement = connection.prepareStatement("SELECT 1");
-            ResultSet testResult = testStatement.executeQuery();
-            testResult.close();
-            testStatement.close();
-            return true;
-        } catch (SQLException e) {
-            log.error("检查MySQL连接失败", e);
-            return false;
-        }
+    @Override
+    public JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId) {
+        JSONObject config = new JSONObject();
+        putIfNotEmpty(config, "url", connectionConfig.getString("url"));
+        putIfNotEmpty(config, "user", connectionConfig.getString("username"));
+        putIfNotEmpty(config, "password", connectionConfig.getString("password"));
+        putIfNotEmpty(config, "compatible_mode", connectionConfig.getString("compatible_mode"));
+        putIfNotEmpty(config, "dialect", connectionConfig.getString("dialect"));
+        putIfNotEmpty(config, "connection_check_timeout_sec", connectionConfig.getInteger("connection_check_timeout_sec"));
+        putIfNotEmpty(config, "partition_column", connectionConfig.getString("partition_column"));
+        putIfNotEmpty(config, "partition_upper_bound", connectionConfig.getLong("partition_upper_bound"));
+        putIfNotEmpty(config, "partition_lower_bound", connectionConfig.getLong("partition_lower_bound"));
+        putIfNotEmpty(config, "partition_num", connectionConfig.getInteger("partition_num"));
+        putIfNotEmpty(config, "decimal_type_narrowing", connectionConfig.getBoolean("decimal_type_narrowing"));
+        putIfNotEmpty(config, "int_type_narrowing", connectionConfig.getBoolean("int_type_narrowing"));
+        putIfNotEmpty(config, "handle_blob_as_string", connectionConfig.getBoolean("handle_blob_as_string"));
+        putIfNotEmpty(config, "use_select_count", connectionConfig.getBoolean("use_select_count"));
+        putIfNotEmpty(config, "skip_analyze", connectionConfig.getBoolean("skip_analyze"));
+        String whereCondition = connectionConfig.getString("where_condition");
+        putIfNotEmpty(config, "where_condition", whereCondition);
+        putIfNotEmpty(config, "split.size", connectionConfig.getInteger("split_size"));
+        putIfNotEmpty(config, "split.even-distribution.factor.upper-bound", connectionConfig.getInteger("split_even_distribution_factor_upper_bound"));
+        putIfNotEmpty(config, "split.even-distribution.factor.lower-bound", connectionConfig.getInteger("split_even_distribution_factor_lower_bound"));
+        putIfNotEmpty(config, "split.sample-sharding.threshold", connectionConfig.getInteger("split_sample_sharding_threshold"));
+        putIfNotEmpty(config, "split.inverse-sampling.rate", connectionConfig.getInteger("split_inverse_sampling_rate"));
+        putIfNotEmpty(config, "split.string_split_mode", connectionConfig.getString("split_string_split_mode"));
+        putIfNotEmpty(config, "split.string_split_mode_collate", connectionConfig.getString("split_string_split_mode_collate"));
+        addTableList(config, connectionConfig, whereCondition);
+        return config;
     }
 }

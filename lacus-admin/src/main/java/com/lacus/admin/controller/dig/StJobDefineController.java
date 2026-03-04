@@ -49,10 +49,35 @@ public class StJobDefineController {
         return ResponseDTO.ok();
     }
 
+    @ApiOperation("发布任务")
+    @PostMapping("/publish/{jobId}")
+    public ResponseDTO<Void> publishJob(@PathVariable("jobId") Long jobId) {
+        stJobBusiness.publishJob(jobId, 1);
+        return ResponseDTO.ok();
+    }
+
+    @ApiOperation("取消发布任务")
+    @PostMapping("/unpublish/{jobId}")
+    public ResponseDTO<Void> unPublishJob(@PathVariable("jobId") Long jobId) {
+        stJobBusiness.publishJob(jobId, 0);
+        return ResponseDTO.ok();
+    }
+
     @ApiOperation("删除任务定义")
     @DeleteMapping("/{jobId}")
     public ResponseDTO<Void> deleteJob(@PathVariable Long jobId) {
         stJobBusiness.deleteJob(jobId);
         return ResponseDTO.ok();
+    }
+
+    @ApiOperation("获取任务配置")
+    @GetMapping("/config/{jobId}")
+    public ResponseDTO<String> getJobHocon(@PathVariable("jobId") Long jobId) {
+        String hocon = stJobBusiness.getJobHocon(jobId);
+        // 对 password 进行脱敏处理
+        if (hocon != null) {
+            hocon = hocon.replaceAll("password\\s*=\\s*(\"[^\"]*\"|[^\\s,{}]+)", "password = \"******\"");
+        }
+        return ResponseDTO.ok(hocon);
     }
 }

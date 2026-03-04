@@ -1,5 +1,6 @@
 package com.lacus.st.interfaces;
 
+import com.alibaba.fastjson2.JSONObject;
 import lombok.Getter;
 
 import java.util.Map;
@@ -7,11 +8,11 @@ import java.util.Map;
 /**
  * ST组件基础接口
  * 所有ST组件都需要实现此接口
- * 
+ *
  * @author lacus
  */
 public interface StComponentInterface {
-    
+
     /**
      * 初始化组件
      * @param config 组件配置参数
@@ -25,7 +26,7 @@ public interface StComponentInterface {
      * @return 验证结果
      */
     ValidationResult validateConfig(Map<String, Object> config);
-    
+
     /**
      * 获取组件元数据信息
      * @return 组件元数据
@@ -55,22 +56,22 @@ public interface StComponentInterface {
     class ValidationResult {
         private final boolean valid;
         private final String message;
-        
+
         public ValidationResult(boolean valid, String message) {
             this.valid = valid;
             this.message = message;
         }
-        
+
         public static ValidationResult success() {
             return new ValidationResult(true, "验证通过");
         }
-        
+
         public static ValidationResult failure(String message) {
             return new ValidationResult(false, message);
         }
 
     }
-    
+
     /**
      * 组件元数据
      */
@@ -83,8 +84,8 @@ public interface StComponentInterface {
         private final String version;
         private final String author;
         private final String type;
-        
-        public ComponentMetadata(String name, String displayName, String description, 
+
+        public ComponentMetadata(String name, String displayName, String description,
                                String version, String author, String type) {
             this.name = name;
             this.displayName = displayName;
@@ -95,4 +96,12 @@ public interface StComponentInterface {
         }
 
     }
+
+    /**
+     * 构建组件的任务配置JSON
+     * @param connectionConfig 连接配置参数
+     * @param datasourceId 数据源ID（可选）
+     * @return 组件特定的配置JSON
+     */
+    JSONObject buildTaskConfig(JSONObject connectionConfig, Long datasourceId);
 }
