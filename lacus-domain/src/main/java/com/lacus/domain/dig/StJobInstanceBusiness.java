@@ -24,6 +24,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -79,7 +80,8 @@ public class StJobInstanceBusiness {
             instance.setJobId(jobId);
             instance.setInstanceName(job.getJobName() + "_" + System.currentTimeMillis());
             instance.setJobConfig(jobConfig);
-            instance.setStatus(0); // 0表示待执行，1表示运行中
+            instance.setStatus(0); // 0表示运行中
+            instance.setStartTime(new Date());
 
             // 保存任务实例
             boolean saved = stJobInstanceService.save(instance);

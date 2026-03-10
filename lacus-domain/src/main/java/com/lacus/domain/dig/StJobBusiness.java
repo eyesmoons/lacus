@@ -109,4 +109,8 @@ public class StJobBusiness {
         }
         return stJobInstanceBusiness.buildJobJson(job, taskList, taskRelationList);
     }
+
+    public StJobEntity detail(Long jobId) {
+        return stJobService.getById(jobId);
+    }
 }

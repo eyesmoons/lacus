@@ -9,4 +9,8 @@ import lombok.EqualsAndHashCode;
 public class UpdateStJobCommand extends AddStJobCommand {
     @NotNull(message = "任务ID不能为空")
     private Long jobId;
+    private String jobScript;
+    private String engineName;
+    private String engineVersion;
+    private String engineParam;
 }
