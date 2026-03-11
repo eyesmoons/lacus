@@ -955,6 +955,8 @@ CREATE TABLE `one_api_call_history` (
 CREATE TABLE `st_job` (
     `job_id` bigint NOT NULL AUTO_INCREMENT COMMENT '任务ID',
     `job_name` varchar(50) NOT NULL COMMENT '任务名称',
+    `job_type` int default '1' comment '任务类型',
+    `job_script` text default NULL comment '专家模式任务配置',
     `env_id` bigint DEFAULT NULL COMMENT '环境ID',
     `engine_name` varchar(50) DEFAULT NULL  COMMENT '引擎名称',
     engine_version varchar (100) default null comment '引擎版本',
@@ -1015,6 +1017,8 @@ CREATE TABLE `st_job_instance` (
     `job_config` text COMMENT '任务配置',
     `status` tinyint NOT NULL DEFAULT '0' COMMENT '任务状态',
     `log_info` longtext DEFAULT NULL COMMENT '日志信息',
+    start_time datetime default NULL comment '开始时间',
+    end_time datetime default NULL comment '结束时间',
     `deleted` tinyint NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
     `creator_id` varchar(64) COLLATE utf8mb4_bin NOT NULL DEFAULT '' COMMENT '创建人',
     `create_time` datetime NOT NULL COMMENT '创建时间',

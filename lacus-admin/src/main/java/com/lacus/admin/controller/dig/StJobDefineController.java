@@ -70,6 +70,12 @@ public class StJobDefineController {
         return ResponseDTO.ok();
     }
 
+    @ApiOperation("任务详情")
+    @GetMapping("/{jobId}")
+    public ResponseDTO<?> detail(@PathVariable Long jobId) {
+        return ResponseDTO.ok(stJobBusiness.detail(jobId));
+    }
+
     @ApiOperation("获取任务配置")
     @GetMapping("/config/{jobId}")
     public ResponseDTO<String> getJobHocon(@PathVariable("jobId") Long jobId) {

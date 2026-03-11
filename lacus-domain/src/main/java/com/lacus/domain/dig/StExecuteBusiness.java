@@ -24,6 +24,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -57,7 +58,16 @@ public class StExecuteBusiness {
             throw new CustomException("任务[" + jobId + "]不存在");
         }
         // 1. 构建任务json
-        String jobConfig = createJobConfig(job);
+        String jobConfig;
+        Integer jobType = job.getJobType();
+        if (jobType == 1) {
+            jobConfig = createJobConfig(job);
+        } else if (jobType == 2) {
+            jobConfig = job.getJobScript();
+        } else {
+            throw new CustomException("不支持的任务类型：" + jobType);
+        }
+
         logger.debug("Generated job config for job {}: {}", jobId, jobConfig);
 
         // 2. 创建任务实例
@@ -152,6 +162,7 @@ public class StExecuteBusiness {
         } else {
             instance.setStatus(2);
         }
+        instance.setEndTime(new Date());
         instanceService.updateById(instance);
     }
 }

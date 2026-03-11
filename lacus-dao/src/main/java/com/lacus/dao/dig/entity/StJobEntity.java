@@ -21,6 +21,12 @@ public class StJobEntity extends BaseEntity<StJobEntity> {
     @TableField("job_name")
     private String jobName;
 
+    @TableField("job_type")
+    private Integer jobType;
+
+    @TableField("job_script")
+    private String jobScript;
+
     @TableField("env_id")
     private Long envId;
 

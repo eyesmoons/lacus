@@ -1,5 +1,6 @@
 package com.lacus.dao.dig.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
@@ -7,6 +8,8 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.lacus.common.core.base.BaseEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+
+import java.util.Date;
 
 /**
  * @author shengyu
@@ -35,4 +38,10 @@ public class StJobInstanceEntity extends BaseEntity<StJobInstanceEntity> {
 
     @TableField(exist = false)
     private String jobName;
+
+    @TableField("start_time")
+    private Date startTime;
+
+    @TableField("end_time")
+    private Date endTime;
 }
