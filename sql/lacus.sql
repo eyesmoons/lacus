@@ -1195,3 +1195,197 @@ CREATE INDEX IDX_QRTZ_FT_J_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_NAME,JOB_GROU
 CREATE INDEX IDX_QRTZ_FT_JG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,JOB_GROUP);
 CREATE INDEX IDX_QRTZ_FT_T_G ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_NAME,TRIGGER_GROUP);
 CREATE INDEX IDX_QRTZ_FT_TG ON QRTZ_FIRED_TRIGGERS(SCHED_NAME,TRIGGER_GROUP);
+
+-- ----------------------------
+-- Table structure for dq_rule_template (数据质量规则模板)
+-- ----------------------------
+DROP TABLE IF EXISTS `dq_rule_template`;
+CREATE TABLE `dq_rule_template` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '模板ID',
+  `template_code` varchar(64) NOT NULL COMMENT '模板编码，如 NULL_CHECK',
+  `template_name` varchar(128) NOT NULL COMMENT '模板名称，如 空值检测',
+  `dimension` varchar(32) NOT NULL DEFAULT 'completeness' COMMENT '质量维度：completeness/uniqueness/timeliness/validity/consistency/stability',
+  `template_icon` varchar(64) DEFAULT NULL COMMENT '前端图标名称',
+  `template_color` varchar(32) DEFAULT NULL COMMENT '前端图标颜色',
+  `description` varchar(512) DEFAULT NULL COMMENT '模板描述',
+  `check_sql_pattern` text NOT NULL COMMENT '聚合统计SQL模板，固定格式 SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  `items_sql_pattern` text DEFAULT NULL COMMENT '明细行过滤SQL模板（SELECT * WHERE 条件），支持 {outputTable}/{field}/{field2}/{minValue}/{maxValue}/{enumValues}/{regexPattern}/{length}/{lengthOp}/{timeUnit}/{statMethod} 等占位符',
+  `extra_config_schema` text DEFAULT NULL COMMENT '模板专属额外配置字段的JSON Schema（用于前端动态渲染表单）',
+  `sort_order` int(11) NOT NULL DEFAULT '0' COMMENT '排序序号',
+  `enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用：1启用 0禁用',
+  `creator_id` bigint(20) DEFAULT NULL COMMENT '创建者ID',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater_id` bigint(20) DEFAULT NULL COMMENT '更新者ID',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标志：0正常 1已删除',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `uk_template_code` (`template_code`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据质量规则模板表';
+
+-- 预置 12 种基础模板（按质量维度分组）
+-- dimension: completeness/uniqueness/timeliness/validity/consistency/stability
+-- check_sql_pattern: 固定聚合计数，引用 {templateCode}_items 临时视图
+-- items_sql_pattern: 输出问题数据明细行，供 HDFS 写出和人工核查
+INSERT INTO `dq_rule_template`
+  (`template_code`,`template_name`,`dimension`,`template_icon`,`template_color`,`description`,`check_sql_pattern`,`items_sql_pattern`,`extra_config_schema`,`sort_order`)
+VALUES
+-- ===== 完整性 (completeness) =====
+('NULL_CHECK', '字段空值校验', 'completeness', 'Warning', '#e6a23c',
+  '检测字段中 NULL 值的行数',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM {outputTable} WHERE {field} IS NULL',
+  NULL, 1),
+
+('EMPTY_STRING_CHECK', '字段空字符串校验', 'completeness', 'CircleClose', '#e6903c',
+  '检测字段中空字符串（空值或仅含空白字符）的行数',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM {outputTable} WHERE {field} IS NULL OR TRIM({field}) = ''''',
+  NULL, 2),
+
+-- ===== 唯一性 (uniqueness) =====
+('UNIQUENESS_CHECK', '字段唯一性校验', 'uniqueness', 'Key', '#67c23a',
+  '检测字段中存在重复值的行数（group by 后 count > 1 的所有原始行）',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM (SELECT *, COUNT(*) OVER (PARTITION BY {field}) AS _cnt FROM {outputTable}) _tmp WHERE _cnt > 1',
+  NULL, 3),
+
+('DISTINCT_COUNT_CHECK', '字段去重值个数校验', 'uniqueness', 'Filter', '#45a65c',
+  '校验字段去重后的唯一值数量是否符合预期（distinct count）',
+  'SELECT COUNT(DISTINCT {field}) AS statistics_value FROM {outputTable}',
+  NULL,
+  NULL, 4),
+
+('DUPLICATE_COUNT_CHECK', '字段重复值个数校验', 'uniqueness', 'CopyDocument', '#f56c6c',
+  '检测字段中多余的重复数据行数（如1,2,2,2中的额外两个2）',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM (SELECT *, COUNT(*) OVER (PARTITION BY {field}) AS _cnt FROM {outputTable}) _tmp WHERE _cnt > 1',
+  NULL, 5),
+
+-- ===== 及时性 (timeliness) =====
+('SINGLE_TABLE_TIME_CHECK', '单表时间字段比较', 'timeliness', 'Timer', '#409eff',
+  '比较同一张表中两个时间字段的差值，检测超时行',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM {outputTable} WHERE (UNIX_TIMESTAMP({field2}) - UNIX_TIMESTAMP({field})) / {timeUnit} > {threshold}',
+  '{"field2":{"type":"string","label":"对比时间字段","required":true},"timeUnit":{"type":"select","label":"时间单位（秒数）","options":["1","60","3600","86400"],"required":true},"threshold":{"type":"number","label":"阈值（差值超过此值为异常）","required":true}}', 6),
+
+-- ===== 有效性 (validity) =====
+('REGEX_CHECK', '字段格式校验', 'validity', 'EditPen', '#6c5ff5',
+  '使用正则表达式校验字段格式（如身份证、手机号、邮箱等）',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM {outputTable} WHERE {field} NOT RLIKE ''{regexPattern}''',
+  '{"regexPattern":{"type":"string","label":"正则表达式","required":true}}', 8),
+
+('LENGTH_CHECK', '字段长度校验', 'validity', 'Rank', '#9b59b6',
+  '校验字段字符串长度是否满足条件',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM {outputTable} WHERE LENGTH({field}) {lengthOp} {length}',
+  '{"lengthOp":{"type":"select","label":"操作符","options":["<",">","=","!=","<=",">="],"required":true},"length":{"type":"number","label":"长度阈值","required":true}}', 9),
+
+-- ===== 一致性 (consistency) =====
+('CONSISTENCY_CHECK', '单表字段值一致性比较', 'consistency', 'Switch', '#f39c12',
+  '比较同一张表中两个字段的原值是否一致，检测不一致行',
+  'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
+  'SELECT * FROM {outputTable} WHERE {field} != {field2} OR ({field} IS NULL AND {field2} IS NOT NULL) OR ({field} IS NOT NULL AND {field2} IS NULL)',
+  '{"field2":{"type":"string","label":"对比字段B","required":true}}', 10),
+
+-- ===== 稳定性 (stability) =====
+('STAT_CHECK', '字段统计值校验', 'stability', 'Odometer', '#1abc9c',
+  '对字段的聚合统计值（AVG/MAX/MIN/SUM/COUNT）与固定阈值比较',
+  'SELECT {statMethod}({field}) AS statistics_value FROM {outputTable}',
+  NULL,
+  '{"statMethod":{"type":"select","label":"统计方式","options":["AVG","MAX","MIN","SUM","COUNT"],"required":true}}', 11),
+
+-- ----------------------------
+-- Table structure for dq_check_result (数据质量检测结果明细)
+-- ----------------------------
+DROP TABLE IF EXISTS `dq_check_result`;
+CREATE TABLE `dq_check_result` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '结果ID',
+  `log_id` bigint(20) NOT NULL COMMENT '关联执行记录ID（dq_execution_log.id）',
+  `rule_id` bigint(20) NOT NULL COMMENT '规则ID',
+  `rule_name` varchar(128) DEFAULT NULL COMMENT '规则名称快照',
+  `template_code` varchar(64) DEFAULT NULL COMMENT '规则模板编码',
+  `check_sql` text DEFAULT NULL COMMENT '实际执行的检测SQL',
+  `actual_value` decimal(20,4) DEFAULT NULL COMMENT '检测到的实际值',
+  `expected_value` decimal(20,4) DEFAULT NULL COMMENT '期望值',
+  `expected_type` varchar(32) DEFAULT NULL COMMENT '期望值类型：FIXED/DAILY_AVG等',
+  `check_method` varchar(64) DEFAULT NULL COMMENT '校验方式',
+  `operator` varchar(8) DEFAULT NULL COMMENT '校验操作符',
+  `formula_result` decimal(20,4) DEFAULT NULL COMMENT '公式计算结果（校验方式作用后）',
+  `pass_flag` tinyint(1) DEFAULT NULL COMMENT '是否通过：1通过 0不通过',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '写入时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_log_id` (`log_id`),
+  KEY `idx_rule_id` (`rule_id`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据质量检测结果明细表';
+
+-- ----------------------------
+-- Table structure for dq_rule (数据质量规则定义)
+-- ----------------------------
+DROP TABLE IF EXISTS `dq_rule`;
+CREATE TABLE `dq_rule` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '规则ID',
+  `rule_name` varchar(128) NOT NULL COMMENT '规则名称',
+  `template_id` bigint(20) NOT NULL COMMENT '规则模板ID（关联 dq_rule_template.id）',
+  `datasource_id` bigint(20) DEFAULT NULL COMMENT '数据源ID（关联 meta_datasource.datasource_id）',
+  `db_name` varchar(256) DEFAULT NULL COMMENT '数据库名称',
+  `table_name` varchar(256) DEFAULT NULL COMMENT '数据表名称',
+  `field_names` varchar(1024) DEFAULT NULL COMMENT '检测字段列表（逗号分隔）',
+  `rule_config` longtext COMMENT '校验规则配置JSON（仅含步骤四：checkMethod/operator/expectedType等）',
+  `spark_params` text COMMENT 'Spark任务参数JSON（deployMode/driverCores/driverMemory/numExecutors/executorMemory/executorCores/queue/otherParams）',
+  `description` text COMMENT '规则描述',
+  `enabled` tinyint(1) NOT NULL DEFAULT '1' COMMENT '是否启用：1启用 0禁用',
+  `creator_id` bigint(20) DEFAULT NULL COMMENT '创建者ID',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  `updater_id` bigint(20) DEFAULT NULL COMMENT '更新者ID',
+  `update_time` datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  `deleted` tinyint(1) NOT NULL DEFAULT '0' COMMENT '删除标志：0正常 1已删除',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据质量规则定义表';
+
+-- ----------------------------
+-- Table structure for dq_execution_log (数据质量任务执行记录)
+-- ----------------------------
+DROP TABLE IF EXISTS `dq_execution_log`;
+CREATE TABLE `dq_execution_log` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '执行记录ID',
+  `rule_id` bigint(20) NOT NULL COMMENT '规则ID',
+  `rule_name` varchar(128) DEFAULT NULL COMMENT '规则名称快照',
+  `spark_app_id` varchar(128) DEFAULT NULL COMMENT 'Spark Application ID',
+  `status` varchar(32) NOT NULL COMMENT '执行状态: SUBMITTED/RUNNING/SUCCESS/FAILED/STOPPED',
+  `start_time` datetime DEFAULT NULL COMMENT '开始时间',
+  `end_time` datetime DEFAULT NULL COMMENT '结束时间',
+  `datasource_id` bigint(20) DEFAULT NULL COMMENT '数据源ID',
+  `datasource_name` varchar(128) DEFAULT NULL COMMENT '数据源名称快照',
+  `db_name` varchar(128) DEFAULT NULL COMMENT '数据库名',
+  `table_name` varchar(128) DEFAULT NULL COMMENT '数据表名',
+  `field_names` varchar(512) DEFAULT NULL COMMENT '检测字段（逗号分隔）',
+  `result_value` varchar(128) DEFAULT NULL COMMENT '检查结果值',
+  `pass_flag` tinyint(1) DEFAULT NULL COMMENT '是否通过：1 通过 0 未通过',
+  `log_info` longtext COMMENT '执行日志信息（包含 stdout/stderr）',
+  `task_config` longtext COMMENT '本次执行的 Spark DataQuality 配置 JSON 快照',
+  `error_data_path` varchar(512) DEFAULT NULL COMMENT '错误数据行 HDFS 输出路径',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_rule_id` (`rule_id`),
+  KEY `idx_status` (`status`),
+  KEY `idx_create_time` (`create_time`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据质量任务执行记录表';
+
+-- ----------------------------
+-- Table structure for dq_statistics_value (数据质量统计值快照)
+-- ----------------------------
+DROP TABLE IF EXISTS `dq_statistics_value`;
+CREATE TABLE `dq_statistics_value` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '记录ID',
+  `rule_id` bigint(20) NOT NULL COMMENT '规则ID',
+  `template_code` varchar(64) DEFAULT NULL COMMENT '规则模板编码',
+  `log_id` bigint(20) NOT NULL COMMENT '执行记录ID（关联 dq_execution_log.id）',
+  `statistics_name` varchar(256) DEFAULT NULL COMMENT '统计指标名称，如 null_count.statistics_value',
+  `statistics_value` decimal(20,4) DEFAULT NULL COMMENT '统计值',
+  `create_time` datetime DEFAULT CURRENT_TIMESTAMP COMMENT '写入时间',
+  PRIMARY KEY (`id`),
+  KEY `idx_rule_id` (`rule_id`),
+  KEY `idx_log_id` (`log_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据质量统计值快照表';
