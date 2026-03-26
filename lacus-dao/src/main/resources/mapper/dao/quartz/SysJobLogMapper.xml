@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.quartz.mapper.SysJobLogMapper">
+
+    <resultMap id="SysJobLogResult" type="com.lacus.dao.quartz.entity.SysJobLog">
+        <id column="job_log_id" property="jobLogId"/>
+        <result column="job_name" property="jobName"/>
+        <result column="job_group" property="jobGroup"/>
+        <result column="invoke_target" property="invokeTarget"/>
+        <result column="job_message" property="jobMessage"/>
+        <result column="status" property="status"/>
+        <result column="exception_info" property="exceptionInfo"/>
+        <result column="create_time" property="createTime"/>
+    </resultMap>
+
+    <sql id="selectJobLogVo">
+        select job_log_id, job_name, job_group, invoke_target, job_message, status, exception_info, create_time
+        from sys_job_log
+    </sql>
+
+    <!-- 查询所有的任务日志 -->
+    <select id="selectJobLogAll" resultMap="SysJobLogResult">
+        <include refid="selectJobLogVo"/>
+    </select>
+
+    <!-- 清空任务日志 -->
+    <update id="cleanJobLog">
+        truncate table sys_job_log
+    </update>
+
+</mapper>
