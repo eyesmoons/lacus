@@ -21,24 +21,27 @@ public class CustomMetaObjectHandler implements MetaObjectHandler {
     public void insertFill(MetaObject metaObject) {
         this.setFieldValByName("createTime", new Date(), metaObject);
 
-        this.strictInsertFill(metaObject, "creatorId", this::getUserIdSafely, Long.class);
+        this.strictInsertFill(metaObject, "creatorId", this::getUserIdSafely, String.class);
     }
 
     @Override
     public void updateFill(MetaObject metaObject) {
         this.setFieldValByName("updateTime", new Date(), metaObject);
-        Long newUpdaterId = getUserIdSafely();
+        String newUpdaterId = getUserIdSafely();
 
-        this.strictUpdateFill(metaObject, "updaterId", Long.class, newUpdaterId);
+        this.strictUpdateFill(metaObject, "updaterId", String.class, newUpdaterId);
     }
 
-    public Long getUserIdSafely() {
-        Long userId = null;
+    public String getUserIdSafely() {
+        String userId = null;
         try {
             LoginUser loginUser = AuthenticationUtils.getLoginUser();
-            userId = loginUser.getUserId();
+            // 将用户 ID 转换为字符串
+            userId = String.valueOf(loginUser.getUserId());
         } catch (Exception e) {
-            log.info("can not find user in current thread.");
+            log.info("can not find user in current thread, using system user id (0).");
+            // 当无法获取当前用户时（如定时任务执行），使用系统用户 ID "0"
+            userId = "0";
         }
         return userId;
     }

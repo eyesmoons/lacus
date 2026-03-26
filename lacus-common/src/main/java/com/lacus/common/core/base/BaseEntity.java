@@ -19,7 +19,7 @@ public class BaseEntity<T extends Model<?>> extends Model<T> {
 
     @ApiModelProperty("创建者ID")
     @TableField(value = "creator_id", fill = FieldFill.INSERT)
-    private Long creatorId;
+    private String creatorId;
 
     @ApiModelProperty("创建时间")
     @TableField(value = "create_time", fill = FieldFill.INSERT)
@@ -27,7 +27,7 @@ public class BaseEntity<T extends Model<?>> extends Model<T> {
 
     @ApiModelProperty("更新者ID")
     @TableField(value = "updater_id", fill = FieldFill.UPDATE, updateStrategy = FieldStrategy.NOT_NULL)
-    private Long updaterId;
+    private String updaterId;
 
     @ApiModelProperty("更新时间")
     @TableField(value = "update_time", fill = FieldFill.UPDATE)

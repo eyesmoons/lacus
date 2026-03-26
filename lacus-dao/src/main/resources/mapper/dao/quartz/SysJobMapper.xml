@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.quartz.mapper.SysJobMapper">
+
+    <resultMap id="SysJobResult" type="com.lacus.dao.quartz.entity.SysJob">
+        <id column="job_id" property="jobId"/>
+        <result column="job_name" property="jobName"/>
+        <result column="job_group" property="jobGroup"/>
+        <result column="invoke_target" property="invokeTarget"/>
+        <result column="cron_expression" property="cronExpression"/>
+        <result column="misfire_policy" property="misfirePolicy"/>
+        <result column="concurrent" property="concurrent"/>
+        <result column="status" property="status"/>
+        <result column="creator_id" property="creatorId"/>
+        <result column="create_time" property="createTime"/>
+        <result column="create_time" property="createTime"/>
+        <result column="update_time" property="updateTime"/>
+        <result column="remark" property="remark"/>
+    </resultMap>
+
+    <sql id="selectJobVo">
+        select job_id, job_name, job_group, invoke_target, cron_expression, misfire_policy, concurrent, status,
+               creator_id, create_time, remark
+        from sys_job
+    </sql>
+
+    <update id="updateJobStatusByJobGroup" parameterType="com.lacus.dao.quartz.entity.SysJob">
+        update sys_job
+        <set>
+            status = #{status},
+            update_time = sysdate()
+        </set>
+        where job_group = #{jobGroup}
+    </update>
+
+    <!-- 查询所有的定时任务 -->
+    <select id="selectJobAll" resultMap="SysJobResult">
+        <include refid="selectJobVo"/>
+    </select>
+
+    <!-- 查询定时任务列表 -->
+    <select id="selectJobList" parameterType="com.lacus.dao.quartz.entity.SysJob" resultMap="SysJobResult">
+        <include refid="selectJobVo"/>
+        <where>
+            <if test="jobName != null and jobName != ''">
+                AND job_name like concat('%', #{jobName}, '%')
+            </if>
+            <if test="jobGroup != null and jobGroup != ''">
+                AND job_group = #{jobGroup}
+            </if>
+            <if test="invokeTarget != null and invokeTarget != ''">
+                AND invoke_target = #{invokeTarget}
+            </if>
+            <if test="status != null and status != ''">
+                AND status = #{status}
+            </if>
+        </where>
+    </select>
+
+</mapper>
