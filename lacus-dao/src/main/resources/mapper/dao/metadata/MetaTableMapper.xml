@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.lacus.dao.metadata.mapper.MetaTableMapper">
-    <resultMap id="dbTableMap" type="com.lacus.dao.metadata.entity.MetaDbTableEntity">
+    <resultMap id="dbTableMap" type="com.lacus.dao.metadata.entity.MetaDbTableEntity" autoMapping="false">
         <result column="datasource_id" property="datasourceId"/>
         <result column="datasource_name" property="datasourceName"/>
         <result column="datasource_type" property="datasourceType"/>

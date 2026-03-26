@@ -15,7 +15,6 @@ import com.lacus.domain.metadata.datasource.model.MetaDatasourceModel;
 import com.lacus.domain.metadata.datasource.model.MetaDatasourceModelFactory;
 import com.lacus.domain.metadata.datasource.query.DatasourceQuery;
 import com.lacus.service.metadata.IMetaDataSourceService;
-import com.lacus.utils.beans.MetaDatasource;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +37,7 @@ public class DatasourceBusiness {
 
     public PageDTO pageList(DatasourceQuery query) {
         Page<MetaDatasourceEntity> page = metadataSourceService.page(query.toPage(), query.toQueryWrapper());
+        page.getRecords().forEach(metaDatasourceEntity -> metaDatasourceEntity.setConnectionParams(metaDatasourceEntity.getConnectionParams().replaceAll("\"password\"\\s*:\\s*\"[^\"]*\"", "\"password\" : \"******\"")));
         return new PageDTO(page.getRecords(), page.getTotal());
     }
 
