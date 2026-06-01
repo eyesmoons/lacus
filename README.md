@@ -84,8 +84,8 @@
 
 - 代码下载
 ```
-前端项目代码：git clone https://github.com/eyesmoons/lacus
-后端项目代码：git clone https://github.com/eyesmoons/lacus-ui
+前端项目代码：git clone https://github.com/eyesmoons/lacus-ui
+后端项目代码：git clone https://github.com/eyesmoons/lacus
 docker部署：git clone https://github.com/eyesmoons/lacus-docker
 ```
 - 安装 Mysql

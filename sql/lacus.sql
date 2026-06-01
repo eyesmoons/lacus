@@ -1215,7 +1215,7 @@ CREATE TABLE `dq_rule_template` (
   UNIQUE KEY `uk_template_code` (`template_code`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='数据质量规则模板表';
 
--- 预置 12 种基础模板（按质量维度分组）
+-- 预置 10 种基础模板（按质量维度分组）
 -- dimension: completeness/uniqueness/timeliness/validity/consistency/stability
 -- check_sql_pattern: 固定聚合计数，引用 {templateCode}_items 临时视图
 -- items_sql_pattern: 输出问题数据明细行，供 HDFS 写出和人工核查
@@ -1266,27 +1266,27 @@ VALUES
   '使用正则表达式校验字段格式（如身份证、手机号、邮箱等）',
   'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
   'SELECT * FROM {outputTable} WHERE {field} NOT RLIKE ''{regexPattern}''',
-  '{"regexPattern":{"type":"string","label":"正则表达式","required":true}}', 8),
+  '{"regexPattern":{"type":"string","label":"正则表达式","required":true}}', 7),
 
 ('LENGTH_CHECK', '字段长度校验', 'validity', 'Rank', '#9b59b6',
   '校验字段字符串长度是否满足条件',
   'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
   'SELECT * FROM {outputTable} WHERE LENGTH({field}) {lengthOp} {length}',
-  '{"lengthOp":{"type":"select","label":"操作符","options":["<",">","=","!=","<=",">="],"required":true},"length":{"type":"number","label":"长度阈值","required":true}}', 9),
+  '{"lengthOp":{"type":"select","label":"操作符","options":["<",">","=","!=","<=",">="],"required":true},"length":{"type":"number","label":"长度阈值","required":true}}', 8),
 
 -- ===== 一致性 (consistency) =====
 ('CONSISTENCY_CHECK', '单表字段值一致性比较', 'consistency', 'Switch', '#f39c12',
   '比较同一张表中两个字段的原值是否一致，检测不一致行',
   'SELECT COUNT(*) AS statistics_value FROM {templateCode}_items',
   'SELECT * FROM {outputTable} WHERE {field} != {field2} OR ({field} IS NULL AND {field2} IS NOT NULL) OR ({field} IS NOT NULL AND {field2} IS NULL)',
-  '{"field2":{"type":"string","label":"对比字段B","required":true}}', 10),
+  '{"field2":{"type":"string","label":"对比字段B","required":true}}', 9),
 
 -- ===== 稳定性 (stability) =====
 ('STAT_CHECK', '字段统计值校验', 'stability', 'Odometer', '#1abc9c',
   '对字段的聚合统计值（AVG/MAX/MIN/SUM/COUNT）与固定阈值比较',
   'SELECT {statMethod}({field}) AS statistics_value FROM {outputTable}',
   NULL,
-  '{"statMethod":{"type":"select","label":"统计方式","options":["AVG","MAX","MIN","SUM","COUNT"],"required":true}}', 11),
+  '{"statMethod":{"type":"select","label":"统计方式","options":["AVG","MAX","MIN","SUM","COUNT"],"required":true}}', 10);
 
 -- ----------------------------
 -- Table structure for dq_check_result (数据质量检测结果明细)
