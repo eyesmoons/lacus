@@ -21,8 +21,8 @@ public class AddFlinkJarJobCommand extends CommonFlinkRunCommand {
     @NotBlank(message = "部署模式不能为空")
     private String deployMode;
 
-    @NotNull(message = "主类jar包不能为空")
-    private Long mainJarPath;
+    @NotBlank(message = "主类jar包不能为空")
+    private String mainJarPath;
 
     private String extJarPath;
 
