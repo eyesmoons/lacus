@@ -6,6 +6,7 @@ import com.lacus.common.exception.CustomException;
 import com.lacus.dao.flink.entity.FlinkJobEntity;
 import com.lacus.dao.flink.entity.FlinkJobInstanceEntity;
 import com.lacus.dao.system.entity.SysEnvEntity;
+import com.lacus.dao.system.entity.SysResourcesEntity;
 import com.lacus.enums.FlinkDeployModeEnum;
 import com.lacus.enums.FlinkJobTypeEnum;
 import com.lacus.enums.FlinkStatusEnum;
@@ -14,8 +15,9 @@ import com.lacus.service.flink.IFlinkJobService;
 import com.lacus.service.flink.dto.JobRunParamDTO;
 import com.lacus.service.flink.dto.StandaloneFlinkJobInfo;
 import com.lacus.service.system.ISysEnvService;
-import com.lacus.utils.JobExecuteThreadPoolUtil;
+import com.lacus.service.system.ISysResourcesService;
 import com.lacus.utils.CommonPropertyUtils;
+import com.lacus.utils.JobExecuteThreadPoolUtil;
 import com.lacus.utils.file.FileUtil;
 import com.lacus.utils.hdfs.HdfsUtil;
 import com.lacus.utils.time.DateUtils;
@@ -32,6 +34,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -59,6 +62,9 @@ public class FlinkJobBaseService {
     private IFlinkJobInstanceService flinkJobInstanceService;
     @Autowired
     private ISysEnvService envService;
+
+    @Autowired
+    private ISysResourcesService sysResourcesService;
 
     public String submitJob(String command, FlinkDeployModeEnum flinkDeployModeEnum) throws Exception {
         log.info("flink任务提交命令：{} ", command);
@@ -342,11 +348,12 @@ public class FlinkJobBaseService {
             private void downJar(JobRunParamDTO jobRunParamDTO, FlinkJobEntity flinkJobEntity) {
                 if (Objects.equals(FlinkJobTypeEnum.JAR, flinkJobEntity.getJobType())) {
                     String mainJarPath = flinkJobEntity.getMainJarPath();
-                    String mainJarName = new File(mainJarPath).getName();
+                    SysResourcesEntity resource = sysResourcesService.getById(mainJarPath);
                     String localJarPath = CommonPropertyUtils.getString(FLINK_JOB_EXECUTE_HOME) + "/download/" + flinkJobEntity.getJobId() + File.separator;
                     try {
-                        HdfsUtil.copyFileFromHdfs(mainJarPath, localJarPath);
-                        jobRunParamDTO.setMainJarPath(localJarPath + mainJarName);
+                        FileUtil.createDirectoryWith755(Paths.get(localJarPath));
+                        HdfsUtil.copyFileFromHdfs(resource.getFilePath(), localJarPath + resource.getName());
+                        jobRunParamDTO.setMainJarPath(localJarPath + resource.getName());
                     } catch (IOException e) {
                         throw new CustomException("下载hdfs文件出错：" + e.getMessage());
                     }
