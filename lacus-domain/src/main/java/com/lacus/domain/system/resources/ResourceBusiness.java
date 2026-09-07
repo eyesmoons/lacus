@@ -26,6 +26,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -82,7 +83,8 @@ public class ResourceBusiness {
         verifyFile(pid, aliaName, type, file);
 
         SysResourcesEntity pResource = sysResourcesService.getById(pid);
-        String currDirNFileName = pResource.getFilePath() + File.separator + aliaName;
+        String filePath = pResource.getFilePath();
+        String currDirNFileName = Paths.get(filePath, aliaName).toString();
         try {
             if (checkResourceExists(currDirNFileName)) {
                 log.error("文件已经存在，不能重复上传: {}", RegexUtils.escapeNRT(aliaName));
