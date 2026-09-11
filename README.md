@@ -15,6 +15,15 @@
 - 如果你正在调研一款轻量级的大数据平台，那么这个项目很可能值得你去花点时间研究一下。
 - 如果你热爱开源，喜欢折腾，并且对大数据感兴趣，欢迎加入这个项目，或者联系作者加入相关讨论群，交流大数据技术。
 - 如果觉得对你有帮助，别忘了顺手点个 **⭐️star⭐️** 哦，你的认可对我们非常重要！！！
+## Star History
+
+<a href="https://www.star-history.com/?repos=eyesmoons%2Flacus&type=timeline&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=eyesmoons/lacus&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=eyesmoons/lacus&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=eyesmoons/lacus&type=date&legend=top-left" />
+ </picture>
+</a>
 
 ## 如何使用
 ### 一、系统截图
