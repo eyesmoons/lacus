@@ -1,0 +1,34 @@
+<!ELEMENT script (#PCDATA | trim | where | set | foreach | choose | if)*>
+
+
+<!ELEMENT trim (#PCDATA | trim | where | set | foreach | choose | if)*>
+<!ATTLIST trim
+prefix CDATA #IMPLIED
+prefixOverrides CDATA #IMPLIED
+suffix CDATA #IMPLIED
+suffixOverrides CDATA #IMPLIED
+>
+<!ELEMENT where (#PCDATA | trim | where | set | foreach | choose | if)*>
+<!ELEMENT set (#PCDATA | trim | where | set | foreach | choose | if)*>
+
+<!ELEMENT foreach (#PCDATA | trim | where | set | foreach | choose | if)*>
+<!ATTLIST foreach
+collection CDATA #REQUIRED
+item CDATA #IMPLIED
+index CDATA #IMPLIED
+open CDATA #IMPLIED
+close CDATA #IMPLIED
+separator CDATA #IMPLIED
+>
+
+<!ELEMENT choose (when* , otherwise?)>
+<!ELEMENT when (#PCDATA | trim | where | set | foreach | choose | if)*>
+<!ATTLIST when
+test CDATA #REQUIRED
+>
+<!ELEMENT otherwise (#PCDATA | trim | where | set | foreach | choose | if)*>
+
+<!ELEMENT if (#PCDATA | trim | where | set | foreach | choose | if)*>
+<!ATTLIST if
+test CDATA #REQUIRED
+>

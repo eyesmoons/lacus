@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.dashboard.mapper.DashboardMapper">
+
+    <!-- 四引擎实例按日×原始状态分组计数。只选聚合列，避免触碰 job_script 等 longtext 字段 -->
+    <select id="selectTrend" resultType="com.lacus.dao.dashboard.dto.InstanceTrendRow">
+        SELECT DATE_FORMAT(submit_time, '%Y-%m-%d') AS stat_date, 'FLINK' AS engine, status AS raw_status, COUNT(*) AS cnt
+          FROM flink_job_instance
+         WHERE deleted = 0 AND submit_time &gt;= #{begin} AND submit_time &lt; #{end}
+         GROUP BY stat_date, status
+        UNION ALL
+        SELECT DATE_FORMAT(submit_time, '%Y-%m-%d') AS stat_date, 'SPARK' AS engine, job_status AS raw_status, COUNT(*) AS cnt
+          FROM spark_job_instance
+         WHERE deleted = 0 AND submit_time &gt;= #{begin} AND submit_time &lt; #{end}
+         GROUP BY stat_date, job_status
+        UNION ALL
+        SELECT DATE_FORMAT(submit_time, '%Y-%m-%d') AS stat_date, 'DATASYNC' AS engine, status AS raw_status, COUNT(*) AS cnt
+          FROM data_sync_job_instance
+         WHERE deleted = 0 AND submit_time &gt;= #{begin} AND submit_time &lt; #{end}
+         GROUP BY stat_date, status
+        UNION ALL
+        SELECT DATE_FORMAT(start_time, '%Y-%m-%d') AS stat_date, 'DIG' AS engine, status AS raw_status, COUNT(*) AS cnt
+          FROM st_job_instance
+         WHERE deleted = 0 AND start_time &gt;= #{begin} AND start_time &lt; #{end}
+         GROUP BY stat_date, status
+    </select>
+
+    <!-- 时间窗口内四引擎状态分布；begin 为 null 时统计全量（"当前运行中"口径） -->
+    <select id="selectStatusDistribution" resultType="com.lacus.dao.dashboard.dto.EngineStatusCount">
+        SELECT 'FLINK' AS engine, status AS raw_status, COUNT(*) AS cnt
+          FROM flink_job_instance
+         WHERE deleted = 0
+           <if test="begin != null">AND submit_time &gt;= #{begin} AND submit_time &lt; #{end}</if>
+         GROUP BY status
+        UNION ALL
+        SELECT 'SPARK' AS engine, job_status AS raw_status, COUNT(*) AS cnt
+          FROM spark_job_instance
+         WHERE deleted = 0
+           <if test="begin != null">AND submit_time &gt;= #{begin} AND submit_time &lt; #{end}</if>
+         GROUP BY job_status
+        UNION ALL
+        SELECT 'DATASYNC' AS engine, status AS raw_status, COUNT(*) AS cnt
+          FROM data_sync_job_instance
+         WHERE deleted = 0
+           <if test="begin != null">AND submit_time &gt;= #{begin} AND submit_time &lt; #{end}</if>
+         GROUP BY status
+        UNION ALL
+        SELECT 'DIG' AS engine, status AS raw_status, COUNT(*) AS cnt
+          FROM st_job_instance
+         WHERE deleted = 0
+           <if test="begin != null">AND start_time &gt;= #{begin} AND start_time &lt; #{end}</if>
+         GROUP BY status
+    </select>
+</mapper>

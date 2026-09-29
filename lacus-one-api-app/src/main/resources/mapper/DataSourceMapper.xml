@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.mapper.DataSourceMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.lacus.dao.entity.DataSourceEntity">
+        <id column="datasource_id" property="datasourceId" />
+        <result column="connection_params" property="connectionParams" />
+    </resultMap>
+
+    <select id="getDatasourceById" resultType="com.lacus.dao.entity.DataSourceEntity">
+        select datasource_id,
+               datasource_name,
+               connection_params
+        from `lacus`.meta_datasource
+        where datasource_id = #{id}
+    </select>
+
+</mapper>

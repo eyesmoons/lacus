@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.metadata.mapper.ClickHouseSchemaMapper">
+    <resultMap id="schemaDbMap" type="com.lacus.dao.metadata.entity.SchemaDbEntity">
+        <result column="schema_name" property="schemaName"/>
+    </resultMap>
+
+    <resultMap id="schemaTableMap" type="com.lacus.dao.metadata.entity.SchemaTableEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="table_type" property="tableType"/>
+        <result column="engine" property="engine"/>
+        <result column="table_rows" property="tableRows"/>
+        <result column="data_length" property="dataLength"/>
+        <result column="create_time" property="createTime"/>
+        <result column="table_comment" property="tableComment"/>
+    </resultMap>
+
+    <resultMap id="schemaColumnMap" type="com.lacus.dao.metadata.entity.SchemaColumnEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="column_name" property="columnName"/>
+        <result column="column_default" property="columnDefault"/>
+        <result column="is_nullable" property="isNullable"/>
+        <result column="data_type" property="dataType"/>
+        <result column="column_type" property="columnType"/>
+        <result column="character_octet_length" property="characterOctetLength"/>
+        <result column="numeric_precision" property="numericPrecision"/>
+        <result column="numeric_scale" property="numericScale"/>
+        <result column="column_comment" property="columnComment"/>
+    </resultMap>
+
+    <select id="listAllSchemaDb" resultMap="schemaDbMap">
+        SELECT
+            name as schema_name
+        FROM
+            system.databases
+        WHERE
+            name != 'information_schema'
+            AND name != 'INFORMATION_SCHEMA'
+            AND name != 'system'
+    </select>
+
+    <select id="listSchemaTable" resultMap="schemaTableMap">
+        SELECT
+            database as table_schema,
+            name as table_name,
+            '' as table_type,
+            engine,
+            total_rows as table_rows,
+            total_bytes as data_length,
+            metadata_modification_time as create_time,
+            '' as table_comment
+        FROM system.tables
+        <where>
+            <if test="dbName != null and dbName != ''">
+                AND database = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                AND name = #{tableName}
+            </if>
+        </where>
+    </select>
+
+    <select id="listSchemaColumn" resultMap="schemaColumnMap">
+        SELECT
+            database as table_schema,
+            table as table_name,
+            name as column_name,
+            default_expression as column_default,
+            '' as is_nullable,
+            type as data_type,
+            type as column_type,
+            data_uncompressed_bytes as character_octet_length,
+            null as numeric_precision,
+            null as numeric_scale,
+            comment as column_comment
+        FROM system.columns
+        <where>
+            <if test="dbName != null and dbName != ''">
+                AND database = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                AND table = #{tableName}
+            </if>
+        </where>
+    </select>
+</mapper>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.metadata.mapper.OracleSchemaMapper">
+    <resultMap id="schemaDbMap" type="com.lacus.dao.metadata.entity.SchemaDbEntity">
+        <result column="schema_name" property="schemaName"/>
+    </resultMap>
+
+    <resultMap id="schemaTableMap" type="com.lacus.dao.metadata.entity.SchemaTableEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="table_type" property="tableType"/>
+        <result column="engine" property="engine"/>
+        <result column="table_rows" property="tableRows"/>
+        <result column="data_length" property="dataLength"/>
+        <result column="create_time" property="createTime"/>
+        <result column="table_comment" property="tableComment"/>
+    </resultMap>
+
+    <resultMap id="schemaColumnMap" type="com.lacus.dao.metadata.entity.SchemaColumnEntity">
+        <result column="table_schema" property="tableSchema"/>
+        <result column="table_name" property="tableName"/>
+        <result column="column_name" property="columnName"/>
+        <result column="column_default" property="columnDefault"/>
+        <result column="is_nullable" property="isNullable"/>
+        <result column="data_type" property="dataType"/>
+        <result column="column_type" property="columnType"/>
+        <result column="character_octet_length" property="characterOctetLength"/>
+        <result column="numeric_precision" property="numericPrecision"/>
+        <result column="numeric_scale" property="numericScale"/>
+        <result column="column_comment" property="columnComment"/>
+    </resultMap>
+
+    <select id="listAllSchemaDb" resultMap="schemaDbMap">
+        select
+            tablespace_name as schema_name
+        from dba_tablespaces
+    </select>
+
+    <select id="listSchemaTable" resultMap="schemaTableMap">
+        SELECT
+        #{dbName} AS table_schema,
+        o.object_name AS table_name,
+        CASE o.object_type
+        WHEN 'TABLE' THEN 'BASE TABLE'
+        WHEN 'VIEW' THEN 'VIEW'
+        ELSE o.object_type
+        END AS table_type,
+        'ORACLE' AS engine,
+        t.num_rows AS table_rows,
+        t.blocks * (SELECT value FROM v$parameter WHERE name = 'db_block_size') AS data_length,
+        o.created AS create_time,
+        c.comments AS table_comment
+        FROM user_objects o
+        LEFT JOIN user_tables t ON o.object_name = t.table_name AND o.object_type = 'TABLE'
+        LEFT JOIN user_tab_comments c ON o.object_name = c.table_name
+        <where>
+            o.object_name not like '%$%' and o.object_type = 'TABLE'
+            <if test="tableName != null and tableName != ''">
+                AND o.object_name = #{tableName}
+            </if>
+        </where>
+    </select>
+
+    <select id="listSchemaColumn" resultMap="schemaColumnMap">
+        SELECT
+            OWNER AS table_schema,
+            TABLE_NAME AS table_name,
+            COLUMN_NAME AS column_name,
+            DATA_DEFAULT AS column_default，
+            NULLABLE AS is_nullable，
+            DATA_TYPE AS data_type,
+            DATA_TYPE AS column_type,
+            CHAR_LENGTH AS character_octet_length,
+            DATA_PRECISION AS numeric_precision,
+            DATA_SCALE  AS numeric_scale,
+            '' AS column_comment
+        FROM all_tab_columns
+        <where>
+            <if test="dbName != null and dbName != ''">
+                AND OWNER = #{dbName}
+            </if>
+            <if test="tableName != null and tableName != ''">
+                AND table_name = #{tableName}
+            </if>
+        </where>
+    </select>
+</mapper>

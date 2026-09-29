@@ -1,0 +1,4 @@
+-- OneAPI 可观测性：调用历史表索引建议
+-- 说明：本变更不改表结构；以下索引由 DBA 评估后在线执行，用于支撑监控/统计/历史端点的 call_time 区间扫描与 api_url 关联。
+-- ALTER TABLE one_api_call_history ADD INDEX idx_call_time (call_time);
+-- ALTER TABLE one_api_call_history ADD INDEX idx_api_url (api_url);

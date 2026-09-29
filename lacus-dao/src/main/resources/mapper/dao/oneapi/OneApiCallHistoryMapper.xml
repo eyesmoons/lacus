@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.lacus.dao.oneapi.mapper.OneApiCallHistoryMapper">
+
+    <!-- 监控概览：按 api_url 分组聚合（可选按数据源过滤，数据源在 one_api_info 上） -->
+    <select id="selectMonitorOverview" resultType="com.lacus.common.core.dto.oneapi.MonitorOverviewItemDTO">
+        SELECT h.api_url               AS apiUrl,
+               COUNT(*)                AS callCount,
+               SUM(CASE WHEN h.call_status = 'SUCCESS' THEN 1 ELSE 0 END) AS successCount,
+               SUM(CASE WHEN h.call_status = 'FAIL' THEN 1 ELSE 0 END)    AS failCount,
+               AVG(h.call_delay)      AS avgCost
+          FROM one_api_call_history h
+          LEFT JOIN one_api_info i ON i.api_url = h.api_url
+         WHERE h.deleted = 0
+           AND h.call_time &gt;= #{startTime} AND h.call_time &lt;= #{endTime}
+           <if test="datasourceId != null">AND i.datasource_id = #{datasourceId}</if>
+         GROUP BY h.api_url
+    </select>
+
+    <!-- 单接口有序 delay 列表（供 Java 取 P95） -->
+    <select id="selectDelaysByApiUrl" resultType="java.lang.Long">
+        SELECT call_delay
+          FROM one_api_call_history
+         WHERE deleted = 0
+           AND api_url = #{apiUrl}
+           AND call_time &gt;= #{startTime} AND call_time &lt;= #{endTime}
+           AND call_delay IS NOT NULL
+         ORDER BY call_delay ASC
+    </select>
+
+    <!-- 统计概览：总量 -->
+    <select id="selectStatsSummary" resultType="com.lacus.common.core.dto.oneapi.StatsSummaryDTO">
+        SELECT COUNT(*)                AS totalCount,
+               SUM(CASE WHEN h.call_status = 'SUCCESS' THEN 1 ELSE 0 END) AS successCount,
+               SUM(CASE WHEN h.call_status = 'FAIL' THEN 1 ELSE 0 END)    AS failCount,
+               AVG(h.call_delay)      AS avgCost
+          FROM one_api_call_history h
+          LEFT JOIN one_api_info i ON i.api_url = h.api_url
+         WHERE h.deleted = 0
+           AND h.call_time &gt;= #{startTime} AND h.call_time &lt;= #{endTime}
+           <if test="datasourceId != null">AND i.datasource_id = #{datasourceId}</if>
+    </select>
+
+    <!-- TopN 接口（按 callCount 降序） -->
+    <select id="selectTopApis" resultType="com.lacus.common.core.dto.oneapi.TopApiDTO">
+        SELECT h.api_url               AS apiUrl,
+               COUNT(*)                AS callCount,
+               SUM(CASE WHEN h.call_status = 'FAIL' THEN 1 ELSE 0 END) AS failCount
+          FROM one_api_call_history h
+          LEFT JOIN one_api_info i ON i.api_url = h.api_url
+         WHERE h.deleted = 0
+           AND h.call_time &gt;= #{startTime} AND h.call_time &lt;= #{endTime}
+           <if test="datasourceId != null">AND i.datasource_id = #{datasourceId}</if>
+         GROUP BY h.api_url
+         ORDER BY callCount DESC
+         LIMIT #{limit}
+    </select>
+
+    <!-- 趋势分桶（MySQL） -->
+    <select id="selectTrend" resultType="com.lacus.common.core.dto.oneapi.TrendBucketDTO">
+        SELECT DATE_FORMAT(call_time, #{dateFormat}) AS time,
+               COUNT(*)                AS callCount,
+               AVG(call_delay)        AS avgCost,
+               SUM(CASE WHEN call_status = 'FAIL' THEN 1 ELSE 0 END) AS failCount
+          FROM one_api_call_history
+         WHERE deleted = 0
+           AND call_time &gt;= #{startTime} AND call_time &lt;= #{endTime}
+         GROUP BY DATE_FORMAT(call_time, #{dateFormat})
+         ORDER BY time ASC
+    </select>
+
+    <!-- 历史分页（关联 one_api_info 取 apiName/reqMethod） -->
+    <select id="selectHistoryPage" resultType="com.lacus.common.core.dto.oneapi.HistoryRowDTO">
+        SELECT h.history_id            AS callId,
+               i.api_name              AS apiName,
+               i.req_method            AS reqMethod,
+               h.call_status           AS status,
+               h.call_delay            AS costTime,
+               h.call_ip               AS caller,
+               h.call_time             AS callTime
+          FROM one_api_call_history h
+          LEFT JOIN one_api_info i ON i.api_url = h.api_url
+         WHERE h.deleted = 0
+           AND h.call_time &gt;= #{startTime} AND h.call_time &lt;= #{endTime}
+           <if test="apiUrl != null and apiUrl != ''">AND h.api_url = #{apiUrl}</if>
+           <if test="callStatus != null and callStatus != ''">AND h.call_status = #{callStatus}</if>
+         ORDER BY h.call_time DESC
+         LIMIT #{pageSize} OFFSET #{offset}
+    </select>
+
+    <!-- 历史分页总数 -->
+    <select id="selectHistoryCount" resultType="java.lang.Long">
+        SELECT COUNT(*)
+          FROM one_api_call_history h
+         WHERE h.deleted = 0
+           AND h.call_time &gt;= #{startTime} AND h.call_time &lt;= #{endTime}
+           <if test="apiUrl != null and apiUrl != ''">AND h.api_url = #{apiUrl}</if>
+           <if test="callStatus != null and callStatus != ''">AND h.call_status = #{callStatus}</if>
+    </select>
+
+</mapper>
