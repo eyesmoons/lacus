@@ -1,2 +1,8 @@
 target/
 *.class
+.idea
+.codegraph
+.comet
+docs
+AGENTS.md
+CLAUDE.md
