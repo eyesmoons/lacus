@@ -13,8 +13,20 @@ Lacus 是一个开源、一体化、企业级大数据集成与处理平台，�
 
 ---
 
-## 系统功能全景
+## Star History
 
+<a href="https://www.star-history.com/?repos=eyesmoons%2Flacus&type=timeline&legend=top-left">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=eyesmoons/lacus&type=date&theme=dark&legend=top-left" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=eyesmoons/lacus&type=date&legend=top-left" />
+   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=eyesmoons/lacus&type=date&legend=top-left" />
+ </picture>
+</a>
+
+---
+
+## 系统功能全景
+![系统首页](images/index.png)
 Lacus 围绕「数据全链路」提供以下核心模块：
 
 | 模块 | 路径入口 | 核心能力 |
@@ -344,4 +356,3 @@ Lacus 是一个功能完整、架构清晰、可扩展性强的开源大数据�
 
 - 前端：https://github.com/eyesmoons/lacus-ui
 - 后端：https://github.com/eyesmoons/lacus
-- Docker 部署：https://github.com/eyesmoons/lacus-docker
