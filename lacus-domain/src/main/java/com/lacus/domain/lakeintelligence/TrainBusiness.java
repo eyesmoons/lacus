@@ -1,0 +1,230 @@
+package com.lacus.domain.lakeintelligence;
+
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lacus.common.core.page.PageDTO;
+import com.lacus.common.exception.CustomException;
+import com.lacus.dao.lakeintelligence.entity.LakeDatasetEntity;
+import com.lacus.dao.lakeintelligence.entity.LakeTaskEntity;
+import com.lacus.domain.lakeintelligence.command.TrainRequest;
+import com.lacus.domain.lakeintelligence.dto.ProgressResponse;
+import com.lacus.domain.lakeintelligence.dto.TaskDTO;
+import com.lacus.domain.lakeintelligence.feign.MlServiceFeign;
+import com.lacus.domain.lakeintelligence.query.TaskPageQuery;
+import com.lacus.enums.TaskStatus;
+import com.lacus.enums.TaskType;
+import com.lacus.service.lakeintelligence.ILakeDatasetService;
+import com.lacus.service.lakeintelligence.ILakeTaskService;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
+
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * 训练任务业务逻辑
+ */
+@Slf4j
+@Service
+public class TrainBusiness {
+
+    @Autowired
+    private ILakeTaskService lakeTaskService;
+
+    @Autowired
+    private ILakeDatasetService lakeDatasetService;
+
+    @Autowired
+    private MlServiceFeign mlServiceFeign;
+
+    /**
+     * 训练任务轮询间隔（毫秒），默认 2000ms
+     */
+    @Value("${training.poll-interval-ms:2000}")
+    private long pollIntervalMs;
+
+    /**
+     * 分页查询训练任务列表
+     */
+    public PageDTO pageList(TaskPageQuery query) {
+        return new PageDTO(lakeTaskService.page(query.toPage(), query.toQueryWrapper()));
+    }
+
+    /**
+     * 启动训练任务
+     */
+    public TaskDTO startTraining(TrainRequest request) {
+        if (lakeTaskService.isTaskNameDuplicated(null, request.getTaskName())) {
+            throw new CustomException("任务名称[" + request.getTaskName() + "]已存在");
+        }
+        // 构建 ML 服务请求
+        Map<String, Object> mlRequest = new HashMap<>();
+        mlRequest.put("trainer_type", request.getTrainerType());
+        mlRequest.put("dataset_uri", resolveDatasetUri(request.getDatasetId()));
+        mlRequest.put("epochs", request.getEpochs());
+        mlRequest.put("batch_size", request.getBatchSize());
+        mlRequest.put("learning_rate", request.getLearningRate());
+        mlRequest.put("device", request.getDevice());
+
+        Map<String, Object> response;
+        try {
+            response = mlServiceFeign.startTrain(mlRequest);
+        } catch (Exception e) {
+            throw new CustomException("启动训练失败：" + e.getMessage());
+        }
+
+        if (response == null || (response.get("code") != null && Integer.valueOf(-1).equals(response.get("code")))) {
+            throw new CustomException("启动训练失败：" + (response != null ? response.get("message") : "无响应"));
+        }
+
+        // 创建本地任务记录
+        LakeTaskEntity entity = new LakeTaskEntity();
+        entity.setTaskName(request.getTaskName());
+        entity.setTaskType(TaskType.IMAGE_SIMILARITY.getCode());
+        entity.setDatasetId(request.getDatasetId());
+        entity.setStatus(TaskStatus.TRAINING.getCode());
+        entity.setTrainingProgress(0);
+        entity.setCreatorId(request.getCreatorId());
+        entity.setStartedAt(new Date());
+        entity.setCreateTime(new Date());
+        entity.setUpdateTime(new Date());
+        entity.setDeleted(0);
+        // 保存超参数
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<String, Object> hyperParams = new HashMap<>();
+            hyperParams.put("trainer_type", request.getTrainerType());
+            hyperParams.put("epochs", request.getEpochs());
+            hyperParams.put("batch_size", request.getBatchSize());
+            hyperParams.put("learning_rate", request.getLearningRate());
+            hyperParams.put("device", request.getDevice());
+            entity.setHyperParams(mapper.writeValueAsString(hyperParams));
+        } catch (Exception e) {
+            log.warn("序列化超参数失败", e);
+        }
+        lakeTaskService.save(entity);
+        return toDTO(entity);
+    }
+
+    /**
+     * 查询训练进度
+     */
+    public ProgressResponse getProgress(Long taskId) {
+        LakeTaskEntity entity = lakeTaskService.getById(taskId);
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new CustomException("任务[" + taskId + "]不存在");
+        }
+        ProgressResponse response = new ProgressResponse();
+        response.setTaskId(String.valueOf(taskId));
+        response.setStatus(entity.getStatus());
+        response.setProgress(entity.getTrainingProgress());
+        response.setMessage(entity.getErrorMessage());
+        return response;
+    }
+
+    /**
+     * 取消训练任务
+     */
+    public void cancelTraining(Long taskId) {
+        LakeTaskEntity entity = lakeTaskService.getById(taskId);
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new CustomException("任务[" + taskId + "]不存在");
+        }
+        if (TaskStatus.COMPLETED.getCode().equals(entity.getStatus())) {
+            throw new CustomException("任务已完成，无法取消");
+        }
+        if (TaskStatus.CANCELLED.getCode().equals(entity.getStatus())) {
+            throw new CustomException("任务已取消");
+        }
+        try {
+            mlServiceFeign.cancelTrain(String.valueOf(taskId));
+        } catch (Exception e) {
+            log.warn("调用 ML 服务取消训练失败：{}", e.getMessage());
+        }
+        entity.setStatus(TaskStatus.CANCELLED.getCode());
+        entity.setErrorMessage("用户取消");
+        entity.setUpdateTime(new Date());
+        lakeTaskService.updateById(entity);
+    }
+
+    /**
+     * 获取任务详情
+     */
+    public TaskDTO detail(Long taskId) {
+        LakeTaskEntity entity = lakeTaskService.getById(taskId);
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new CustomException("任务[" + taskId + "]不存在");
+        }
+        return toDTO(entity);
+    }
+
+    /**
+     * 定时轮询训练中的任务进度
+     */
+    @Scheduled(fixedDelayString = "${training.poll-interval-ms:2000}")
+    public void pollTrainingProgress() {
+        LambdaQueryWrapper<LakeTaskEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(LakeTaskEntity::getStatus, TaskStatus.TRAINING.getCode());
+        wrapper.eq(LakeTaskEntity::getDeleted, 0);
+        List<LakeTaskEntity> trainingTasks = lakeTaskService.list(wrapper);
+        for (LakeTaskEntity task : trainingTasks) {
+            try {
+                Map<String, Object> response = mlServiceFeign.getTrainProgress(String.valueOf(task.getTaskId()));
+                if (response == null) {
+                    continue;
+                }
+                String status = (String) response.get("status");
+                if ("completed".equalsIgnoreCase(status)) {
+                    task.setStatus(TaskStatus.COMPLETED.getCode());
+                    task.setTrainingProgress(100);
+                    task.setCompletedAt(new Date());
+                } else if ("failed".equalsIgnoreCase(status)) {
+                    task.setStatus(TaskStatus.FAILED.getCode());
+                    task.setErrorMessage((String) response.get("message"));
+                } else if ("cancelled".equalsIgnoreCase(status)) {
+                    task.setStatus(TaskStatus.CANCELLED.getCode());
+                } else {
+                    // 训练中，更新进度
+                    Object epoch = response.get("epoch");
+                    Object totalEpochs = response.get("total_epochs");
+                    if (epoch instanceof Number && totalEpochs instanceof Number && ((Number) totalEpochs).intValue() > 0) {
+                        int progress = (int) (((Number) epoch).doubleValue() / ((Number) totalEpochs).doubleValue() * 100);
+                        task.setTrainingProgress(Math.min(progress, 100));
+                    }
+                }
+                task.setUpdateTime(new Date());
+                lakeTaskService.updateById(task);
+            } catch (Exception e) {
+                log.warn("轮询任务[{}]进度失败：{}", task.getTaskId(), e.getMessage());
+            }
+        }
+    }
+
+    private String resolveDatasetUri(Long datasetId) {
+        // TODO: 根据 datasetId 解析实际数据集 URI（从 source_config 中获取）
+        // 简化实现：返回本地路径
+        if (datasetId == null) {
+            throw new CustomException("数据集ID不能为空");
+        }
+        LakeDatasetEntity dataset = lakeDatasetService.getById(datasetId);
+        if (dataset == null) {
+            throw new CustomException("数据集[" + datasetId + "]不存在");
+        }
+        if (dataset.getLocalPath() == null || dataset.getLocalPath().isEmpty()) {
+            throw new CustomException("数据集[" + datasetId + "]本地路径不存在");
+        }
+        return dataset.getLocalPath();
+    }
+
+    private TaskDTO toDTO(LakeTaskEntity entity) {
+        TaskDTO dto = new TaskDTO();
+        BeanUtils.copyProperties(entity, dto);
+        return dto;
+    }
+}

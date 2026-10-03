@@ -27,20 +27,20 @@
 
 ## 3. Spring Boot 后端 — Domain 层
 
-- [ ] 3.1 在 `lacus-domain` 中新增 `lakeintelligence` 包结构（command/, query/, feign/, dto/, model/），验证目录创建
-- [ ] 3.2 实现 Feign 客户端 `MlServiceFeign`（调用 Python ML 服务），遵循 SchedulerFeign 模式（url 从配置读取 + fallback + configuration），验证编译通过
-- [ ] 3.3 实现 Feign 配置 `MlServiceFeignConfiguration`（设置超时和请求头），验证编译通过
-- [ ] 3.4 实现 Feign Fallback `MlServiceFeignFallbackFactory`，验证服务不可用时返回友好错误
-- [ ] 3.5 实现 Command 类：CreateDatasetRequest、TrainRequest、SearchRequest、BuildVectorRequest，验证编译通过
-- [ ] 3.6 实现 Query 类：DatasetPageQuery、TaskPageQuery、ModelPageQuery，验证编译通过
-- [ ] 3.7 实现 DTO 类：DatasetDTO、TaskDTO、ModelInfoDTO、VectorIndexDTO、ProgressResponse、SearchResponse，验证编译通过
-- [ ] 3.8 实现 `DatasetBusiness`：创建数据集、数据源探测、数据集删除，验证方法可调用
-- [ ] 3.9 实现 `TrainBusiness`：启动训练、查询进度、取消训练，验证方法可调用
-- [ ] 3.10 实现 `VectorIndexBusiness`：构建向量库、查询构建进度，验证方法可调用
-- [ ] 3.11 实现 `SearchBusiness`：相似检索，验证方法可调用
-- [ ] 3.12 实现 `ModelBusiness`：模型列表、模型详情、模型下载、模型删除，验证方法可调用
-- [ ] 3.13 实现 `TaskHandler` 接口和 `TaskHandlerFactory`，验证 Spring 自动注入可发现处理器
-- [ ] 3.14 实现 `SimilarityTaskHandler`，验证返回正确的配置 Schema
+- [x] 3.1 在 `lacus-domain` 中新增 `lakeintelligence` 包结构（command/, query/, feign/, dto/, task/），验证目录创建
+- [x] 3.2 实现 Feign 客户端 `MlServiceFeign`（调用 Python ML 服务），遵循 SchedulerFeign 模式（url 从配置读取 + fallback + configuration），验证编译通过
+- [x] 3.3 实现 Feign 配置 `MlServiceFeignConfiguration`（设置超时和请求头），验证编译通过
+- [x] 3.4 实现 Feign Fallback `MlServiceFeignFallbackFactory`，验证服务不可用时返回友好错误
+- [x] 3.5 实现 Command 类：CreateDatasetRequest、TrainRequest、SearchRequest、BuildVectorRequest，验证编译通过
+- [x] 3.6 实现 Query 类：DatasetPageQuery、TaskPageQuery、ModelPageQuery，验证编译通过
+- [x] 3.7 实现 DTO 类：DatasetDTO、TaskDTO、ModelInfoDTO、VectorIndexDTO、ProgressResponse、SearchResponse，验证编译通过
+- [x] 3.8 实现 `DatasetBusiness`：创建数据集、数据源探测、数据集删除，验证方法可调用
+- [x] 3.9 实现 `TrainBusiness`：启动训练、查询进度、取消训练，验证方法可调用
+- [x] 3.10 实现 `VectorIndexBusiness`：构建向量库、查询构建进度，验证方法可调用
+- [x] 3.11 实现 `SearchBusiness`：相似检索，验证方法可调用
+- [x] 3.12 实现 `ModelBusiness`：模型列表、模型详情、模型下载、模型删除，验证方法可调用
+- [x] 3.13 实现 `TaskHandler` 接口和 `TaskHandlerFactory`，验证 Spring 自动注入可发现处理器
+- [x] 3.14 实现 `SimilarityTaskHandler`，验证返回正确的配置 Schema
 
 ## 4. Spring Boot 后端 — Admin 层
 
