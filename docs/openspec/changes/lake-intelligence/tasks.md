@@ -9,21 +9,21 @@
 
 ## 2. Python ML 服务
 
-- [ ] 2.1 创建 `ml_service/` 目录结构（app.py, config.py, requirements.txt, routers/, core/, tasks/, models/, sources/, utils/），验证目录结构完整
-- [ ] 2.2 实现合并的 `SimilarityAutoEncoder` 模型（`models/similarity_autoencoder.py`），验证 `model.encode()` 输出形状为 (N, 512)
-- [ ] 2.3 实现训练基类 `BaseTrainer`（`core/trainer_base.py`），包含通用训练循环和进度回调，验证类可实例化
-- [ ] 2.4 实现 `SimilarityTrainer`（`tasks/similarity_trainer.py`），继承 BaseTrainer，验证可创建实例
-- [ ] 2.5 实现任务注册工厂 `TaskRegistry`（`core/task_registry.py`），验证可通过任务类型创建对应训练器
-- [ ] 2.6 实现数据源抽象基类 `DatasetSource` 和工厂 `SourceFactory`（`core/dataset_source.py`, `core/source_factory.py`），验证工厂可路由到对应实现
-- [ ] 2.7 实现 LOCAL 数据源（`sources/local_source.py`），验证 probe() 返回正确文件数
-- [ ] 2.8 实现 HDFS 数据源（`sources/hdfs_source.py`），验证 probe() 可连接 HDFS
-- [ ] 2.9 实现 S3/MinIO 数据源（`sources/s3_source.py`），验证 probe() 可列出 bucket 文件
-- [ ] 2.10 实现 HTTP 数据源（`sources/http_source.py`），验证 probe() 返回文件大小
-- [ ] 2.11 实现 FastAPI 路由：`/api/train`（启动训练）、`/api/train/{task_id}`（查询进度）、`/api/train/{task_id}/cancel`（取消训练），验证接口可访问
-- [ ] 2.12 实现 FastAPI 路由：`/api/vectors/build`（构建向量库）、`/api/search`（相似检索），验证接口可访问
-- [ ] 2.13 实现 FastAPI 路由：`/api/dataset/probe-source`（数据源探测），验证返回正确探测结果
-- [ ] 2.14 实现向量构建服务（参考 `similarity_embeddings.py`），验证可批量提取 embedding 并写入 ChromaDB
-- [ ] 2.15 实现模型缓存 `ModelCache`（`core/model_cache.py`），验证相同模型路径只加载一次
+- [x] 2.1 创建 `ml_service/` 目录结构（app.py, config.py, requirements.txt, routers/, core/, tasks/, models/, sources/, utils/），验证目录结构完整
+- [x] 2.2 实现合并的 `SimilarityAutoEncoder` 模型（`models/similarity_autoencoder.py`），验证 `model.encode()` 输出形状为 (N, 512)
+- [x] 2.3 实现训练基类 `BaseTrainer`（`core/trainer_base.py`），包含通用训练循环和进度回调，验证类可实例化
+- [x] 2.4 实现 `SimilarityTrainer`（`tasks/similarity_trainer.py`），继承 BaseTrainer，验证可创建实例
+- [x] 2.5 实现任务注册工厂 `TaskRegistry`（`core/task_registry.py`），验证可通过任务类型创建对应训练器
+- [x] 2.6 实现数据源抽象基类 `DatasetSource` 和工厂 `SourceFactory`（`core/dataset_source.py`, `core/source_factory.py`），验证工厂可路由到对应实现
+- [x] 2.7 实现 LOCAL 数据源（`sources/local_source.py`），验证 probe() 返回正确文件数
+- [x] 2.8 实现 HDFS 数据源（`sources/hdfs_source.py`），验证 probe() 可连接 HDFS
+- [x] 2.9 实现 S3/MinIO 数据源（`sources/s3_source.py`），验证 probe() 可列出 bucket 文件
+- [x] 2.10 实现 HTTP 数据源（`sources/http_source.py`），验证 probe() 返回文件大小
+- [x] 2.11 实现 FastAPI 路由：`/api/train`（启动训练）、`/api/train/{task_id}`（查询进度）、`/api/train/{task_id}/cancel`（取消训练），验证接口可访问
+- [x] 2.12 实现 FastAPI 路由：`/api/vectors/build`（构建向量库）、`/api/search`（相似检索），验证接口可访问
+- [x] 2.13 实现 FastAPI 路由：`/api/dataset/probe-source`（数据源探测），验证返回正确探测结果
+- [x] 2.14 实现向量构建服务（参考 `similarity_embeddings.py`），验证可批量提取 embedding 并写入 ChromaDB
+- [x] 2.15 实现模型缓存 `ModelCache`（`core/model_cache.py`），验证相同模型路径只加载一次
 
 ## 3. Spring Boot 后端 — Domain 层
 
