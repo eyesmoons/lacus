@@ -63,6 +63,8 @@ public enum Module {
     METADATA(11),
 
     DATASERVER(12),
+
+    LAKE_INTELLIGENCE(13),
     ;
 
 

@@ -65,12 +65,12 @@
 
 ## 6. 配置与集成
 
-- [ ] 6.1 更新 `application.yml`：新增 `ml.service.url`、`storage.root`、`app.crypto.key` 配置项，验证配置加载正确
-- [ ] 6.2 实现 `FileStorageConfig`：文件存储路径配置，验证文件可写入
-- [ ] 6.3 实现 `CredentialCrypto`：AES-GCM 加解密工具类，验证加密/解密结果一致
-- [ ] 6.4 实现 `AsyncConfig`：异步线程池配置（并发训练任务限制），验证线程池创建
-- [ ] 6.5 实现 `GlobalExceptionHandler` 新增异常处理：SourceUnreachableException、DownloadFailedException、QuotaExceededException，验证异常返回正确错误码
-- [ ] 6.6 实现安全防护工具类 `SecurityUtils`（zip bomb 检测、路径穿越检测），验证可检测恶意文件
+- [x] 6.1 更新 `application.yml`：新增 `ml.service.url`、`storage.root`、`app.crypto.key` 配置项，验证配置加载正确
+- [x] 6.2 实现 `FileStorageConfig`：文件存储路径配置，验证文件可写入
+- [x] 6.3 实现 `CredentialCrypto`：AES-GCM 加解密工具类，验证加密/解密结果一致
+- [x] 6.4 实现 `AsyncConfig`：异步线程池配置（并发训练任务限制），验证线程池创建
+- [x] 6.5 实现 `GlobalExceptionHandler` 新增异常处理：SourceUnreachableException、DownloadFailedException、QuotaExceededException，验证异常返回正确错误码
+- [x] 6.6 实现安全防护工具类 `SecurityUtils`（zip bomb 检测、路径穿越检测），验证可检测恶意文件
 
 ## 7. 端到端验证
 
