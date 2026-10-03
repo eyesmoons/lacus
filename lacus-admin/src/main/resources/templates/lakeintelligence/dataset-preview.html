@@ -1,11 +1,140 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>湖智 - 数据集预览</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{lakeintelligence/layout::layout('湖智 - 数据集预览', ~{::content})}"
+      lang="zh-CN">
 <body>
-    <h1>数据集预览</h1>
-    <p>湖智模块 - 数据集预览页面（前端实现待补充）</p>
+    <th:block th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1">数据集预览</h4>
+                <p class="text-muted mb-0">查看数据集详情、图片样本，或启动训练任务</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/lake-intelligence/dataset/upload" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>返回上传
+                </a>
+                <button type="button" class="btn btn-outline-danger" id="deleteBtn" onclick="deleteDataset()">
+                    <i class="bi bi-trash me-1"></i>删除
+                </button>
+            </div>
+        </div>
+
+        <!-- 加载状态 -->
+        <div id="loadingSpinner" class="text-center py-5">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">加载中...</span>
+            </div>
+            <p class="text-muted mt-2">正在加载数据集信息...</p>
+        </div>
+
+        <!-- 数据集信息 -->
+        <div id="datasetContent" class="d-none">
+            <div class="row g-4 mb-4">
+                <div class="col-md-6">
+                    <div class="card lake-card h-100">
+                        <div class="card-header">
+                            <i class="bi bi-info-circle me-2"></i>基本信息
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-borderless mb-0">
+                                <tbody>
+                                    <tr>
+                                        <td class="text-muted" style="width:100px">名称</td>
+                                        <td class="fw-medium" id="metaName">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">描述</td>
+                                        <td id="metaDesc">-</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">数据源</td>
+                                        <td><span class="badge bg-secondary" id="metaSource">-</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="text-muted">状态</td>
+                                        <td><span id="metaStatus">-</span></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card lake-card h-100">
+                        <div class="card-header">
+                            <i class="bi bi-bar-chart me-2"></i>统计信息
+                        </div>
+                        <div class="card-body">
+                            <div class="row text-center g-3">
+                                <div class="col-4">
+                                    <div class="fs-3 fw-bold text-primary" id="metaImageCount">0</div>
+                                    <small class="text-muted">图片数量</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fs-3 fw-bold text-info" id="metaTotalSize">0 B</div>
+                                    <small class="text-muted">文件总大小</small>
+                                </div>
+                                <div class="col-4">
+                                    <div class="fs-3 fw-bold text-success" id="metaCreateTime">-</div>
+                                    <small class="text-muted">创建时间</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 操作区 -->
+            <div class="card lake-card mb-4">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-1">准备就绪</h6>
+                        <small class="text-muted">数据集已就绪，可以开始训练模型</small>
+                    </div>
+                    <a href="/lake-intelligence/training/new" class="btn btn-primary" id="startTrainBtn">
+                        <i class="bi bi-play-circle me-1"></i>开始训练
+                    </a>
+                </div>
+            </div>
+
+            <!-- 图片缩略图 -->
+            <div class="card lake-card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span><i class="bi bi-images me-2"></i>图片样本预览</span>
+                    <small class="text-muted" id="thumbnailCount">共 0 张</small>
+                </div>
+                <div class="card-body">
+                    <div class="thumbnail-grid" id="thumbnailGrid">
+                        <!-- 缩略图由 JS 动态填充 -->
+                    </div>
+                    <div id="emptyThumbnails" class="text-center py-5 text-muted d-none">
+                        <i class="bi bi-image fs-1 d-block mb-2"></i>
+                        暂无可预览的图片
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 错误状态 -->
+        <div id="errorState" class="d-none">
+            <div class="card lake-card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
+                    <h5 class="mt-3">加载失败</h5>
+                    <p class="text-muted" id="errorMessage">数据集不存在或已被删除</p>
+                    <a href="/lake-intelligence/dataset/upload" class="btn btn-primary">
+                        <i class="bi bi-plus-circle me-1"></i>创建新数据集
+                    </a>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <script th:src="@{/js/lakeintelligence/dataset-preview.js}"></script>
+    <script th:inline="javascript">
+        // 从路径提取 datasetId
+        const pathParts = window.location.pathname.split('/');
+        const datasetId = pathParts[pathParts.indexOf('dataset') + 1];
+    </script>
 </body>
 </html>

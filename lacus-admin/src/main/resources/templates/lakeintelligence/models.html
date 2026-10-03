@@ -1,11 +1,91 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>湖智 - 模型管理</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{lakeintelligence/layout::layout('湖智 - 模型管理', ~{::content})}"
+      lang="zh-CN">
 <body>
-    <h1>模型管理</h1>
-    <p>湖智模块 - 模型管理页面（前端实现待补充）</p>
+    <th:block th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1">模型管理</h4>
+                <p class="text-muted mb-0">查看、下载或删除已训练的模型</p>
+            </div>
+            <a href="/lake-intelligence/training/new" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i>新建训练
+            </a>
+        </div>
+
+        <!-- 筛选 -->
+        <div class="card lake-card mb-4">
+            <div class="card-body">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label class="form-label">模型名称</label>
+                        <input type="text" class="form-control" id="filterName" placeholder="搜索模型名称...">
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">架构</label>
+                        <select class="form-select" id="filterArch">
+                            <option value="">全部</option>
+                            <option value="SimilarityAutoEncoder">SimilarityAutoEncoder</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <label class="form-label">每页</label>
+                        <select class="form-select" id="pageSize">
+                            <option value="10">10 条</option>
+                            <option value="20" selected>20 条</option>
+                            <option value="50">50 条</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="loadModels()">
+                            <i class="bi bi-search me-1"></i>查询
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 模型列表 -->
+        <div class="card lake-card">
+            <div class="table-responsive">
+                <table class="table table-hover align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th style="width: 60px">#</th>
+                            <th>模型名称</th>
+                            <th>架构</th>
+                            <th>Embedding 维度</th>
+                            <th>训练轮数</th>
+                            <th>最终损失</th>
+                            <th>文件大小</th>
+                            <th>创建时间</th>
+                            <th style="width: 180px">操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modelTableBody">
+                        <tr>
+                            <td colspan="9" class="text-center py-5 text-muted">
+                                <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                    <span class="visually-hidden">加载中...</span>
+                                </div>
+                                <span class="ms-2">加载中...</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                <small class="text-muted" id="tableInfo">共 0 条记录</small>
+                <nav>
+                    <ul class="pagination pagination-sm mb-0" id="pagination">
+                        <!-- 分页由 JS 动态填充 -->
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </th:block>
+
+    <script th:src="@{/js/lakeintelligence/model-manager.js}"></script>
 </body>
 </html>
