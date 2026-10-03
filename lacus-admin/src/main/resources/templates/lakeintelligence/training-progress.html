@@ -1,11 +1,110 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <title>湖智 - 训练进度</title>
-</head>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{lakeintelligence/layout::layout('湖智 - 训练进度', ~{::content})}"
+      lang="zh-CN">
 <body>
-    <h1>训练进度</h1>
-    <p>湖智模块 - 训练进度页面（前端实现待补充）</p>
+    <th:block th:fragment="content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h4 class="mb-1">训练进度</h4>
+                <p class="text-muted mb-0">实时监控模型训练状态与损失曲线</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="/lake-intelligence/training/new" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-1"></i>返回配置
+                </a>
+                <button type="button" class="btn btn-outline-danger" id="cancelBtn" onclick="cancelTraining()">
+                    <i class="bi bi-stop-circle me-1"></i>取消训练
+                </button>
+            </div>
+        </div>
+
+        <!-- 状态卡片 -->
+        <div class="row g-4 mb-4">
+            <div class="col-md-3">
+                <div class="card lake-card">
+                    <div class="card-body text-center">
+                        <div class="text-muted small mb-1">状态</div>
+                        <div class="fs-5 fw-bold" id="taskStatus">
+                            <span class="badge bg-secondary">加载中</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card lake-card">
+                    <div class="card-body text-center">
+                        <div class="text-muted small mb-1">当前轮次</div>
+                        <div class="fs-5 fw-bold text-primary" id="currentEpoch">0 / 0</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card lake-card">
+                    <div class="card-body text-center">
+                        <div class="text-muted small mb-1">训练损失</div>
+                        <div class="fs-5 fw-bold text-info" id="trainLoss">-</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card lake-card">
+                    <div class="card-body text-center">
+                        <div class="text-muted small mb-1">验证损失</div>
+                        <div class="fs-5 fw-bold text-warning" id="valLoss">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 进度条 -->
+        <div class="card lake-card mb-4">
+            <div class="card-body">
+                <div class="d-flex justify-content-between mb-2">
+                    <span class="fw-medium">训练进度</span>
+                    <span class="text-muted" id="progressText">0%</span>
+                </div>
+                <div class="progress" style="height: 24px;">
+                    <div class="progress-bar progress-bar-striped progress-bar-animated"
+                         id="progressBar" role="progressbar" style="width: 0%">0%</div>
+                </div>
+                <div class="text-muted small mt-2" id="progressMessage"></div>
+            </div>
+        </div>
+
+        <!-- 损失曲线 -->
+        <div class="card lake-card mb-4">
+            <div class="card-header">
+                <i class="bi bi-graph-down me-2"></i>损失曲线
+            </div>
+            <div class="card-body">
+                <canvas id="lossChart" height="250"></canvas>
+                <div id="noChartData" class="text-center text-muted py-4 d-none">
+                    <i class="bi bi-bar-chart-line fs-2 d-block mb-2"></i>
+                    等待训练数据...
+                </div>
+            </div>
+        </div>
+
+        <!-- 训练完成操作 -->
+        <div id="completedActions" class="d-none">
+            <div class="card lake-card border-success">
+                <div class="card-body d-flex align-items-center justify-content-between">
+                    <div>
+                        <h6 class="mb-1 text-success"><i class="bi bi-check-circle me-2"></i>训练完成</h6>
+                        <small class="text-muted">模型已保存，可以开始构建向量库</small>
+                    </div>
+                    <a href="/lake-intelligence/vector-build" class="btn btn-success">
+                        <i class="bi bi-database-add me-1"></i>构建向量库
+                    </a>
+                </div>
+            </div>
+        </div>
+    </th:block>
+
+    <script th:src="@{/js/lakeintelligence/training.js}"></script>
+    <script th:inline="javascript">
+        const taskId = window.location.pathname.split('/').pop();
+    </script>
 </body>
 </html>

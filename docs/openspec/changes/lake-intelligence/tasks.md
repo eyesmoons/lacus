@@ -54,14 +54,14 @@
 
 ## 5. 前端页面
 
-- [ ] 5.1 实现 `dataset-upload.html`（图片库上传页）：数据源切换逻辑、文件上传、测试连接、创建数据集，验证页面渲染正确
-- [ ] 5.2 实现 `dataset-preview.html`（图片库预览页）：缩略图网格、基本信息展示、操作按钮，验证页面渲染正确
-- [ ] 5.3 实现 `training-new.html`（训练配置页）：参数表单（epochs, lr, batch_size 滑块）、提交训练，验证页面渲染正确
-- [ ] 5.4 实现 `training-progress.html`（训练进度页）：损失曲线（Chart.js）、进度条、取消按钮，验证页面渲染正确
-- [ ] 5.5 实现 `vector-build.html`（向量库构建页）：构建按钮、进度展示，验证页面渲染正确
-- [ ] 5.6 实现 `search.html`（相似检索页）：图片上传、Top-K 结果网格、相似度标签，验证页面渲染正确
-- [ ] 5.7 实现 `model-manager.html`（模型管理页）：模型列表、下载/删除操作，验证页面渲染正确
-- [ ] 5.8 实现前端 JS：dataset-upload.js（数据源切换）、training.js（进度轮询）、search.js（结果展示），验证 JS 加载无报错
+- [x] 5.1 实现 `dataset-upload.html`（图片库上传页）：数据源切换逻辑、文件上传、测试连接、创建数据集，验证页面渲染正确
+- [x] 5.2 实现 `dataset-preview.html`（图片库预览页）：缩略图网格、基本信息展示、操作按钮，验证页面渲染正确
+- [x] 5.3 实现 `training-new.html`（训练配置页）：参数表单（epochs, lr, batch_size 滑块）、提交训练，验证页面渲染正确
+- [x] 5.4 实现 `training-progress.html`（训练进度页）：损失曲线（Chart.js）、进度条、取消按钮，验证页面渲染正确
+- [x] 5.5 实现 `vector-build.html`（向量库构建页）：构建按钮、进度展示，验证页面渲染正确
+- [x] 5.6 实现 `search.html`（相似检索页）：图片上传、Top-K 结果网格、相似度标签，验证页面渲染正确
+- [x] 5.7 实现 `model-manager.html`（模型管理页）：模型列表、下载/删除操作，验证页面渲染正确
+- [x] 5.8 实现前端 JS：dataset-upload.js（数据源切换）、training.js（进度轮询）、search.js（结果展示），验证 JS 加载无报错
 
 ## 6. 配置与集成
 
