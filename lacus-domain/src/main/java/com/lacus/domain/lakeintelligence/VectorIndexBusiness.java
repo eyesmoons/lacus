@@ -1,12 +1,14 @@
 package com.lacus.domain.lakeintelligence;
 
 import com.lacus.common.exception.CustomException;
+import com.lacus.dao.lakeintelligence.entity.LakeDatasetEntity;
 import com.lacus.dao.lakeintelligence.entity.LakeVectorIndexEntity;
 import com.lacus.domain.lakeintelligence.command.BuildVectorRequest;
 import com.lacus.domain.lakeintelligence.dto.ProgressResponse;
 import com.lacus.domain.lakeintelligence.dto.VectorIndexDTO;
 import com.lacus.domain.lakeintelligence.feign.MlServiceFeign;
 import com.lacus.enums.TaskStatus;
+import com.lacus.service.lakeintelligence.ILakeDatasetService;
 import com.lacus.service.lakeintelligence.ILakeVectorIndexService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -27,6 +29,9 @@ public class VectorIndexBusiness {
 
     @Autowired
     private ILakeVectorIndexService lakeVectorIndexService;
+
+    @Autowired
+    private ILakeDatasetService lakeDatasetService;
 
     @Autowired
     private MlServiceFeign mlServiceFeign;
@@ -100,7 +105,14 @@ public class VectorIndexBusiness {
         if (datasetId == null) {
             throw new CustomException("数据集ID不能为空");
         }
-        throw new CustomException("数据集[" + datasetId + "]路径不存在");
+        LakeDatasetEntity dataset = lakeDatasetService.getById(datasetId);
+        if (dataset == null) {
+            throw new CustomException("数据集[" + datasetId + "]不存在");
+        }
+        if (dataset.getLocalPath() == null || dataset.getLocalPath().isEmpty()) {
+            throw new CustomException("数据集[" + datasetId + "]本地路径不存在");
+        }
+        return dataset.getLocalPath();
     }
 
     private VectorIndexDTO toDTO(LakeVectorIndexEntity entity) {

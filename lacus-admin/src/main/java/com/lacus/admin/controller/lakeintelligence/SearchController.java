@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -32,7 +33,13 @@ public class SearchController {
     @PostMapping(consumes = "multipart/form-data")
     @PreAuthorize("@permission.has('lakeintelligence:search:query')")
     public ResponseDTO<SearchResponse> search(@RequestPart(value = "image", required = false) MultipartFile image,
-                                               @RequestPart("params") SearchRequest request) {
+                                               @RequestParam(value = "image_id", required = false) String imageId,
+                                               @RequestParam(value = "top_k", required = false) Integer topK,
+                                               @RequestParam(value = "collection_name", required = false) String collectionName) {
+        SearchRequest request = new SearchRequest();
+        request.setImageId(imageId);
+        request.setTopK(topK);
+        request.setCollectionName(collectionName);
         return ResponseDTO.ok(searchBusiness.search(image, request));
     }
 }

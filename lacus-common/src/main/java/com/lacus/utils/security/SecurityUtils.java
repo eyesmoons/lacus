@@ -60,21 +60,30 @@ public class SecurityUtils {
                     continue;
                 }
 
-                // 累加解压后大小
-                totalSize += entry.getSize();
-                if (totalSize > maxSize) {
-                    throw new CustomException("zip 解压后总大小超出限制，最大允许 " + maxSize + " 字节（疑似 zip bomb）");
-                }
-
-                // 解压单个文件
+                // 解压单个文件，并实时计数实际写入的字节数
+                // 注意：entry.getSize() 可能返回 -1（UNKNOWN），不可用于安全校验
                 Path extractedPath = extractedFile.toPath();
                 Path parent = extractedPath.getParent();
                 if (parent != null && !parent.toFile().exists()) {
                     parent.toFile().mkdirs();
                 }
 
-                try (InputStream is = zipFile.getInputStream(entry)) {
-                    java.nio.file.Files.copy(is, extractedPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                long entryBytes = 0;
+                try (InputStream is = zipFile.getInputStream(entry);
+                     java.io.OutputStream os = java.nio.file.Files.newOutputStream(extractedPath,
+                             java.nio.file.StandardOpenOption.CREATE,
+                             java.nio.file.StandardOpenOption.TRUNCATE_EXISTING,
+                             java.nio.file.StandardOpenOption.WRITE)) {
+                    byte[] buffer = new byte[8192];
+                    int len;
+                    while ((len = is.read(buffer)) > 0) {
+                        os.write(buffer, 0, len);
+                        entryBytes += len;
+                        totalSize += len;
+                        if (totalSize > maxSize) {
+                            throw new CustomException("zip 解压后总大小超出限制，最大允许 " + maxSize + " 字节（疑似 zip bomb）");
+                        }
+                    }
                 }
 
                 log.debug("解压文件: {}, 当前总文件数: {}, 当前总大小: {}", entry.getName(), fileCount, totalSize);
