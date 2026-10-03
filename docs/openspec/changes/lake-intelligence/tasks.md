@@ -44,13 +44,13 @@
 
 ## 4. Spring Boot 后端 — Admin 层
 
-- [ ] 4.1 在 `lacus-admin` 中新增 `controller/lakeintelligence/` 包，验证目录创建
-- [ ] 4.2 实现 `DatasetController`：POST /api/lake-intelligence/datasets（创建数据集）、POST /api/lake-intelligence/datasets/probe-source（探测数据源）、GET /api/lake-intelligence/datasets/{id}/preview（预览数据集）、DELETE /api/lake-intelligence/datasets/{id}（删除数据集），验证接口可访问
-- [ ] 4.3 实现 `TrainController`：POST /api/lake-intelligence/tasks（启动训练）、GET /api/lake-intelligence/tasks/{id}/progress（查询进度）、POST /api/lake-intelligence/tasks/{id}/cancel（取消训练），验证接口可访问
-- [ ] 4.4 实现 `VectorController`：POST /api/lake-intelligence/vectors/build（构建向量库）、GET /api/lake-intelligence/vectors/{id}/progress（查询进度），验证接口可访问
-- [ ] 4.5 实现 `SearchController`：POST /api/lake-intelligence/search（相似检索），验证接口可访问
-- [ ] 4.6 实现 `ModelController`：GET /api/lake-intelligence/models（模型列表）、GET /api/lake-intelligence/models/{id}/download（下载模型）、DELETE /api/lake-intelligence/models/{id}（删除模型），验证接口可访问
-- [ ] 4.7 实现 `PageController`：页面路由（dataset/upload, dataset/{id}/preview, training/new, training/{id}, vector-build, search, models），验证页面可访问
+- [x] 4.1 在 `lacus-admin` 中新增 `controller/lakeintelligence/` 包，验证目录创建
+- [x] 4.2 实现 `DatasetController`：POST /api/lake-intelligence/datasets（创建数据集）、POST /api/lake-intelligence/datasets/probe-source（探测数据源）、GET /api/lake-intelligence/datasets/{id}/preview（预览数据集）、DELETE /api/lake-intelligence/datasets/{id}（删除数据集），验证接口可访问
+- [x] 4.3 实现 `TrainController`：POST /api/lake-intelligence/tasks（启动训练）、GET /api/lake-intelligence/tasks/{id}/progress（查询进度）、POST /api/lake-intelligence/tasks/{id}/cancel（取消训练），验证接口可访问
+- [x] 4.4 实现 `VectorController`：POST /api/lake-intelligence/vectors/build（构建向量库）、GET /api/lake-intelligence/vectors/{id}/progress（查询进度），验证接口可访问
+- [x] 4.5 实现 `SearchController`：POST /api/lake-intelligence/search（相似检索），验证接口可访问
+- [x] 4.6 实现 `ModelController`：GET /api/lake-intelligence/models（模型列表）、GET /api/lake-intelligence/models/{id}/download（下载模型）、DELETE /api/lake-intelligence/models/{id}（删除模型），验证接口可访问
+- [x] 4.7 实现 `PageController`：页面路由（dataset/upload, dataset/{id}/preview, training/new, training/{id}, vector-build, search, models），验证页面可访问
 
 ## 5. 前端页面
 
