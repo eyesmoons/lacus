@@ -1,6 +1,7 @@
 package com.lacus.domain.lakeintelligence;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.lacus.common.config.FileStorageConfig;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
@@ -28,6 +29,9 @@ public class ModelBusiness {
 
     @Autowired
     private ILakeModelInfoService lakeModelInfoService;
+
+    @Autowired
+    private FileStorageConfig fileStorageConfig;
 
     /**
      * 分页查询模型列表
@@ -63,6 +67,17 @@ public class ModelBusiness {
         File file = new File(entity.getModelPath());
         if (!file.exists()) {
             throw new CustomException("模型文件不存在：" + entity.getModelPath());
+        }
+        // 路径穿越防护：验证文件规范路径位于预期的模型存储目录内
+        String modelsRoot = fileStorageConfig.getRoot() + File.separator + "models";
+        try {
+            String expectedPrefix = new File(modelsRoot).getCanonicalPath();
+            String actualPath = file.getCanonicalPath();
+            if (!actualPath.startsWith(expectedPrefix + File.separator) && !actualPath.equals(expectedPrefix)) {
+                throw new CustomException("模型文件路径非法，拒绝访问：" + entity.getModelPath());
+            }
+        } catch (IOException e) {
+            throw new CustomException("模型文件路径校验失败：" + e.getMessage());
         }
         return file;
     }

@@ -60,7 +60,7 @@ public interface MlServiceFeign {
      * 相似检索（图片上传）
      */
     @PostMapping(value = "/api/search", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    Map<String, Object> search(@RequestPart("image") MultipartFile image, @RequestParam Map<String, String> params);
+    Map<String, Object> search(@RequestPart(value = "image", required = false) MultipartFile image, @RequestParam Map<String, String> params);
 
     /**
      * 数据源探测

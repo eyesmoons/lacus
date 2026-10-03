@@ -20,7 +20,7 @@ class HDFSSource(DatasetSource):
         if parsed.port:
             self.namenode = f"{parsed.hostname}:{parsed.port}"
         else:
-            self.namenode = f"{parsed.hostname}:9000"
+            self.namenode = f"{parsed.hostname}:8020"
         self.hdfs_path = parsed.path
 
     def _get_client(self):

@@ -41,10 +41,12 @@ class TestHTTPSource:
     def test_download_zip(self):
         """测试下载 zip 文件"""
         _mock_requests.reset_mock()
+        zip_bytes = _create_fake_zip_bytes()
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = _create_fake_zip_bytes()
+        mock_response.content = zip_bytes
         mock_response.headers = {"Content-Type": "application/zip"}
+        mock_response.iter_content = lambda chunk_size: [zip_bytes]
         _mock_requests.get.return_value = mock_response
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -73,10 +75,12 @@ class TestHTTPSource:
     def test_download_with_auth(self):
         """测试带认证的下载"""
         _mock_requests.reset_mock()
+        zip_bytes = _create_fake_zip_bytes()
         mock_response = MagicMock()
         mock_response.status_code = 200
-        mock_response.content = _create_fake_zip_bytes()
+        mock_response.content = zip_bytes
         mock_response.headers = {"Content-Type": "application/zip"}
+        mock_response.iter_content = lambda chunk_size: [zip_bytes]
         _mock_requests.get.return_value = mock_response
 
         from core.dataset_source import SourceCredentials

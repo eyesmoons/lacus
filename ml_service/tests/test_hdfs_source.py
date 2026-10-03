@@ -23,7 +23,7 @@ class TestHDFSSource:
     def test_extract_with_default_port(self):
         """测试默认端口"""
         source = HDFSSource(uri="hdfs://namenode/data/images")
-        assert source.namenode == "namenode:9000"
+        assert source.namenode == "namenode:8020"
 
     def test_probe_returns_file_count(self):
         """测试 probe 返回文件数量"""

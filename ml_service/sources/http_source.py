@@ -3,8 +3,8 @@
 使用 requests 库下载远程文件，支持 zip 解压。
 """
 import os
+import tempfile
 import zipfile
-import io
 from urllib.parse import urlparse
 
 from core.dataset_source import DatasetSource
@@ -44,12 +44,21 @@ class HTTPSource(DatasetSource):
         )
 
         if is_zip:
-            # 解压 zip 文件
-            with zipfile.ZipFile(io.BytesIO(response.content)) as zf:
-                for member in zf.namelist():
-                    ext = os.path.splitext(member)[1].lower()
-                    if ext in IMAGE_EXTENSIONS:
-                        zf.extract(member, target_dir)
+            # 流式写入临时 zip 文件，避免将整个文件加载到内存（防止 OOM / zip bomb）
+            tmp_fd, tmp_path = tempfile.mkstemp(suffix=".zip", dir=target_dir)
+            try:
+                with os.fdopen(tmp_fd, "wb") as tmp_file:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            tmp_file.write(chunk)
+                with zipfile.ZipFile(tmp_path) as zf:
+                    for member in zf.namelist():
+                        ext = os.path.splitext(member)[1].lower()
+                        if ext in IMAGE_EXTENSIONS:
+                            zf.extract(member, target_dir)
+            finally:
+                if os.path.exists(tmp_path):
+                    os.remove(tmp_path)
         else:
             # 直接保存文件
             filename = os.path.basename(urlparse(self.url).path) or "download.bin"

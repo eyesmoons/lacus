@@ -70,7 +70,7 @@ class TestSearchRouter:
             }
             response = client.post(
                 "/api/search",
-                json={
+                data={
                     "image_id": "query_image",
                     "top_k": 3,
                 }
