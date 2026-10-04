@@ -177,3 +177,11 @@ INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, componen
 (3014, '向量构建触发', 3004, 1, '', '', 0, 1, 3, 1, 1, 'lakeintelligence:vector:build', '#', 0, NOW(), '', 0);
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+-- 清理旧的湖智菜单数据（如果存在）
+-- ============================================================
+DELETE FROM sys_menu WHERE menu_id >= 3000 AND menu_id < 3100;
+DELETE FROM sys_menu WHERE path LIKE 'lakeintelligence%';
+DELETE FROM sys_menu WHERE path LIKE 'similarity%';
+DELETE FROM sys_menu WHERE path LIKE 'classification%';
