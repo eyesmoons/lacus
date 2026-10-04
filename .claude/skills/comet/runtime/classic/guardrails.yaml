@@ -1,0 +1,13 @@
+allowedSkills:
+  - comet-open
+  - comet-design
+  - comet-build
+  - comet-verify
+  - comet-archive
+  - comet-hotfix
+  - comet-tweak
+allowedAgents: []
+allowedTools: []
+maxIterations: 500
+maxRetriesPerAction: 3
+confirmationRequiredFor: []

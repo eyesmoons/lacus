@@ -1,0 +1,6 @@
+runtime:
+  - id: classic-completed
+    scope: completion
+    type: state_equals
+    field: status
+    equals: completed
