@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
 
 /**
  * 向量库管理接口
@@ -42,5 +43,11 @@ public class VectorController {
     @GetMapping("/{id}/progress")
     public ResponseDTO<ProgressResponse> getBuildProgress(@PathVariable("id") Long id) {
         return ResponseDTO.ok(vectorIndexBusiness.getBuildProgress(id));
+    }
+
+    @ApiOperation("获取向量集合列表")
+    @GetMapping("/collections")
+    public ResponseDTO<List<VectorIndexDTO>> listCollections() {
+        return ResponseDTO.ok(vectorIndexBusiness.listCollections());
     }
 }
