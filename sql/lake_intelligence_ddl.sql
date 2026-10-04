@@ -130,7 +130,7 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- 湖智平台 (父目录)
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
-VALUES (3000, '湖智平台', 0, 10, 'lakeintelligence', NULL, 0, 1, 1, 1, 1, NULL, 'cpu', 0, NOW(), '湖智AI平台', 0);
+VALUES (3000, '湖智平台', 0, 10, 'lake-intelligence', NULL, 0, 1, 1, 1, 1, NULL, 'cpu', 0, NOW(), '湖智AI平台', 0);
 
 -- 以图搜图 (子目录)
 INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
