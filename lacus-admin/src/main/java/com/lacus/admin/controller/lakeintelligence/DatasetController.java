@@ -28,7 +28,7 @@ import java.util.Map;
  */
 @Api(value = "数据集管理", tags = {"湖智-数据集"})
 @RestController
-@RequestMapping("/api/lake-intelligence/datasets")
+@RequestMapping("/lake-intelligence/datasets")
 public class DatasetController {
 
     @Autowired
