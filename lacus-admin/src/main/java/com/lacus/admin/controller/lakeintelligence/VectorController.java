@@ -34,14 +34,12 @@ public class VectorController {
 
     @ApiOperation("构建向量库")
     @PostMapping("/build")
-    @PreAuthorize("@permission.has('lakeintelligence:vector:build')")
     public ResponseDTO<VectorIndexDTO> buildVectors(@RequestBody @Valid BuildVectorRequest request) {
         return ResponseDTO.ok(vectorIndexBusiness.buildVectors(request));
     }
 
     @ApiOperation("查询构建进度")
     @GetMapping("/{id}/progress")
-    @PreAuthorize("@permission.has('lakeintelligence:vector:progress')")
     public ResponseDTO<ProgressResponse> getBuildProgress(@PathVariable("id") Long id) {
         return ResponseDTO.ok(vectorIndexBusiness.getBuildProgress(id));
     }
