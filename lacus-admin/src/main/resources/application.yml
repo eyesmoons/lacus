@@ -26,3 +26,29 @@ lacus:
   embedded:
     mysql: false
     redis: false
+
+ml:
+  service:
+    url: http://localhost:8000
+    timeout:
+      connect: 5000
+      read: 120000
+
+storage:
+  root: /data/lake-intelligence
+  max-dataset-size: 50000
+  max-upload-size: 500MB
+  max-image-size: 10MB
+
+app:
+  crypto:
+    key: ${CRYPTO_KEY:change-me-in-production}
+
+training:
+  max-concurrent: 1
+  timeout-hours: 2
+  poll-interval-ms: 2000
+
+vector:
+  build-timeout-hours: 1
+  batch-size: 5000

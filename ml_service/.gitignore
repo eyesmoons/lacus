@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+model_weights/
+task_temp/
+chroma_backend/
+.DS_Store

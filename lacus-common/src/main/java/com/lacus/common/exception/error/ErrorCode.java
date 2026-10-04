@@ -190,6 +190,14 @@ public enum ErrorCode implements ErrorCodeInterface {
 
         API_SQL_SCRIPT_ONLY_SUPPORT_SELECT(Module.DATASERVER,22,"API脚本仅支持查询语句"),
 
+        // ----------------------------- Lake Intelligence --------------------------------
+
+        SOURCE_UNREACHABLE(Module.LAKE_INTELLIGENCE, 1, "数据源不可达：{}"),
+
+        DOWNLOAD_FAILED(Module.LAKE_INTELLIGENCE, 2, "下载失败：{}"),
+
+        QUOTA_EXCEEDED(Module.LAKE_INTELLIGENCE, 3, "配额已超出：{}"),
+
         ;
         private final int code;
         private final String msg;
