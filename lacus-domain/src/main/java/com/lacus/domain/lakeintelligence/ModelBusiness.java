@@ -15,10 +15,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 模型管理业务逻辑
@@ -108,5 +109,34 @@ public class ModelBusiness {
         ModelInfoDTO dto = new ModelInfoDTO();
         BeanUtils.copyProperties(entity, dto);
         return dto;
+    }
+
+    public List<Map<String, Object>> listArchitectures(String taskType) {
+        List<Map<String, Object>> architectures = new ArrayList<>();
+        if ("IMAGE_CLASSIFICATION".equals(taskType)) {
+            architectures.add(new HashMap<String, Object>() {{
+                put("id", "cnn_classifier");
+                put("name", "CNN 分类器");
+                put("taskType", "IMAGE_CLASSIFICATION");
+            }});
+        } else if ("IMAGE_SIMILARITY".equals(taskType)) {
+            architectures.add(new HashMap<String, Object>() {{
+                put("id", "similarity_autoencoder");
+                put("name", "相似度自编码器");
+                put("taskType", "IMAGE_SIMILARITY");
+            }});
+        } else {
+            architectures.add(new HashMap<String, Object>() {{
+                put("id", "similarity_autoencoder");
+                put("name", "相似度自编码器");
+                put("taskType", "IMAGE_SIMILARITY");
+            }});
+            architectures.add(new HashMap<String, Object>() {{
+                put("id", "cnn_classifier");
+                put("name", "CNN 分类器");
+                put("taskType", "IMAGE_CLASSIFICATION");
+            }});
+        }
+        return architectures;
     }
 }

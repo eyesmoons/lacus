@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 训练任务管理接口
@@ -49,5 +52,11 @@ public class TrainController {
     public ResponseDTO<?> cancelTraining(@PathVariable("id") Long id) {
         trainBusiness.cancelTraining(id);
         return ResponseDTO.ok();
+    }
+
+    @ApiOperation("获取任务超参配置 Schema")
+    @GetMapping("/hyperparam-schema")
+    public ResponseDTO<Map<String, Object>> getHyperparamSchema(@RequestParam("task_type") String taskType) {
+        return ResponseDTO.ok(trainBusiness.getHyperparamSchema(taskType));
     }
 }

@@ -16,7 +16,10 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -60,8 +63,8 @@ public class DatasetBusiness {
         entity.setTaskType(request.getTaskType());
         entity.setStatus(DatasetStatus.PROCESSING.getCode());
         entity.setCreatorId(request.getCreatorId());
-        entity.setCreateTime(new java.util.Date());
-        entity.setUpdateTime(new java.util.Date());
+        entity.setCreateTime(new Date());
+        entity.setUpdateTime(new Date());
         entity.setDeleted(0);
         lakeDatasetService.save(entity);
         return toDTO(entity);
@@ -154,5 +157,40 @@ public class DatasetBusiness {
         DatasetDTO dto = new DatasetDTO();
         BeanUtils.copyProperties(entity, dto);
         return dto;
+    }
+
+    public Map<String, Object> getClassStats(Long datasetId) {
+        // 返回模拟的类别分布统计
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("datasetId", datasetId);
+        stats.put("totalSamples", 100);
+        List<Map<String, Object>> distribution = new ArrayList<>();
+        distribution.add(new HashMap<String, Object>() {{
+            put("classId", 0);
+            put("className", "上衣");
+            put("count", 25);
+        }});
+        distribution.add(new HashMap<String, Object>() {{
+            put("classId", 1);
+            put("className", "鞋");
+            put("count", 20);
+        }});
+        distribution.add(new HashMap<String, Object>() {{
+            put("classId", 2);
+            put("className", "包");
+            put("count", 15);
+        }});
+        distribution.add(new HashMap<String, Object>() {{
+            put("classId", 3);
+            put("className", "下装");
+            put("count", 22);
+        }});
+        distribution.add(new HashMap<String, Object>() {{
+            put("classId", 4);
+            put("className", "手表");
+            put("count", 18);
+        }});
+        stats.put("classDistribution", distribution);
+        return stats;
     }
 }
