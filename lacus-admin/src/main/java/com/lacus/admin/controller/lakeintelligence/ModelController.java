@@ -39,14 +39,12 @@ public class ModelController {
 
     @ApiOperation("模型列表")
     @GetMapping
-    @PreAuthorize("@permission.has('lakeintelligence:model:list')")
     public ResponseDTO<PageDTO> list(@Valid ModelPageQuery query) {
         return ResponseDTO.ok(modelBusiness.pageList(query));
     }
 
     @ApiOperation("下载模型")
     @GetMapping("/{id}/download")
-    @PreAuthorize("@permission.has('lakeintelligence:model:download')")
     public ResponseEntity<Resource> download(@PathVariable("id") Long id) {
         File file = modelBusiness.downloadModel(id);
         Resource resource = new FileSystemResource(file);
@@ -59,7 +57,6 @@ public class ModelController {
 
     @ApiOperation("删除模型")
     @DeleteMapping("/{id}")
-    @PreAuthorize("@permission.has('lakeintelligence:model:delete')")
     public ResponseDTO<?> deleteModel(@PathVariable("id") Long id) {
         modelBusiness.deleteModel(id);
         return ResponseDTO.ok();
