@@ -18,10 +18,13 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.validation.Valid;
 import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 模型管理接口
@@ -60,5 +63,11 @@ public class ModelController {
     public ResponseDTO<?> deleteModel(@PathVariable("id") Long id) {
         modelBusiness.deleteModel(id);
         return ResponseDTO.ok();
+    }
+
+    @ApiOperation("获取可用模型架构列表")
+    @GetMapping("/architectures")
+    public ResponseDTO<List<Map<String, Object>>> listArchitectures(@RequestParam(required = false) String taskType) {
+        return ResponseDTO.ok(modelBusiness.listArchitectures(taskType));
     }
 }

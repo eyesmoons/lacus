@@ -18,6 +18,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -119,5 +120,10 @@ public class VectorIndexBusiness {
         VectorIndexDTO dto = new VectorIndexDTO();
         BeanUtils.copyProperties(entity, dto);
         return dto;
+    }
+
+    public List<VectorIndexDTO> listCollections() {
+        List<LakeVectorIndexEntity> entities = lakeVectorIndexService.list();
+        return entities.stream().map(this::toDTO).collect(java.util.stream.Collectors.toList());
     }
 }
