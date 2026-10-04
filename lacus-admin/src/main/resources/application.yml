@@ -37,8 +37,8 @@ ml:
 storage:
   root: /data/lake-intelligence
   max-dataset-size: 50000
-  max-upload-size: 500MB
-  max-image-size: 10MB
+  max-upload-size: 500
+  max-image-size: 10
 
 app:
   crypto:
