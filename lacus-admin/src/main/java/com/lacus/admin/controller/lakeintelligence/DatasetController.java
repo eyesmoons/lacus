@@ -4,6 +4,8 @@ import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.domain.lakeintelligence.DatasetBusiness;
 import com.lacus.domain.lakeintelligence.command.CreateDatasetRequest;
 import com.lacus.domain.lakeintelligence.dto.DatasetDTO;
+import com.lacus.domain.lakeintelligence.query.DatasetPageQuery;
+import com.lacus.common.core.page.PageDTO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,12 @@ public class DatasetController {
 
     @Autowired
     private DatasetBusiness datasetBusiness;
+
+    @ApiOperation("数据集列表")
+    @GetMapping
+    public ResponseDTO<PageDTO> list(@Valid DatasetPageQuery query) {
+        return ResponseDTO.ok(datasetBusiness.pageList(query));
+    }
 
     @ApiOperation("创建数据集")
     @PostMapping

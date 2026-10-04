@@ -25,6 +25,9 @@ public class DatasetPageQuery extends AbstractPageQuery {
     @ApiModelProperty("创建者ID")
     private String creatorId;
 
+    @ApiModelProperty("任务类型: IMAGE_SIMILARITY/IMAGE_CLASSIFICATION")
+    private String taskType;
+
     @Override
     public QueryWrapper toQueryWrapper() {
         QueryWrapper wrapper = new QueryWrapper();
@@ -39,6 +42,9 @@ public class DatasetPageQuery extends AbstractPageQuery {
         }
         if (creatorId != null && !creatorId.isEmpty()) {
             wrapper.eq("creator_id", creatorId);
+        }
+        if (taskType != null && !taskType.isEmpty()) {
+            wrapper.eq("task_type", taskType);
         }
         wrapper.eq("deleted", 0);
         wrapper.orderByDesc("create_time");
