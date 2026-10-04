@@ -1,0 +1,121 @@
+-- ============================================================
+-- Lake Intelligence 模块 DDL
+-- 数据库: MySQL 5.7+
+-- 字符集: utf8mb4
+-- 表名前缀: lake_
+-- ============================================================
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- ----------------------------
+-- Table structure for lake_datasets
+-- 图片库元信息表
+-- ----------------------------
+DROP TABLE IF EXISTS `lake_datasets`;
+CREATE TABLE `lake_datasets` (
+  `dataset_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `dataset_name` varchar(128) NOT NULL COMMENT '图片库名称',
+  `description` varchar(500) DEFAULT NULL COMMENT '图片库描述',
+  `storage_source` varchar(32) NOT NULL COMMENT '存储来源: LOCAL/HDFS/S3/MINIO/HTTP',
+  `source_config` text COMMENT '数据源配置 (JSON, 含路径/URL/凭证等)',
+  `status` varchar(32) NOT NULL DEFAULT 'PROCESSING' COMMENT '状态: PROCESSING/WAITING_DOWNLOAD/DOWNLOADING/READY/ERROR',
+  `image_count` int(11) DEFAULT '0' COMMENT '图片数量',
+  `total_size_bytes` bigint(20) DEFAULT '0' COMMENT '总文件大小(字节)',
+  `local_path` varchar(512) DEFAULT NULL COMMENT '本地存储路径',
+  `error_message` varchar(1024) DEFAULT NULL COMMENT '错误信息',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+  `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`dataset_id`),
+  KEY `idx_dataset_name` (`dataset_name`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='图片库元信息表';
+
+-- ----------------------------
+-- Table structure for lake_tasks
+-- 训练任务表
+-- ----------------------------
+DROP TABLE IF EXISTS `lake_tasks`;
+CREATE TABLE `lake_tasks` (
+  `task_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `task_name` varchar(128) NOT NULL COMMENT '任务名称',
+  `task_type` varchar(64) NOT NULL COMMENT '任务类型: IMAGE_SIMILARITY',
+  `dataset_id` bigint(20) NOT NULL COMMENT '关联图片库ID',
+  `model_id` bigint(20) DEFAULT NULL COMMENT '关联模型ID',
+  `status` varchar(32) NOT NULL DEFAULT 'PENDING' COMMENT '状态: PENDING/TRAINING/COMPLETED/FAILED/CANCELLED',
+  `hyper_params' text COMMENT '超参数配置 (JSON, epochs/lr/batch_size等)',
+  `training_progress` int(11) DEFAULT '0' COMMENT '训练进度百分比',
+  `loss_history' text COMMENT '损失曲线数据 (JSON数组)',
+  `error_message` varchar(1024) DEFAULT NULL COMMENT '错误信息',
+  `started_at` datetime DEFAULT NULL COMMENT '开始时间',
+  `completed_at` datetime DEFAULT NULL COMMENT '完成时间',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+  `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`task_id`),
+  KEY `idx_task_name` (`task_name`),
+  KEY `idx_dataset_id` (`dataset_id`),
+  KEY `idx_status` (`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='训练任务表';
+
+-- ----------------------------
+-- Table structure for lake_model_info
+-- 模型元信息表
+-- ----------------------------
+DROP TABLE IF EXISTS `lake_model_info`;
+CREATE TABLE `lake_model_info` (
+  `model_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `model_name` varchar(128) NOT NULL COMMENT '模型名称',
+  `task_id` bigint(20) DEFAULT NULL COMMENT '关联训练任务ID',
+  `dataset_id` bigint(20) NOT NULL COMMENT '关联图片库ID',
+  `model_arch` varchar(64) NOT NULL DEFAULT 'SimilarityAutoEncoder' COMMENT '模型架构',
+  `model_path` varchar(512) NOT NULL COMMENT '模型文件本地路径',
+  `model_size_bytes` bigint(20) DEFAULT '0' COMMENT '模型文件大小(字节)',
+  `embedding_dim` int(11) DEFAULT '512' COMMENT 'Embedding维度',
+  `training_epochs` int(11) DEFAULT NULL COMMENT '实际训练轮数',
+  `final_loss` decimal(10,6) DEFAULT NULL COMMENT '最终损失值',
+  `vector_index_id` bigint(20) DEFAULT NULL COMMENT '关联向量库ID',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+  `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`model_id`),
+  KEY `idx_model_name` (`model_name`),
+  KEY `idx_task_id` (`task_id`),
+  KEY `idx_dataset_id` (`dataset_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='模型元信息表';
+
+-- ----------------------------
+-- Table structure for lake_vector_indexes
+-- 向量库索引表
+-- ----------------------------
+DROP TABLE IF EXISTS `lake_vector_indexes`;
+CREATE TABLE `lake_vector_indexes` (
+  `index_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
+  `index_name` varchar(128) NOT NULL COMMENT '向量库名称',
+  `dataset_id` bigint(20) NOT NULL COMMENT '关联图片库ID',
+  `model_id` bigint(20) NOT NULL COMMENT '关联模型ID',
+  `index_path` varchar(512) NOT NULL COMMENT '向量索引本地路径',
+  `total_vectors` int(11) DEFAULT '0' COMMENT '向量总数',
+  `dimension` int(11) DEFAULT '512' COMMENT '向量维度',
+  `distance_metric` varchar(32) DEFAULT 'cosine' COMMENT '距离度量: cosine/euclidean',
+  `build_status` varchar(32) DEFAULT 'PENDING' COMMENT '构建状态: PENDING/BUILDING/COMPLETED/FAILED',
+  `error_message` varchar(1024) DEFAULT NULL COMMENT '错误信息',
+  `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
+  `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
+  `create_time` datetime NOT NULL COMMENT '创建时间',
+  `updater_id` varchar(128) DEFAULT NULL COMMENT '修改人',
+  `update_time` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+  PRIMARY KEY (`index_id`),
+  KEY `idx_index_name` (`index_name`),
+  KEY `idx_dataset_id` (`dataset_id`),
+  KEY `idx_model_id` (`model_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='向量库索引表';
+
+SET FOREIGN_KEY_CHECKS = 1;

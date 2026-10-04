@@ -1,5 +1,8 @@
 package com.lacus.core.interceptor.exception;
 
+import com.lacus.common.exception.DownloadFailedException;
+import com.lacus.common.exception.QuotaExceededException;
+import com.lacus.common.exception.SourceUnreachableException;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.common.exception.ApiException;
 import com.lacus.common.exception.CustomException;
@@ -109,6 +112,33 @@ public class GlobalExceptionHandler {
         log.error(e.getMessage(), e);
         String message = e.getBindingResult().getFieldError().getDefaultMessage();
         return ResponseDTO.fail(ErrorCode.Client.COMMON_REQUEST_PARAMETERS_INVALID, message);
+    }
+
+    /**
+     * 数据源不可达异常
+     */
+    @ExceptionHandler(SourceUnreachableException.class)
+    public ResponseDTO<?> handleSourceUnreachableException(SourceUnreachableException e) {
+        log.error(e.getMessage(), e);
+        return ResponseDTO.fail(e);
+    }
+
+    /**
+     * 下载失败异常
+     */
+    @ExceptionHandler(DownloadFailedException.class)
+    public ResponseDTO<?> handleDownloadFailedException(DownloadFailedException e) {
+        log.error(e.getMessage(), e);
+        return ResponseDTO.fail(e);
+    }
+
+    /**
+     * 配额超出异常
+     */
+    @ExceptionHandler(QuotaExceededException.class)
+    public ResponseDTO<?> handleQuotaExceededException(QuotaExceededException e) {
+        log.error(e.getMessage(), e);
+        return ResponseDTO.fail(e);
     }
 
 
