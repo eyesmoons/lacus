@@ -27,6 +27,9 @@ public class CreateDatasetRequest {
     @NotNull(message = "数据源配置不能为空")
     private String sourceConfig;
 
+    @ApiModelProperty(value = "任务类型: IMAGE_SIMILARITY/IMAGE_CLASSIFICATION")
+    private String taskType = "IMAGE_SIMILARITY";
+
     @ApiModelProperty(value = "创建者ID", required = true)
     @NotBlank(message = "创建者ID不能为空")
     private String creatorId;

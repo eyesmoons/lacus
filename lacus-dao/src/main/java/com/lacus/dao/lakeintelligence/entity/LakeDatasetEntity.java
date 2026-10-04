@@ -45,6 +45,12 @@ public class LakeDatasetEntity {
     private String sourceConfig;
 
     /**
+     * 任务类型: IMAGE_SIMILARITY/IMAGE_CLASSIFICATION
+     */
+    @TableField("task_type")
+    private String taskType;
+
+    /**
      * 状态: PROCESSING/WAITING_DOWNLOAD/DOWNLOADING/READY/ERROR
      */
     @TableField("status")
