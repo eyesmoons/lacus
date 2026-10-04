@@ -68,6 +68,11 @@ public class MlServiceFeignFallbackFactory implements FallbackFactory<MlServiceF
             public Map<String, Object> probeSource(Map<String, Object> request) {
                 return fail("数据源探测");
             }
+
+            @Override
+            public Map<String, Object> classify(MultipartFile image, Map<String, String> params) {
+                return fail("图像分类");
+            }
         };
     }
 }

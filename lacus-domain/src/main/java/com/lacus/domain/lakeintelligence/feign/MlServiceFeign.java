@@ -67,4 +67,10 @@ public interface MlServiceFeign {
      */
     @PostMapping("/api/dataset/probe-source")
     Map<String, Object> probeSource(@RequestBody Map<String, Object> request);
+
+    /**
+     * 图像分类推理（图片上传）
+     */
+    @PostMapping(value = "/api/classify", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    Map<String, Object> classify(@RequestPart(value = "image", required = false) MultipartFile image, @RequestParam Map<String, String> params);
 }
