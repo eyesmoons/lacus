@@ -26,7 +26,7 @@ import javax.validation.Valid;
  */
 @Api(value = "训练任务管理", tags = {"湖智-训练"})
 @RestController
-@RequestMapping("/api/lake-intelligence/tasks")
+@RequestMapping("/lake-intelligence/tasks")
 public class TrainController {
 
     @Autowired
