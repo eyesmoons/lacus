@@ -31,7 +31,7 @@ import java.io.File;
  */
 @Api(value = "模型管理", tags = {"湖智-模型"})
 @RestController
-@RequestMapping("/api/lake-intelligence/models")
+@RequestMapping("/lake-intelligence/models")
 public class ModelController {
 
     @Autowired

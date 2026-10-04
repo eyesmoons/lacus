@@ -23,7 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Api(value = "相似检索", tags = {"湖智-检索"})
 @RestController
-@RequestMapping("/api/lake-intelligence/search")
+@RequestMapping("/lake-intelligence/search")
 public class SearchController {
 
     @Autowired

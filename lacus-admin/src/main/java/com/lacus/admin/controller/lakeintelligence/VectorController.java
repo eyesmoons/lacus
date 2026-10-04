@@ -26,7 +26,7 @@ import javax.validation.Valid;
  */
 @Api(value = "向量库管理", tags = {"湖智-向量库"})
 @RestController
-@RequestMapping("/api/lake-intelligence/vectors")
+@RequestMapping("/lake-intelligence/vectors")
 public class VectorController {
 
     @Autowired
