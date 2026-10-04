@@ -2,7 +2,7 @@
 import os
 from fastapi import FastAPI
 
-from routers import train, vectors, search, dataset_source
+from routers import train, vectors, search, dataset_source, classify
 
 
 def create_app() -> FastAPI:
@@ -18,6 +18,7 @@ def create_app() -> FastAPI:
     app.include_router(vectors.router)
     app.include_router(search.router)
     app.include_router(dataset_source.router)
+    app.include_router(classify.router)
 
     # 确保必要目录存在
     from config import default_config

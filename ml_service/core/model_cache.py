@@ -30,6 +30,11 @@ class ModelCache:
             return SimilarityAutoEncoder()
         self._creators["similarity_autoencoder"] = _create_similarity
 
+        def _create_classifier():
+            from models.classifier import Classifier
+            return Classifier()
+        self._creators["classifier"] = _create_classifier
+
     def register_creator(self, name: str, creator: Callable[[], Any]) -> None:
         """注册自定义模型创建器"""
         self._creators[name] = creator
