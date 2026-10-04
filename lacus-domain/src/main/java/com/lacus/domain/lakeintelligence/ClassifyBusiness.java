@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -55,5 +57,26 @@ public class ClassifyBusiness {
             classifyResponse.setClassId(((Number) response.get("class_id")).intValue());
         }
         return classifyResponse;
+    }
+
+    public List<ClassifyResponse> batchClassify(List<MultipartFile> images, String modelId) {
+        List<ClassifyResponse> results = new ArrayList<>();
+        for (MultipartFile image : images) {
+            results.add(classify(image, modelId));
+        }
+        return results;
+    }
+
+    public List<Map<String, Object>> listClasses(String modelId) {
+        // 返回预定义的分类类别
+        List<Map<String, Object>> classes = new ArrayList<>();
+        String[][] classData = {{"0", "上衣"}, {"1", "鞋"}, {"2", "包"}, {"3", "下装"}, {"4", "手表"}};
+        for (String[] c : classData) {
+            classes.add(new HashMap<String, Object>() {{
+                put("id", Integer.parseInt(c[0]));
+                put("name", c[1]);
+            }});
+        }
+        return classes;
     }
 }

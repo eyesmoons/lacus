@@ -22,6 +22,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -226,5 +228,89 @@ public class TrainBusiness {
         TaskDTO dto = new TaskDTO();
         BeanUtils.copyProperties(entity, dto);
         return dto;
+    }
+
+    public Map<String, Object> getHyperparamSchema(String taskType) {
+        Map<String, Object> schema = new HashMap<>();
+        if ("IMAGE_CLASSIFICATION".equals(taskType)) {
+            schema.put("taskType", "IMAGE_CLASSIFICATION");
+            List<Map<String, Object>> fields = new ArrayList<>();
+            fields.add(new HashMap<String, Object>() {{
+                put("name", "epochs");
+                put("type", "number");
+                put("label", "训练轮数");
+                put("default", 20);
+                put("min", 1);
+                put("max", 200);
+                put("required", true);
+            }});
+            fields.add(new HashMap<String, Object>() {{
+                put("name", "learning_rate");
+                put("type", "number");
+                put("label", "学习率");
+                put("default", 0.001);
+                put("min", 0.0001);
+                put("max", 0.01);
+                put("required", true);
+            }});
+            Map<String, Object> batchField = new HashMap<>();
+            batchField.put("name", "batch_size");
+            batchField.put("type", "select");
+            batchField.put("label", "批次大小");
+            batchField.put("default", 32);
+            batchField.put("options", Arrays.asList(16, 32, 64));
+            batchField.put("required", true);
+            fields.add(batchField);
+            fields.add(new HashMap<String, Object>() {{
+                put("name", "n_classes");
+                put("type", "number");
+                put("label", "分类数");
+                put("default", 5);
+                put("min", 2);
+                put("max", 100);
+                put("required", true);
+            }});
+            schema.put("fields", fields);
+        } else {
+            schema.put("taskType", "IMAGE_SIMILARITY");
+            List<Map<String, Object>> fields = new ArrayList<>();
+            fields.add(new HashMap<String, Object>() {{
+                put("name", "epochs");
+                put("type", "number");
+                put("label", "训练轮数");
+                put("default", 30);
+                put("min", 1);
+                put("max", 200);
+                put("required", true);
+            }});
+            fields.add(new HashMap<String, Object>() {{
+                put("name", "learning_rate");
+                put("type", "number");
+                put("label", "学习率");
+                put("default", 0.001);
+                put("min", 0.0001);
+                put("max", 0.01);
+                put("required", true);
+            }});
+            Map<String, Object> batchField = new HashMap<>();
+            batchField.put("name", "batch_size");
+            batchField.put("type", "select");
+            batchField.put("label", "批次大小");
+            batchField.put("default", 32);
+            batchField.put("options", Arrays.asList(16, 32, 64));
+            batchField.put("required", true);
+            fields.add(batchField);
+            fields.add(new HashMap<String, Object>() {{
+                put("name", "embedding_dim");
+                put("type", "number");
+                put("label", "嵌入维度");
+                put("default", 512);
+                put("min", 64);
+                put("max", 2048);
+                put("required", true);
+            }});
+            schema.put("fields", fields);
+        }
+        return schema;
     }
 }

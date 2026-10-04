@@ -58,4 +58,10 @@ public class DatasetController {
         datasetBusiness.deleteDataset(id);
         return ResponseDTO.ok();
     }
+
+    @ApiOperation("获取数据集类别分布统计")
+    @GetMapping("/{id}/class-stats")
+    public ResponseDTO<Map<String, Object>> getClassStats(@PathVariable("id") Long id) {
+        return ResponseDTO.ok(datasetBusiness.getClassStats(id));
+    }
 }
