@@ -22,7 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @Api(value = "图像分类", tags = {"湖智-分类"})
 @RestController
-@RequestMapping("/api/lake-intelligence/classify")
+@RequestMapping("/lake-intelligence/classify")
 public class ClassifyController {
 
     @Autowired
