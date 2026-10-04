@@ -30,7 +30,6 @@ public class ClassifyController {
 
     @ApiOperation("图像分类推理（支持图片上传）")
     @PostMapping(consumes = "multipart/form-data")
-    @PreAuthorize("@permission.has('lakeintelligence:classify:predict')")
     public ResponseDTO<ClassifyResponse> classify(@RequestPart(value = "image", required = false) MultipartFile image,
                                                   @RequestParam(value = "model_id", required = false) String modelId) {
         return ResponseDTO.ok(classifyBusiness.classify(image, modelId));

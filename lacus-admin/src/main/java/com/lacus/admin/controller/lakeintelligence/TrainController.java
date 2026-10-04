@@ -34,21 +34,18 @@ public class TrainController {
 
     @ApiOperation("启动训练")
     @PostMapping
-    @PreAuthorize("@permission.has('lakeintelligence:task:start')")
     public ResponseDTO<TaskDTO> startTraining(@RequestBody @Valid TrainRequest request) {
         return ResponseDTO.ok(trainBusiness.startTraining(request));
     }
 
     @ApiOperation("查询训练进度")
     @GetMapping("/{id}/progress")
-    @PreAuthorize("@permission.has('lakeintelligence:task:progress')")
     public ResponseDTO<ProgressResponse> getProgress(@PathVariable("id") Long id) {
         return ResponseDTO.ok(trainBusiness.getProgress(id));
     }
 
     @ApiOperation("取消训练")
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("@permission.has('lakeintelligence:task:cancel')")
     public ResponseDTO<?> cancelTraining(@PathVariable("id") Long id) {
         trainBusiness.cancelTraining(id);
         return ResponseDTO.ok();

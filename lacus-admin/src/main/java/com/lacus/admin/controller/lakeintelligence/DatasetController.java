@@ -36,28 +36,24 @@ public class DatasetController {
 
     @ApiOperation("创建数据集")
     @PostMapping
-    @PreAuthorize("@permission.has('lakeintelligence:dataset:create')")
     public ResponseDTO<DatasetDTO> createDataset(@RequestBody @Valid CreateDatasetRequest request) {
         return ResponseDTO.ok(datasetBusiness.createDataset(request));
     }
 
     @ApiOperation("数据源探测")
     @PostMapping("/probe-source")
-    @PreAuthorize("@permission.has('lakeintelligence:dataset:probe')")
     public ResponseDTO<Map<String, Object>> probeSource(@RequestParam("uri") String uri) {
         return ResponseDTO.ok(datasetBusiness.probeSource(uri));
     }
 
     @ApiOperation("预览数据集")
     @GetMapping("/{id}/preview")
-    @PreAuthorize("@permission.has('lakeintelligence:dataset:preview')")
     public ResponseDTO<DatasetDTO> preview(@PathVariable("id") Long id) {
         return ResponseDTO.ok(datasetBusiness.detail(id));
     }
 
     @ApiOperation("删除数据集")
     @DeleteMapping("/{id}")
-    @PreAuthorize("@permission.has('lakeintelligence:dataset:delete')")
     public ResponseDTO<?> deleteDataset(@PathVariable("id") Long id) {
         datasetBusiness.deleteDataset(id);
         return ResponseDTO.ok();
