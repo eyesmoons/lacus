@@ -31,7 +31,6 @@ public class SearchController {
 
     @ApiOperation("相似检索（支持图片上传）")
     @PostMapping(consumes = "multipart/form-data")
-    @PreAuthorize("@permission.has('lakeintelligence:search:query')")
     public ResponseDTO<SearchResponse> search(@RequestPart(value = "image", required = false) MultipartFile image,
                                                @RequestParam(value = "image_id", required = false) String imageId,
                                                @RequestParam(value = "top_k", required = false) Integer topK,
