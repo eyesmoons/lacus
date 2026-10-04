@@ -5,6 +5,7 @@
 from typing import Dict, Type
 
 from core.trainer_base import BaseTrainer
+from tasks.classifier_trainer import ClassifierTrainer
 from tasks.similarity_trainer import SimilarityTrainer
 
 
@@ -14,6 +15,7 @@ class TaskRegistry:
     # 训练器注册表：类型名称 -> 训练器类
     TRAINER_REGISTRY: Dict[str, Type[BaseTrainer]] = {
         "similarity": SimilarityTrainer,
+        "image_classification": ClassifierTrainer,
     }
 
     @classmethod
