@@ -1,0 +1,5 @@
+interface:
+  display_name: 'Comet Classic 预设：Hotfix'
+  short_description: '复现并修复已有功能的局部缺陷，完成回归测试、验证与归档'
+policy:
+  allow_implicit_invocation: true

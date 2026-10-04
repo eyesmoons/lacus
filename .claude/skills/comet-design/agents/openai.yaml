@@ -1,0 +1,5 @@
+interface:
+  display_name: 'Comet Classic 阶段 2：深度设计'
+  short_description: '讨论技术方案和测试策略，经用户确认后完成正式设计文档'
+policy:
+  allow_implicit_invocation: true

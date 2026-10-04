@@ -1,0 +1,122 @@
+apiVersion: comet/v1alpha1
+kind: Skill
+metadata:
+  name: comet-classic
+  version: '1'
+  description: 兼容现有 Classic 状态，按 full、hotfix、tweak 流程调度各阶段 Skill
+goal:
+  statement: 保持现有 CLI 的用法，继续执行或恢复 Classic Run
+  inputs:
+    - name: classic-state
+      description: 已通过校验、且与 Run 中对应字段一致的 ClassicState
+      required: true
+    - name: evidence
+      description: Classic Evidence 收集器返回的结构化检查记录
+      required: true
+  outputs:
+    - name: run-state
+      description: 已通过一次原子操作同步的 Classic 与 Run 状态
+      required: true
+  success:
+    - 现有 Classic 字段与 Run 中的对应字段保持一致
+    - 每个步骤只调用声明的公开 Comet Skill
+    - 标记为 completed 前通过完成条件检查
+orchestration:
+  mode: deterministic
+  entry: full.open
+  steps:
+    - id: full.open
+      action: { type: invoke_skill, ref: comet-open }
+      next: full.design.handoff
+    - id: full.design.handoff
+      action: { type: invoke_skill, ref: comet-design }
+      next: full.design.document
+    - id: full.design.document
+      action: { type: invoke_skill, ref: comet-design }
+      next: full.build.plan
+    - id: full.build.plan
+      action: { type: invoke_skill, ref: comet-build }
+      next: full.build.plan-ready
+    - id: full.build.plan-ready
+      action: { type: invoke_skill, ref: comet-build }
+      next: full.build.configure
+    - id: full.build.configure
+      action: { type: invoke_skill, ref: comet-build }
+      next: full.build.execute
+    - id: full.build.execute
+      action: { type: invoke_skill, ref: comet-build }
+      next: full.build.complete
+    - id: full.build.complete
+      action: { type: invoke_skill, ref: comet-build }
+      next: full.verify.run
+    - id: full.build.fix
+      action: { type: invoke_skill, ref: comet-build }
+      next: full.build.execute
+    - id: full.verify.run
+      action: { type: invoke_skill, ref: comet-verify }
+      next: full.verify.branch
+    - id: full.verify.branch
+      action: { type: invoke_skill, ref: comet-verify }
+      next: full.archive.confirm
+    - id: full.archive.confirm
+      action: { type: invoke_skill, ref: comet-archive }
+      next: full.archive.execute
+    - id: full.archive.execute
+      action: { type: invoke_skill, ref: comet-archive }
+      next: completed
+    - id: hotfix.open
+      action: { type: invoke_skill, ref: comet-hotfix }
+      next: hotfix.build.execute
+    - id: hotfix.build.execute
+      action: { type: invoke_skill, ref: comet-build }
+      next: hotfix.build.complete
+    - id: hotfix.build.complete
+      action: { type: invoke_skill, ref: comet-build }
+      next: hotfix.verify.run
+    - id: hotfix.verify.run
+      action: { type: invoke_skill, ref: comet-verify }
+      next: hotfix.verify.branch
+    - id: hotfix.verify.branch
+      action: { type: invoke_skill, ref: comet-verify }
+      next: hotfix.archive.confirm
+    - id: hotfix.archive.confirm
+      action: { type: invoke_skill, ref: comet-archive }
+      next: hotfix.archive.execute
+    - id: hotfix.archive.execute
+      action: { type: invoke_skill, ref: comet-archive }
+      next: completed
+    - id: tweak.open
+      action: { type: invoke_skill, ref: comet-tweak }
+      next: tweak.build.execute
+    - id: tweak.build.execute
+      action: { type: invoke_skill, ref: comet-build }
+      next: tweak.build.complete
+    - id: tweak.build.complete
+      action: { type: invoke_skill, ref: comet-build }
+      next: tweak.verify.run
+    - id: tweak.verify.run
+      action: { type: invoke_skill, ref: comet-verify }
+      next: tweak.verify.branch
+    - id: tweak.verify.branch
+      action: { type: invoke_skill, ref: comet-verify }
+      next: tweak.archive.confirm
+    - id: tweak.archive.confirm
+      action: { type: invoke_skill, ref: comet-archive }
+      next: tweak.archive.execute
+    - id: tweak.archive.execute
+      action: { type: invoke_skill, ref: comet-archive }
+      next: completed
+    - id: completed
+      action: { type: checkpoint }
+      completionEvals:
+        - classic-completed
+skills:
+  - id: comet-open
+  - id: comet-design
+  - id: comet-build
+  - id: comet-verify
+  - id: comet-archive
+  - id: comet-hotfix
+  - id: comet-tweak
+agents: []
+tools: []
