@@ -8,6 +8,7 @@ import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
 import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
 import com.lacus.domain.lakeintelligence.query.ModelPageQuery;
+import com.lacus.core.security.AuthenticationUtils;
 import com.lacus.service.lakeintelligence.ILakeModelInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -45,7 +46,7 @@ public class ModelBusiness {
         entity.setDescription(request.getDescription());
         entity.setDatasetId(request.getDatasetId());
         entity.setStatus("CREATED");
-        entity.setCreatorId(request.getCreatorId());
+        entity.setCreatorId(String.valueOf(AuthenticationUtils.getUserId()));
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
         entity.setDeleted(0);

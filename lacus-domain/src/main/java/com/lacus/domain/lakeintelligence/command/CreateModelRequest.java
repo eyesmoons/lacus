@@ -23,8 +23,4 @@ public class CreateModelRequest {
 
     @ApiModelProperty(value = "任务类型: SIMILARITY/CLASSIFICATION")
     private String taskType = "SIMILARITY";
-
-    @ApiModelProperty(value = "创建者 ID", required = true)
-    @NotBlank(message = "创建者 ID 不能为空")
-    private String creatorId;
 }
