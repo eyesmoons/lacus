@@ -3,7 +3,9 @@ package com.lacus.admin.controller.lakeintelligence;
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.domain.lakeintelligence.ModelBusiness;
 import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
+import com.lacus.domain.lakeintelligence.command.TrainRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
+import com.lacus.domain.lakeintelligence.dto.TaskDTO;
 import com.lacus.domain.lakeintelligence.query.ModelPageQuery;
 import com.lacus.common.core.page.PageDTO;
 import io.swagger.annotations.Api;
@@ -53,6 +55,12 @@ public class ModelController {
     @PostMapping
     public ResponseDTO<ModelInfoDTO> createModel(@RequestBody @Valid CreateModelRequest request) {
         return ResponseDTO.ok(modelBusiness.createModel(request));
+    }
+
+    @ApiOperation("启动模型训练")
+    @PostMapping("/{id}/train")
+    public ResponseDTO<TaskDTO> trainModel(@PathVariable("id") Long id, @RequestBody @Valid TrainRequest request) {
+        return ResponseDTO.ok(modelBusiness.trainModel(id, request));
     }
 
     @ApiOperation("更新模型")

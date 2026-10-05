@@ -82,7 +82,7 @@ public class LakeModelInfoEntity {
     private BigDecimal finalLoss;
 
     /**
-     * 模型状态: TRAINING/TRAINING_FAILED/TRAINING_COMPLETED
+     * 模型状态: PENDING/TRAINING/TRAINING_COMPLETED/TRAINING_FAILED
      */
     @TableField("status")
     private String status;

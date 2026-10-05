@@ -97,6 +97,7 @@ public class TrainBusiness {
         LakeTaskEntity entity = new LakeTaskEntity();
         entity.setTaskName(request.getTaskName());
         entity.setTaskType(TaskType.SIMILARITY.getCode());
+        entity.setModelId(request.getModelId());
         entity.setDatasetId(request.getDatasetId());
         entity.setStatus(TaskStatus.TRAINING.getCode());
         entity.setTrainingProgress(0);
@@ -120,6 +121,18 @@ public class TrainBusiness {
             log.warn("序列化超参数失败", e);
         }
         lakeTaskService.save(entity);
+
+        // 更新模型状态为 TRAINING
+        if (request.getModelId() != null) {
+            LakeModelInfoEntity model = lakeModelInfoService.getById(request.getModelId());
+            if (model != null) {
+                model.setStatus("TRAINING");
+                model.setTaskId(entity.getTaskId());
+                model.setUpdateTime(new Date());
+                lakeModelInfoService.updateById(model);
+            }
+        }
+
         return toDTO(entity);
     }
 
@@ -244,6 +257,15 @@ public class TrainBusiness {
      * 训练完成后创建模型记录
      */
     private void createModelFromTask(LakeTaskEntity task, Map<String, Object> response) {
+        // 如果任务已关联模型，更新现有模型
+        if (task.getModelId() != null) {
+            LakeModelInfoEntity model = lakeModelInfoService.getById(task.getModelId());
+            if (model != null) {
+                updateModelFromTask(model, task, response);
+            }
+            return;
+        }
+
         // 检查是否已存在模型
         LambdaQueryWrapper<LakeModelInfoEntity> wrapper = new LambdaQueryWrapper<>();
         wrapper.eq(LakeModelInfoEntity::getTaskId, task.getTaskId());
@@ -309,6 +331,46 @@ public class TrainBusiness {
 
         lakeModelInfoService.save(model);
         log.info("模型创建成功：taskId={}, modelId={}", task.getTaskId(), model.getModelId());
+    }
+
+    /**
+     * 训练完成后更新已关联的模型记录
+     */
+    private void updateModelFromTask(LakeModelInfoEntity model, LakeTaskEntity task, Map<String, Object> response) {
+        String modelPath = (String) response.get("model_path");
+        if (modelPath != null && !modelPath.isEmpty()) {
+            model.setModelPath(modelPath);
+        }
+
+        String modelArch = (String) response.get("model_arch");
+        if (modelArch != null && !modelArch.isEmpty()) {
+            model.setModelArch(modelArch);
+        }
+
+        model.setStatus("TRAINING_COMPLETED");
+
+        Object finalLoss = response.get("final_loss");
+        if (finalLoss instanceof Number) {
+            model.setFinalLoss(java.math.BigDecimal.valueOf(((Number) finalLoss).doubleValue()));
+        }
+
+        Object epochs = response.get("total_epochs");
+        if (epochs instanceof Number) {
+            model.setTrainingEpochs(((Number) epochs).intValue());
+        }
+
+        try {
+            java.io.File modelFile = new java.io.File(model.getModelPath());
+            if (modelFile.exists()) {
+                model.setModelSizeBytes(modelFile.length());
+            }
+        } catch (Exception e) {
+            // 忽略文件大小获取失败
+        }
+
+        model.setUpdateTime(new Date());
+        lakeModelInfoService.updateById(model);
+        log.info("模型更新成功：taskId={}, modelId={}", task.getTaskId(), model.getModelId());
     }
 
     private String resolveDatasetUri(Long datasetId) {

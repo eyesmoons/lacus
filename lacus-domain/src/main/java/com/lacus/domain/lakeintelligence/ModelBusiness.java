@@ -6,7 +6,9 @@ import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
 import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
+import com.lacus.domain.lakeintelligence.command.TrainRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
+import com.lacus.domain.lakeintelligence.dto.TaskDTO;
 import com.lacus.domain.lakeintelligence.query.ModelPageQuery;
 import com.lacus.core.security.AuthenticationUtils;
 import com.lacus.service.lakeintelligence.ILakeModelInfoService;
@@ -37,6 +39,9 @@ public class ModelBusiness {
     @Autowired
     private FileStorageConfig fileStorageConfig;
 
+    @Autowired
+    private TrainBusiness trainBusiness;
+
     /**
      * 创建模型（仅基本信息）
      */
@@ -45,7 +50,7 @@ public class ModelBusiness {
         entity.setModelName(request.getModelName());
         entity.setDescription(request.getDescription());
         entity.setDatasetId(request.getDatasetId());
-        entity.setStatus("CREATED");
+        entity.setStatus("PENDING");
         entity.setModelPath("");
         entity.setCreatorId(String.valueOf(AuthenticationUtils.getUserId()));
         entity.setCreateTime(new Date());
@@ -53,6 +58,22 @@ public class ModelBusiness {
         entity.setDeleted(0);
         lakeModelInfoService.save(entity);
         return toDTO(entity);
+    }
+
+    /**
+     * 启动模型训练
+     */
+    public TaskDTO trainModel(Long modelId, TrainRequest request) {
+        LakeModelInfoEntity entity = lakeModelInfoService.getById(modelId);
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new CustomException("模型[" + modelId + "]不存在");
+        }
+        if (!"PENDING".equals(entity.getStatus())) {
+            throw new CustomException("模型[" + modelId + "]当前状态为[" + entity.getStatus() + "]，无法启动训练");
+        }
+        request.setModelId(modelId);
+        request.setCreatorId(String.valueOf(AuthenticationUtils.getUserId()));
+        return trainBusiness.startTraining(request);
     }
 
     /**

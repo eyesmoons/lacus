@@ -39,7 +39,9 @@ public class TrainRequest {
     @ApiModelProperty(value = "计算设备（cpu/cuda）")
     private String device = "cpu";
 
-    @ApiModelProperty(value = "创建者ID", required = true)
-    @NotBlank(message = "创建者ID不能为空")
+    @ApiModelProperty(value = "关联模型ID")
+    private Long modelId;
+
+    @ApiModelProperty(value = "创建者ID")
     private String creatorId;
 }
