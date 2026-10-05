@@ -136,29 +136,35 @@ public class DatasetBusiness {
         }
 
         try {
-            // 创建存储目录
-            File storageDir = new File(storageRoot + "/datasets");
-            if (!storageDir.exists()) {
-                storageDir.mkdirs();
+            // 创建存储根目录
+            java.nio.file.Path rootPath = java.nio.file.Paths.get(storageRoot);
+            if (!java.nio.file.Files.exists(rootPath)) {
+                java.nio.file.Files.createDirectories(rootPath);
+            }
+
+            // 创建 datasets 目录
+            java.nio.file.Path datasetsPath = rootPath.resolve("datasets");
+            if (!java.nio.file.Files.exists(datasetsPath)) {
+                java.nio.file.Files.createDirectories(datasetsPath);
             }
 
             // 生成唯一目录名
-            String datasetDir = storageRoot + "/datasets/" + System.currentTimeMillis();
-            File destDir = new File(datasetDir);
-            destDir.mkdirs();
+            String timestamp = String.valueOf(System.currentTimeMillis());
+            java.nio.file.Path datasetDir = datasetsPath.resolve(timestamp);
+            java.nio.file.Files.createDirectories(datasetDir);
 
             // 保存 zip 文件
-            String zipPath = datasetDir + "/" + originalFilename;
-            file.transferTo(new File(zipPath));
+            java.nio.file.Path zipPath = datasetDir.resolve(originalFilename);
+            file.transferTo(zipPath.toFile());
 
             // 解压 zip 文件
-            unzipFile(zipPath, datasetDir);
+            unzipFile(zipPath.toString(), datasetDir.toString());
 
             // 统计图片数量
-            int imageCount = countImageFiles(new File(datasetDir));
+            int imageCount = countImageFiles(datasetDir.toFile());
 
             Map<String, Object> result = new HashMap<>();
-            result.put("localPath", datasetDir);
+            result.put("localPath", datasetDir.toString());
             result.put("imageCount", imageCount);
             result.put("fileName", originalFilename);
 
@@ -166,7 +172,7 @@ public class DatasetBusiness {
         } catch (CustomException e) {
             throw e;
         } catch (Exception e) {
-            throw new CustomException("文件上传失败：" + e.getMessage());
+            throw new CustomException("文件上传失败：" + e.getMessage(), e);
         }
     }
 
