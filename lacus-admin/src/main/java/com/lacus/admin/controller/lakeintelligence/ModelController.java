@@ -2,6 +2,7 @@ package com.lacus.admin.controller.lakeintelligence;
 
 import com.lacus.common.core.dto.ResponseDTO;
 import com.lacus.domain.lakeintelligence.ModelBusiness;
+import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
 import com.lacus.domain.lakeintelligence.query.ModelPageQuery;
 import com.lacus.common.core.page.PageDTO;
@@ -50,10 +51,8 @@ public class ModelController {
 
     @ApiOperation("创建模型")
     @PostMapping
-    public ResponseDTO<ModelInfoDTO> create(@RequestBody Map<String, Object> payload) {
-        String modelName = (String) payload.get("modelName");
-        String description = (String) payload.get("description");
-        return ResponseDTO.ok(modelBusiness.createModel(modelName, description));
+    public ResponseDTO<ModelInfoDTO> createModel(@RequestBody @Valid CreateModelRequest request) {
+        return ResponseDTO.ok(modelBusiness.createModel(request));
     }
 
     @ApiOperation("更新模型")

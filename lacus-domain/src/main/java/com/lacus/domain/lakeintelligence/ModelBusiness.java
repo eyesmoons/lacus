@@ -5,6 +5,7 @@ import com.lacus.common.config.FileStorageConfig;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
+import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
 import com.lacus.domain.lakeintelligence.query.ModelPageQuery;
 import com.lacus.service.lakeintelligence.ILakeModelInfoService;
@@ -38,13 +39,16 @@ public class ModelBusiness {
     /**
      * 创建模型（仅基本信息）
      */
-    public ModelInfoDTO createModel(String modelName, String description) {
+    public ModelInfoDTO createModel(CreateModelRequest request) {
         LakeModelInfoEntity entity = new LakeModelInfoEntity();
-        entity.setModelName(modelName);
-        entity.setDescription(description);
+        entity.setModelName(request.getModelName());
+        entity.setDescription(request.getDescription());
+        entity.setDatasetId(request.getDatasetId());
         entity.setStatus("CREATED");
-        entity.setCreatorId("current-user");
+        entity.setCreatorId(request.getCreatorId());
         entity.setCreateTime(new Date());
+        entity.setUpdateTime(new Date());
+        entity.setDeleted(0);
         lakeModelInfoService.save(entity);
         return toDTO(entity);
     }
