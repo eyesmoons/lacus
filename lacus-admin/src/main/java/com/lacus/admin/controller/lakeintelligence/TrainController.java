@@ -1,10 +1,12 @@
 package com.lacus.admin.controller.lakeintelligence;
 
 import com.lacus.common.core.dto.ResponseDTO;
+import com.lacus.common.core.page.PageDTO;
 import com.lacus.domain.lakeintelligence.TrainBusiness;
 import com.lacus.domain.lakeintelligence.command.TrainRequest;
 import com.lacus.domain.lakeintelligence.dto.ProgressResponse;
 import com.lacus.domain.lakeintelligence.dto.TaskDTO;
+import com.lacus.domain.lakeintelligence.query.TaskPageQuery;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,12 @@ public class TrainController {
 
     @Autowired
     private TrainBusiness trainBusiness;
+
+    @ApiOperation("任务列表")
+    @GetMapping
+    public ResponseDTO<PageDTO> list(@Valid TaskPageQuery query) {
+        return ResponseDTO.ok(trainBusiness.pageList(query));
+    }
 
     @ApiOperation("启动训练")
     @PostMapping
