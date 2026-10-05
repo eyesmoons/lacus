@@ -108,6 +108,7 @@ public class ModelBusiness {
     private ModelInfoDTO toDTO(LakeModelInfoEntity entity) {
         ModelInfoDTO dto = new ModelInfoDTO();
         BeanUtils.copyProperties(entity, dto);
+        dto.setStatus(entity.getStatus());
         return dto;
     }
 
