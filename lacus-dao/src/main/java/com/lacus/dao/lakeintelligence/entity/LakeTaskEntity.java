@@ -45,6 +45,12 @@ public class LakeTaskEntity {
     private Long modelId;
 
     /**
+     * Python ML 端的任务 UUID
+     */
+    @TableField("ml_task_id")
+    private String mlTaskId;
+
+    /**
      * 状态: PENDING/TRAINING/COMPLETED/FAILED/CANCELLED
      */
     @TableField("status")

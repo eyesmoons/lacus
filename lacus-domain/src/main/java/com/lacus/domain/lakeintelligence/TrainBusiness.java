@@ -90,6 +90,9 @@ public class TrainBusiness {
             throw new CustomException("启动训练失败：" + (response != null ? response.get("message") : "无响应"));
         }
 
+        // 获取 Python 端返回的 task_id
+        String mlTaskId = (String) response.get("task_id");
+
         // 创建本地任务记录
         LakeTaskEntity entity = new LakeTaskEntity();
         entity.setTaskName(request.getTaskName());
@@ -97,6 +100,7 @@ public class TrainBusiness {
         entity.setDatasetId(request.getDatasetId());
         entity.setStatus(TaskStatus.TRAINING.getCode());
         entity.setTrainingProgress(0);
+        entity.setMlTaskId(mlTaskId);  // 保存 Python 端的 task_id
         entity.setCreatorId(request.getCreatorId());
         entity.setStartedAt(new Date());
         entity.setCreateTime(new Date());
@@ -182,7 +186,11 @@ public class TrainBusiness {
         List<LakeTaskEntity> trainingTasks = lakeTaskService.list(wrapper);
         for (LakeTaskEntity task : trainingTasks) {
             try {
-                Map<String, Object> response = mlServiceFeign.getTrainProgress(String.valueOf(task.getTaskId()));
+                String mlTaskId = task.getMlTaskId();
+                if (mlTaskId == null || mlTaskId.isEmpty()) {
+                    continue;
+                }
+                Map<String, Object> response = mlServiceFeign.getTrainProgress(mlTaskId);
                 if (response == null) {
                     continue;
                 }
@@ -191,6 +199,8 @@ public class TrainBusiness {
                     task.setStatus(TaskStatus.COMPLETED.getCode());
                     task.setTrainingProgress(100);
                     task.setCompletedAt(new Date());
+                    // 创建模型记录
+                    createModelFromTask(task, response);
                     updateModelStatus(task.getTaskId(), "TRAINING_COMPLETED");
                 } else if ("failed".equalsIgnoreCase(status)) {
                     task.setStatus(TaskStatus.FAILED.getCode());
@@ -228,6 +238,77 @@ public class TrainBusiness {
             model.setUpdateTime(new Date());
             lakeModelInfoService.updateById(model);
         }
+    }
+
+    /**
+     * 训练完成后创建模型记录
+     */
+    private void createModelFromTask(LakeTaskEntity task, Map<String, Object> response) {
+        // 检查是否已存在模型
+        LambdaQueryWrapper<LakeModelInfoEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(LakeModelInfoEntity::getTaskId, task.getTaskId());
+        LakeModelInfoEntity existingModel = lakeModelInfoService.getOne(wrapper);
+        if (existingModel != null) {
+            return;
+        }
+
+        // 获取数据集信息
+        LakeDatasetEntity dataset = lakeDatasetService.getById(task.getDatasetId());
+        if (dataset == null) {
+            return;
+        }
+
+        // 获取模型路径（从 Python 服务响应中）
+        String modelPath = (String) response.get("model_path");
+        if (modelPath == null || modelPath.isEmpty()) {
+            // 使用默认路径
+            modelPath = "/data/lake-intelligence/models/" + task.getTaskId() + "/model.pt";
+        }
+
+        // 获取模型架构
+        String modelArch = (String) response.get("model_arch");
+        if (modelArch == null || modelArch.isEmpty()) {
+            modelArch = "SIMILARITY".equals(task.getTaskType()) ? "similarity_autoencoder" : "cnn_classifier";
+        }
+
+        // 创建模型实体
+        LakeModelInfoEntity model = new LakeModelInfoEntity();
+        model.setModelName(task.getTaskName() + "_model");
+        model.setTaskId(task.getTaskId());
+        model.setDatasetId(task.getDatasetId());
+        model.setModelArch(modelArch);
+        model.setModelPath(modelPath);
+        model.setStatus("TRAINING_COMPLETED");
+
+        // 获取最终损失
+        Object finalLoss = response.get("final_loss");
+        if (finalLoss instanceof Number) {
+            model.setFinalLoss(java.math.BigDecimal.valueOf(((Number) finalLoss).doubleValue()));
+        }
+
+        // 获取训练轮数
+        Object epochs = response.get("total_epochs");
+        if (epochs instanceof Number) {
+            model.setTrainingEpochs(((Number) epochs).intValue());
+        }
+
+        // 获取模型文件大小
+        try {
+            java.io.File modelFile = new java.io.File(modelPath);
+            if (modelFile.exists()) {
+                model.setModelSizeBytes(modelFile.length());
+            }
+        } catch (Exception e) {
+            // 忽略文件大小获取失败
+        }
+
+        model.setCreatorId(task.getCreatorId());
+        model.setCreateTime(new Date());
+        model.setUpdateTime(new Date());
+        model.setDeleted(0);
+
+        lakeModelInfoService.save(model);
+        log.info("模型创建成功：taskId={}, modelId={}", task.getTaskId(), model.getModelId());
     }
 
     private String resolveDatasetUri(Long datasetId) {
