@@ -2,12 +2,15 @@
 
 继承 BaseTrainer，使用 SimilarityAutoEncoder + MSELoss 进行训练。
 """
+import logging
 import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 
 from core.trainer_base import BaseTrainer
 from models.similarity_autoencoder import SimilarityAutoEncoder
+
+logger = logging.getLogger(__name__)
 
 
 class SimilarityTrainer(BaseTrainer):
@@ -85,6 +88,7 @@ class SimilarityTrainer(BaseTrainer):
 
     def _run_training(self) -> None:
         """执行训练循环"""
+        logger.info("[train] 开始训练循环: task_id=%s, epochs=%s, device=%s", self.task_id, self.epochs, self.device)
         min_val_loss = float("inf")
 
         for epoch in range(1, self.epochs + 1):
@@ -101,8 +105,13 @@ class SimilarityTrainer(BaseTrainer):
                 status="training",
                 message=f"Epoch {epoch}/{self.epochs}",
             )
+            logger.info("[train] task_id=%s, epoch=%s/%s, train_loss=%.6f, val_loss=%.6f",
+                        self.task_id, epoch, self.epochs, train_loss, val_loss)
 
             # 保存最优模型
             if val_loss < min_val_loss:
                 min_val_loss = val_loss
                 self.save_checkpoint(self.model, epoch)
+                logger.info("[train] 保存最优模型: task_id=%s, epoch=%s, val_loss=%.6f", self.task_id, epoch, val_loss)
+
+        logger.info("[train] 训练循环完成: task_id=%s", self.task_id)

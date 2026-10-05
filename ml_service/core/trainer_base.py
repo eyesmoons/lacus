@@ -2,11 +2,14 @@
 
 提供通用训练循环、进度回调、取消检查点等基础能力。
 """
+import logging
 import os
 from dataclasses import dataclass, field
 from typing import Callable, Dict, Optional
 
 import torch
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass
@@ -97,6 +100,7 @@ class BaseTrainer:
 
     def train(self) -> None:
         """启动训练"""
+        logger.info("[train] 训练器启动: task_id=%s", self.task_id)
         try:
             self._update_progress(status="training", message="训练开始")
             self._run_training()
@@ -110,8 +114,12 @@ class BaseTrainer:
                 status="completed",
                 message="训练完成",
             )
+            logger.info("[train] 训练完成: task_id=%s, epoch=%s/%s, train_loss=%.6f, val_loss=%.6f",
+                        self.task_id, current.epoch, current.total_epochs, current.train_loss, current.val_loss)
         except InterruptedError:
+            logger.info("[train] 训练已取消: task_id=%s", self.task_id)
             pass
         except Exception as e:
+            logger.exception("[train] 训练失败: task_id=%s, error=%s", self.task_id, str(e))
             self._update_progress(status="failed", message=str(e))
             raise

@@ -2,6 +2,7 @@
 
 提供训练任务的创建、查询和取消接口。
 """
+import logging
 import os
 import threading
 import uuid
@@ -14,6 +15,8 @@ from torch.utils.data import DataLoader, random_split
 
 from core.task_registry import TaskRegistry
 from core.trainer_base import TrainingProgress
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 
@@ -40,6 +43,8 @@ class TrainResponse(BaseModel):
 
 def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
     """创建并启动训练任务"""
+    logger.info("[train] 启动训练任务: task_id=%s, trainer_type=%s, dataset_uri=%s, epochs=%s, batch_size=%s, learning_rate=%s, device=%s",
+                task_id, request.trainer_type, request.dataset_uri, request.epochs, request.batch_size, request.learning_rate, request.device)
     task_store[task_id] = TrainingProgress(status="training", message="训练已启动")
 
     def _run():
@@ -47,7 +52,9 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
             # 1. 解析数据集本地路径
             parsed = urlparse(request.dataset_uri)
             dataset_path = parsed.path or request.dataset_uri
+            logger.info("[train] 解析数据集路径: task_id=%s, dataset_path=%s", task_id, dataset_path)
             if not os.path.isdir(dataset_path):
+                logger.error("[train] 数据集路径不存在: task_id=%s, dataset_path=%s", task_id, dataset_path)
                 task_store[task_id].status = "failed"
                 task_store[task_id].message = f"数据集路径不存在: {dataset_path}"
                 return
@@ -56,8 +63,10 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
             from utils.vector_builder import ImageDataset
             from config import default_config
 
+            logger.info("[train] 加载数据集: task_id=%s", task_id)
             dataset = ImageDataset(dataset_path)
             if len(dataset) == 0:
+                logger.error("[train] 数据集中没有图片文件: task_id=%s", task_id)
                 task_store[task_id].status = "failed"
                 task_store[task_id].message = "数据集中没有图片文件"
                 return
@@ -72,8 +81,11 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
             )
             train_loader = DataLoader(train_set, batch_size=request.batch_size, shuffle=True)
             val_loader = DataLoader(val_set, batch_size=request.batch_size, shuffle=False)
+            logger.info("[train] 数据集加载完成: task_id=%s, total=%s, train=%s, val=%s",
+                        task_id, n, len(train_set), len(val_set))
 
             # 3. 通过 TaskRegistry 创建 SimilarityTrainer
+            logger.info("[train] 创建训练器: task_id=%s, trainer_type=%s", task_id, request.trainer_type)
             trainer = TaskRegistry.create_trainer(
                 request.trainer_type,
                 task_id=task_id,
@@ -89,8 +101,11 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
             _active_trainers[task_id] = trainer
 
             # 5. 启动训练（内部会更新 task_store 状态）
+            logger.info("[train] 开始训练: task_id=%s, epochs=%s", task_id, request.epochs)
             trainer.train()
+            logger.info("[train] 训练完成: task_id=%s", task_id)
         except Exception as e:
+            logger.exception("[train] 训练失败: task_id=%s, error=%s", task_id, str(e))
             task_store[task_id].status = "failed"
             task_store[task_id].message = str(e)
 
@@ -102,8 +117,11 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
 @router.post("/api/train", response_model=TrainResponse)
 async def create_train(request: TrainRequest):
     """创建训练任务"""
+    logger.info("[train] 收到训练请求: trainer_type=%s, dataset_uri=%s, epochs=%s, batch_size=%s, learning_rate=%s, device=%s",
+                request.trainer_type, request.dataset_uri, request.epochs, request.batch_size, request.learning_rate, request.device)
     # 使用传入的 task_id（来自 Java 端），如果没有则生成新的
     task_id = request.task_id if hasattr(request, 'task_id') and request.task_id else str(uuid.uuid4())
+    logger.info("[train] 分配任务ID: task_id=%s", task_id)
     _create_and_start_training(request, task_id)
     return TrainResponse(
         task_id=task_id,
@@ -115,6 +133,7 @@ async def create_train(request: TrainRequest):
 @router.get("/api/train/{task_id}")
 async def get_train_status(task_id: str):
     """获取训练任务状态"""
+    logger.debug("[train] 查询训练状态: task_id=%s", task_id)
     if task_id not in task_store:
         raise HTTPException(status_code=404, detail=f"任务 {task_id} 不存在")
     progress = task_store[task_id]
@@ -132,6 +151,7 @@ async def get_train_status(task_id: str):
 @router.post("/api/train/{task_id}/cancel")
 async def cancel_train(task_id: str):
     """取消训练任务"""
+    logger.info("[train] 取消训练任务: task_id=%s", task_id)
     if task_id not in task_store:
         raise HTTPException(status_code=404, detail=f"任务 {task_id} 不存在")
 
