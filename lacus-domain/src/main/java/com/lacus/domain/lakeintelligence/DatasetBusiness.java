@@ -72,7 +72,9 @@ public class DatasetBusiness {
         entity.setStorageSource(request.getStorageSource());
         entity.setSourceConfig(request.getSourceConfig());
         entity.setTaskType(request.getTaskType());
-        entity.setStatus(DatasetStatus.PROCESSING.getCode());
+        entity.setStatus(request.getStatus() != null && !request.getStatus().isEmpty()
+                ? request.getStatus()
+                : DatasetStatus.PROCESSING.getCode());
         entity.setCreatorId(request.getCreatorId());
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
