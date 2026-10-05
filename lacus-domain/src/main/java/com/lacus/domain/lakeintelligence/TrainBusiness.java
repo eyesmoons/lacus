@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
 import com.lacus.dao.lakeintelligence.entity.LakeDatasetEntity;
+import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
 import com.lacus.dao.lakeintelligence.entity.LakeTaskEntity;
 import com.lacus.domain.lakeintelligence.command.TrainRequest;
 import com.lacus.domain.lakeintelligence.dto.ProgressResponse;
@@ -13,6 +14,7 @@ import com.lacus.domain.lakeintelligence.query.TaskPageQuery;
 import com.lacus.enums.TaskStatus;
 import com.lacus.enums.TaskType;
 import com.lacus.service.lakeintelligence.ILakeDatasetService;
+import com.lacus.service.lakeintelligence.ILakeModelInfoService;
 import com.lacus.service.lakeintelligence.ILakeTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -41,6 +43,9 @@ public class TrainBusiness {
 
     @Autowired
     private ILakeDatasetService lakeDatasetService;
+
+    @Autowired
+    private ILakeModelInfoService lakeModelInfoService;
 
     @Autowired
     private MlServiceFeign mlServiceFeign;
@@ -186,13 +191,16 @@ public class TrainBusiness {
                     task.setStatus(TaskStatus.COMPLETED.getCode());
                     task.setTrainingProgress(100);
                     task.setCompletedAt(new Date());
+                    updateModelStatus(task.getTaskId(), "TRAINING_COMPLETED");
                 } else if ("failed".equalsIgnoreCase(status)) {
                     task.setStatus(TaskStatus.FAILED.getCode());
                     task.setErrorMessage((String) response.get("message"));
+                    updateModelStatus(task.getTaskId(), "TRAINING_FAILED");
                 } else if ("cancelled".equalsIgnoreCase(status)) {
                     task.setStatus(TaskStatus.CANCELLED.getCode());
                 } else {
                     // 训练中，更新进度
+                    updateModelStatus(task.getTaskId(), "TRAINING");
                     Object epoch = response.get("epoch");
                     Object totalEpochs = response.get("total_epochs");
                     if (epoch instanceof Number && totalEpochs instanceof Number && ((Number) totalEpochs).intValue() > 0) {
@@ -205,6 +213,20 @@ public class TrainBusiness {
             } catch (Exception e) {
                 log.warn("轮询任务[{}]进度失败：{}", task.getTaskId(), e.getMessage());
             }
+        }
+    }
+
+    /**
+     * 同步更新关联模型的状态
+     */
+    private void updateModelStatus(Long taskId, String modelStatus) {
+        LambdaQueryWrapper<LakeModelInfoEntity> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(LakeModelInfoEntity::getTaskId, taskId);
+        LakeModelInfoEntity model = lakeModelInfoService.getOne(wrapper);
+        if (model != null) {
+            model.setStatus(modelStatus);
+            model.setUpdateTime(new Date());
+            lakeModelInfoService.updateById(model);
         }
     }
 

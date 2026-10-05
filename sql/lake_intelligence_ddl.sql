@@ -79,6 +79,7 @@ CREATE TABLE `lake_model_info` (
   `embedding_dim` int(11) DEFAULT '512' COMMENT 'Embedding维度',
   `training_epochs` int(11) DEFAULT NULL COMMENT '实际训练轮数',
   `final_loss` decimal(10,6) DEFAULT NULL COMMENT '最终损失值',
+  `status` varchar(32) DEFAULT 'TRAINING' COMMENT '模型状态: TRAINING/TRAINING_FAILED/TRAINING_COMPLETED',
   `vector_index_id` bigint(20) DEFAULT NULL COMMENT '关联向量库ID',
   `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
   `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',
@@ -119,3 +120,69 @@ CREATE TABLE `lake_vector_indexes` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='向量库索引表';
 
 SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+-- Lake Intelligence 菜单数据
+-- 插入到 sys_menu 表，菜单由后端动态管理
+-- ============================================================
+
+SET NAMES utf8mb4;
+SET FOREIGN_KEY_CHECKS = 0;
+
+-- 湖智AI (父目录)
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3000, '湖智AI', 0, 10, 'lake-intelligence', NULL, 0, 1, 1, 1, 1, NULL, 'cpu', 0, NOW(), '湖智AI', 0);
+
+-- 以图搜图 (子目录)
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3001, '以图搜图', 3000, 1, 'similarity', NULL, 0, 1, 1, 1, 1, NULL, 'search', 0, NOW(), '以图搜图功能', 0);
+
+-- 以图搜图 - 数据集管理
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3002, '数据集管理', 3001, 1, 'dataset/list', 'lake-intelligence/similarity/DatasetList', 0, 1, 2, 1, 1, 'lakeintelligence:dataset:list', 'folder', 0, NOW(), '数据集管理菜单', 0);
+
+-- 以图搜图 - 模型管理
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3003, '模型管理', 3001, 2, 'model/list', 'lake-intelligence/similarity/ModelList', 0, 1, 2, 1, 1, 'lakeintelligence:model:list', 'cpu', 0, NOW(), '模型管理菜单', 0);
+
+-- 以图搜图 - 向量构建
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3004, '向量构建', 3001, 3, 'vector/build', 'lake-intelligence/similarity/VectorBuild', 0, 1, 2, 1, 1, 'lakeintelligence:vector:build', 'connection', 0, NOW(), '向量构建菜单', 0);
+
+-- 以图搜图 - 相似检索
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3005, '相似检索', 3001, 4, 'search', 'lake-intelligence/similarity/SimilaritySearch', 0, 1, 2, 1, 1, 'lakeintelligence:search:query', 'search', 0, NOW(), '相似检索菜单', 0);
+
+-- 图片分类 (子目录)
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3006, '图片分类', 3000, 2, 'classification', NULL, 0, 1, 1, 1, 1, NULL, 'picture', 0, NOW(), '图片分类功能', 0);
+
+-- 图片分类 - 数据集管理
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3007, '数据集管理', 3006, 1, 'dataset/list', 'lake-intelligence/classification/DatasetList', 0, 1, 2, 1, 1, 'lakeintelligence:dataset:list', 'folder', 0, NOW(), '数据集管理菜单', 0);
+
+-- 图片分类 - 模型管理
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3008, '模型管理', 3006, 2, 'model/list', 'lake-intelligence/classification/ModelList', 0, 1, 2, 1, 1, 'lakeintelligence:model:list', 'cpu', 0, NOW(), '模型管理菜单', 0);
+
+-- 图片分类 - 图片分类
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted)
+VALUES (3009, '图片分类', 3006, 3, 'classify', 'lake-intelligence/classification/ImageClassify', 0, 1, 2, 1, 1, 'lakeintelligence:classify:predict', 'picture', 0, NOW(), '图片分类菜单', 0);
+
+-- 按钮权限
+INSERT INTO sys_menu (menu_id, menu_name, parent_id, order_num, `path`, component, is_external, is_cache, menu_type, is_visible, status, perms, icon, creator_id, create_time, remark, deleted) VALUES
+(3010, '数据集上传', 3002, 1, '', '', 0, 1, 3, 1, 1, 'lakeintelligence:dataset:add', '#', 0, NOW(), '', 0),
+(3011, '数据集删除', 3002, 2, '', '', 0, 1, 3, 1, 1, 'lakeintelligence:dataset:remove', '#', 0, NOW(), '', 0),
+(3012, '模型添加', 3003, 1, '', '', 0, 1, 3, 1, 1, 'lakeintelligence:model:add', '#', 0, NOW(), '', 0),
+(3013, '模型删除', 3003, 2, '', '', 0, 1, 3, 1, 1, 'lakeintelligence:model:remove', '#', 0, NOW(), '', 0),
+(3014, '向量构建触发', 3004, 1, '', '', 0, 1, 3, 1, 1, 'lakeintelligence:vector:build', '#', 0, NOW(), '', 0);
+
+SET FOREIGN_KEY_CHECKS = 1;
+
+-- ============================================================
+-- 清理旧的湖智菜单数据（如果存在）
+-- ============================================================
+DELETE FROM sys_menu WHERE menu_id >= 3000 AND menu_id < 3100;
+DELETE FROM sys_menu WHERE path LIKE 'lakeintelligence%';
+DELETE FROM sys_menu WHERE path LIKE 'similarity%';
+DELETE FROM sys_menu WHERE path LIKE 'classification%';
