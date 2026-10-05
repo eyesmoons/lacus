@@ -76,6 +76,12 @@ public class LakeModelInfoEntity {
     private BigDecimal finalLoss;
 
     /**
+     * 模型状态: TRAINING/TRAINING_FAILED/TRAINING_COMPLETED
+     */
+    @TableField("status")
+    private String status;
+
+    /**
      * 关联向量库ID
      */
     @TableField("vector_index_id")
