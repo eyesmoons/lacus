@@ -22,10 +22,11 @@ from config import default_config
 class ImageDataset:
     """图像数据集"""
 
-    def __init__(self, image_dir: str, transform=None):
+    def __init__(self, image_dir: str, transform=None, return_name=False):
         from PIL import Image
         self.image_dir = image_dir
         self.transform = transform or self._default_transform()
+        self.return_name = return_name
         self.image_names = sorted([
             f for f in os.listdir(image_dir)
             if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif'))
@@ -45,7 +46,10 @@ class ImageDataset:
         from PIL import Image
         image_path = os.path.join(self.image_dir, self.image_names[idx])
         image = Image.open(image_path).convert('RGB')
-        return self.transform(image), self.image_names[idx]
+        tensor = self.transform(image)
+        if self.return_name:
+            return tensor, self.image_names[idx]
+        return tensor
 
 
 def do_build_vectors(
@@ -80,7 +84,7 @@ def do_build_vectors(
             return collection_name
 
         # 2. 加载数据集
-        dataset = ImageDataset(local_path)
+        dataset = ImageDataset(local_path, return_name=True)
         if len(dataset) == 0:
             task_store[task_id] = TrainingProgress(
                 status="completed",
