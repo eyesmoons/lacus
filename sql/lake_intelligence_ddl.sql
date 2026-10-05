@@ -79,6 +79,7 @@ CREATE TABLE `lake_model_info` (
   `embedding_dim` int(11) DEFAULT '512' COMMENT 'Embedding维度',
   `training_epochs` int(11) DEFAULT NULL COMMENT '实际训练轮数',
   `final_loss` decimal(10,6) DEFAULT NULL COMMENT '最终损失值',
+  `status` varchar(32) DEFAULT 'TRAINING' COMMENT '模型状态: TRAINING/TRAINING_FAILED/TRAINING_COMPLETED',
   `vector_index_id` bigint(20) DEFAULT NULL COMMENT '关联向量库ID',
   `deleted` tinyint(4) NOT NULL DEFAULT '0' COMMENT '删除标识：正常 0 删除 1',
   `creator_id` varchar(64) NOT NULL DEFAULT '' COMMENT '创建人',

@@ -42,6 +42,9 @@ public class ModelInfoDTO {
     @ApiModelProperty("最终损失值")
     private BigDecimal finalLoss;
 
+    @ApiModelProperty("模型状态: TRAINING/TRAINING_FAILED/TRAINING_COMPLETED")
+    private String status;
+
     @ApiModelProperty("关联向量库ID")
     private Long vectorIndexId;
 
