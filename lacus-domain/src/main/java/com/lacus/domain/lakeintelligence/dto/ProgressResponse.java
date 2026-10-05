@@ -3,6 +3,8 @@ package com.lacus.domain.lakeintelligence.dto;
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 /**
  * 训练/构建进度响应 DTO
  */
@@ -29,4 +31,22 @@ public class ProgressResponse {
 
     @ApiModelProperty("消息")
     private String message;
+
+    @ApiModelProperty("模型ID")
+    private Long modelId;
+
+    @ApiModelProperty("模型名称")
+    private String modelName;
+
+    @ApiModelProperty("模型路径")
+    private String modelPath;
+
+    @ApiModelProperty("最终损失值")
+    private BigDecimal finalLoss;
+
+    @ApiModelProperty("训练轮数")
+    private Integer trainingEpochs;
+
+    @ApiModelProperty("模型文件大小(字节)")
+    private Long modelSizeBytes;
 }

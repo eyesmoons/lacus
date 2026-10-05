@@ -149,6 +149,21 @@ public class TrainBusiness {
         response.setStatus(entity.getStatus());
         response.setProgress(entity.getTrainingProgress());
         response.setMessage(entity.getErrorMessage());
+
+        // 训练完成时，返回关联模型的最终结果
+        if ("COMPLETED".equals(entity.getStatus()) && entity.getModelId() != null) {
+            LakeModelInfoEntity model = lakeModelInfoService.getById(entity.getModelId());
+            if (model != null) {
+                response.setModelId(model.getModelId());
+                response.setModelName(model.getModelName());
+                response.setModelPath(model.getModelPath());
+                response.setFinalLoss(model.getFinalLoss());
+                response.setTrainingEpochs(model.getTrainingEpochs());
+                response.setModelSizeBytes(model.getModelSizeBytes());
+                response.setTrainLoss(model.getFinalLoss() != null ? model.getFinalLoss().doubleValue() : null);
+            }
+        }
+
         return response;
     }
 
