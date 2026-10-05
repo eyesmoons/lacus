@@ -18,6 +18,9 @@ public class ModelInfoDTO {
     @ApiModelProperty("模型名称")
     private String modelName;
 
+    @ApiModelProperty("模型描述")
+    private String description;
+
     @ApiModelProperty("关联训练任务ID")
     private Long taskId;
 
