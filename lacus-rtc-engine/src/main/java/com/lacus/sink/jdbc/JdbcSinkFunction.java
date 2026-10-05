@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author shengyu
@@ -24,6 +25,15 @@ import java.util.Map;
 @Slf4j
 public class JdbcSinkFunction extends RichSinkFunction<Map<String, String>> {
     private static final long serialVersionUID = -1L;
+
+    private static final Pattern SAFE_IDENTIFIER = Pattern.compile("^[a-zA-Z0-9_]+$");
+
+    private static String validateIdentifier(String identifier) throws SQLException {
+        if (identifier == null || !SAFE_IDENTIFIER.matcher(identifier).matches()) {
+            throw new SQLException("Invalid SQL identifier: " + identifier);
+        }
+        return identifier;
+    }
 
     private final Map<String, JdbcSinkOption> jdbcSinkOptionMap;
 
@@ -70,6 +80,12 @@ public class JdbcSinkFunction extends RichSinkFunction<Map<String, String>> {
                 Iterator<Map.Entry<String, JsonNode>> firstFields = firstRecord.fields();
                 while (firstFields.hasNext()) {
                     columns.add(firstFields.next().getKey());
+                }
+
+                validateIdentifier(db);
+                validateIdentifier(table);
+                for (String column : columns) {
+                    validateIdentifier(column);
                 }
 
                 String sql = String.format("INSERT INTO %s.%s (%s) VALUES (%s)",
