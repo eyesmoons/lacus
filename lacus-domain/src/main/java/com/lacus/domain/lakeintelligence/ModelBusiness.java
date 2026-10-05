@@ -46,6 +46,7 @@ public class ModelBusiness {
         entity.setDescription(request.getDescription());
         entity.setDatasetId(request.getDatasetId());
         entity.setStatus("CREATED");
+        entity.setModelPath("");
         entity.setCreatorId(String.valueOf(AuthenticationUtils.getUserId()));
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
