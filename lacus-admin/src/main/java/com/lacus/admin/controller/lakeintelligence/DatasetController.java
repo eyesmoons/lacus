@@ -72,4 +72,10 @@ public class DatasetController {
     public ResponseDTO<Map<String, Object>> getClassStats(@PathVariable("id") Long id) {
         return ResponseDTO.ok(datasetBusiness.getClassStats(id));
     }
+
+    @ApiOperation("解析数据集（统计图片数量）")
+    @PostMapping("/{id}/parse")
+    public ResponseDTO<DatasetDTO> parseDataset(@PathVariable("id") Long id) {
+        return ResponseDTO.ok(datasetBusiness.parseDataset(id));
+    }
 }

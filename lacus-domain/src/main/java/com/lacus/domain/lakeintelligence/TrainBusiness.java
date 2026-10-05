@@ -93,7 +93,7 @@ public class TrainBusiness {
         // 创建本地任务记录
         LakeTaskEntity entity = new LakeTaskEntity();
         entity.setTaskName(request.getTaskName());
-        entity.setTaskType(TaskType.IMAGE_SIMILARITY.getCode());
+        entity.setTaskType(TaskType.SIMILARITY.getCode());
         entity.setDatasetId(request.getDatasetId());
         entity.setStatus(TaskStatus.TRAINING.getCode());
         entity.setTrainingProgress(0);
@@ -254,8 +254,8 @@ public class TrainBusiness {
 
     public Map<String, Object> getHyperparamSchema(String taskType) {
         Map<String, Object> schema = new HashMap<>();
-        if ("IMAGE_CLASSIFICATION".equals(taskType)) {
-            schema.put("taskType", "IMAGE_CLASSIFICATION");
+        if ("CLASSIFICATION".equals(taskType)) {
+            schema.put("taskType", "CLASSIFICATION");
             List<Map<String, Object>> fields = new ArrayList<>();
             fields.add(new HashMap<String, Object>() {{
                 put("name", "epochs");
@@ -294,7 +294,7 @@ public class TrainBusiness {
             }});
             schema.put("fields", fields);
         } else {
-            schema.put("taskType", "IMAGE_SIMILARITY");
+            schema.put("taskType", "SIMILARITY");
             List<Map<String, Object>> fields = new ArrayList<>();
             fields.add(new HashMap<String, Object>() {{
                 put("name", "epochs");

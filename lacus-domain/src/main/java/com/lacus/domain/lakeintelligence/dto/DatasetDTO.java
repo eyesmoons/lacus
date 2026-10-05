@@ -26,7 +26,7 @@ public class DatasetDTO {
     @ApiModelProperty("数据源配置 (JSON)")
     private String sourceConfig;
 
-    @ApiModelProperty("任务类型: IMAGE_SIMILARITY/IMAGE_CLASSIFICATION")
+    @ApiModelProperty("任务类型: SIMILARITY/CLASSIFICATION")
     private String taskType;
 
     @ApiModelProperty("状态: PROCESSING/WAITING_DOWNLOAD/DOWNLOADING/READY/ERROR")

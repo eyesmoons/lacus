@@ -114,28 +114,28 @@ public class ModelBusiness {
 
     public List<Map<String, Object>> listArchitectures(String taskType) {
         List<Map<String, Object>> architectures = new ArrayList<>();
-        if ("IMAGE_CLASSIFICATION".equals(taskType)) {
+        if ("CLASSIFICATION".equals(taskType)) {
             architectures.add(new HashMap<String, Object>() {{
                 put("id", "cnn_classifier");
                 put("name", "CNN 分类器");
-                put("taskType", "IMAGE_CLASSIFICATION");
+                put("taskType", "CLASSIFICATION");
             }});
-        } else if ("IMAGE_SIMILARITY".equals(taskType)) {
+        } else if ("SIMILARITY".equals(taskType)) {
             architectures.add(new HashMap<String, Object>() {{
                 put("id", "similarity_autoencoder");
                 put("name", "相似度自编码器");
-                put("taskType", "IMAGE_SIMILARITY");
+                put("taskType", "SIMILARITY");
             }});
         } else {
             architectures.add(new HashMap<String, Object>() {{
                 put("id", "similarity_autoencoder");
                 put("name", "相似度自编码器");
-                put("taskType", "IMAGE_SIMILARITY");
+                put("taskType", "SIMILARITY");
             }});
             architectures.add(new HashMap<String, Object>() {{
                 put("id", "cnn_classifier");
                 put("name", "CNN 分类器");
-                put("taskType", "IMAGE_CLASSIFICATION");
+                put("taskType", "CLASSIFICATION");
             }});
         }
         return architectures;
