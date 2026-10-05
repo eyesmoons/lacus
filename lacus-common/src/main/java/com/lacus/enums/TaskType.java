@@ -5,8 +5,8 @@ package com.lacus.enums;
  */
 public enum TaskType {
 
-    IMAGE_SIMILARITY("IMAGE_SIMILARITY", "图像相似度"),
-    IMAGE_CLASSIFICATION("IMAGE_CLASSIFICATION", "图像分类");
+    SIMILARITY("SIMILARITY", "图像相似度"),
+    CLASSIFICATION("CLASSIFICATION", "图像分类");
 
     private final String code;
     private final String desc;
