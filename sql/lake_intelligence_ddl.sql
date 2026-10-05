@@ -72,6 +72,7 @@ DROP TABLE IF EXISTS `lake_model_info`;
 CREATE TABLE `lake_model_info` (
   `model_id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT '自增主键',
   `model_name` varchar(128) NOT NULL COMMENT '模型名称',
+  `description` varchar(512) DEFAULT NULL COMMENT '模型描述',
   `task_id` bigint(20) DEFAULT NULL COMMENT '关联训练任务ID',
   `dataset_id` bigint(20) NOT NULL COMMENT '关联图片库ID',
   `model_arch` varchar(64) NOT NULL DEFAULT 'SimilarityAutoEncoder' COMMENT '模型架构',
