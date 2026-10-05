@@ -25,7 +25,7 @@ public class DatasetPageQuery extends AbstractPageQuery {
     @ApiModelProperty("创建者ID")
     private String creatorId;
 
-    @ApiModelProperty("任务类型: IMAGE_SIMILARITY/IMAGE_CLASSIFICATION")
+    @ApiModelProperty("任务类型: SIMILARITY/CLASSIFICATION")
     private String taskType;
 
     @Override

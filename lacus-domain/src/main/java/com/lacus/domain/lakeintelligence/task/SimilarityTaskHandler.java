@@ -13,7 +13,7 @@ public class SimilarityTaskHandler implements TaskHandler {
 
     @Override
     public String getTaskType() {
-        return "IMAGE_SIMILARITY";
+        return "SIMILARITY";
     }
 
     @Override

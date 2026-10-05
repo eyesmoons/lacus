@@ -17,7 +17,7 @@ public class TaskDTO {
     @ApiModelProperty("任务名称")
     private String taskName;
 
-    @ApiModelProperty("任务类型: IMAGE_SIMILARITY")
+    @ApiModelProperty("任务类型: SIMILARITY")
     private String taskType;
 
     @ApiModelProperty("关联图片库ID")

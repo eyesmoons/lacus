@@ -13,7 +13,7 @@ public class ClassifierTaskHandler implements TaskHandler {
 
     @Override
     public String getTaskType() {
-        return "IMAGE_CLASSIFICATION";
+        return "CLASSIFICATION";
     }
 
     @Override
