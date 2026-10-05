@@ -15,7 +15,9 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,7 +48,7 @@ public class DatasetBusiness {
      * 创建数据集
      *
      * <p>支持通过 task_type 参数路由到不同的数据集校验逻辑：
-     * IMAGE_SIMILARITY 仅需图片目录；IMAGE_CLASSIFICATION 需要标签信息（CSV 或子目录结构）。</p>
+     * SIMILARITY 仅需图片目录；CLASSIFICATION 需要标签信息（CSV 或子目录结构）。</p>
      */
     public DatasetDTO createDataset(CreateDatasetRequest request) {
         if (lakeDatasetService.isDatasetNameDuplicated(null, request.getDatasetName())) {
@@ -80,10 +82,10 @@ public class DatasetBusiness {
         if (taskType == null || taskType.isEmpty()) {
             return;
         }
-        if ("IMAGE_CLASSIFICATION".equalsIgnoreCase(taskType)) {
+        if ("CLASSIFICATION".equalsIgnoreCase(taskType)) {
             validateClassificationDataset(sourceConfig);
         }
-        // IMAGE_SIMILARITY 暂无特殊校验，预留扩展点
+        // SIMILARITY 暂无特殊校验，预留扩展点
     }
 
     /**
@@ -192,5 +194,74 @@ public class DatasetBusiness {
         }});
         stats.put("classDistribution", distribution);
         return stats;
+    }
+
+    /**
+     * 解析数据集：扫描本地目录中的图片文件，统计数量，更新状态为 READY
+     */
+    @Transactional
+    public DatasetDTO parseDataset(Long datasetId) {
+        LakeDatasetEntity entity = lakeDatasetService.getById(datasetId);
+        if (entity == null) {
+            throw new CustomException("数据集[" + datasetId + "]不存在");
+        }
+
+        String localPath = entity.getLocalPath();
+        if (localPath == null || localPath.isEmpty()) {
+            // 如果没有本地路径，尝试从 source_config 构建
+            String sourceConfig = entity.getSourceConfig();
+            if (sourceConfig != null && !sourceConfig.isEmpty()) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    Map<?, ?> config = mapper.readValue(sourceConfig, Map.class);
+                    localPath = (String) config.get("localPath");
+                } catch (Exception e) {
+                    throw new CustomException("解析本地路径失败：" + e.getMessage());
+                }
+            }
+        }
+
+        if (localPath == null || localPath.isEmpty()) {
+            throw new CustomException("数据集本地路径不存在，无法解析");
+        }
+
+        // 扫描图片文件
+        File dir = new File(localPath);
+        if (!dir.exists() || !dir.isDirectory()) {
+            throw new CustomException("数据集目录不存在：" + localPath);
+        }
+
+        int imageCount = countImageFiles(dir);
+
+        // 更新数据集
+        entity.setImageCount(imageCount);
+        entity.setStatus(DatasetStatus.READY.getCode());
+        entity.setUpdateTime(new Date());
+        lakeDatasetService.updateById(entity);
+
+        log.info("数据集[{}]解析完成，图片数量：{}", datasetId, imageCount);
+        return toDTO(entity);
+    }
+
+    private int countImageFiles(File dir) {
+        int count = 0;
+        File[] files = dir.listFiles();
+        if (files == null) return 0;
+
+        for (File file : files) {
+            if (file.isFile()) {
+                String name = file.getName().toLowerCase();
+                if (name.endsWith(".jpg") || name.endsWith(".jpeg") || name.endsWith(".png") ||
+                    name.endsWith(".bmp") || name.endsWith(".gif") || name.endsWith(".webp")) {
+                    count++;
+                    // 限制最大统计数量，避免大目录耗时过长
+                    if (count >= 50000) break;
+                }
+            } else if (file.isDirectory()) {
+                // 递归统计子目录（可选，根据需要开启）
+                // count += countImageFiles(file);
+            }
+        }
+        return count;
     }
 }
