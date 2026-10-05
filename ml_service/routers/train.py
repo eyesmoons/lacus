@@ -102,7 +102,8 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
 @router.post("/api/train", response_model=TrainResponse)
 async def create_train(request: TrainRequest):
     """创建训练任务"""
-    task_id = str(uuid.uuid4())
+    # 使用传入的 task_id（来自 Java 端），如果没有则生成新的
+    task_id = request.task_id if hasattr(request, 'task_id') and request.task_id else str(uuid.uuid4())
     _create_and_start_training(request, task_id)
     return TrainResponse(
         task_id=task_id,

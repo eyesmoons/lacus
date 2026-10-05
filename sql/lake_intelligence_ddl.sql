@@ -45,6 +45,7 @@ CREATE TABLE `lake_tasks` (
   `task_type` varchar(64) NOT NULL COMMENT '任务类型: IMAGE_SIMILARITY',
   `dataset_id` bigint(20) NOT NULL COMMENT '关联图片库ID',
   `model_id` bigint(20) DEFAULT NULL COMMENT '关联模型ID',
+  `ml_task_id` varchar(64) DEFAULT NULL COMMENT 'Python ML 端的任务 UUID',
   `status` varchar(32) NOT NULL DEFAULT 'PENDING' COMMENT '状态: PENDING/TRAINING/COMPLETED/FAILED/CANCELLED',
   `hyper_params' text COMMENT '超参数配置 (JSON, epochs/lr/batch_size等)',
   `training_progress` int(11) DEFAULT '0' COMMENT '训练进度百分比',
