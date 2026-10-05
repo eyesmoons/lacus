@@ -14,15 +14,21 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * 数据集业务逻辑
@@ -36,6 +42,9 @@ public class DatasetBusiness {
 
     @Autowired
     private MlServiceFeign mlServiceFeign;
+
+    @Value("${storage.root:/data/lake-intelligence}")
+    private String storageRoot;
 
     /**
      * 分页查询数据集列表
@@ -111,6 +120,82 @@ public class DatasetBusiness {
         } catch (Exception e) {
             throw new CustomException("解析数据源配置失败：" + e.getMessage());
         }
+    }
+
+    /**
+     * 上传数据集文件（zip 格式），解压并统计图片数量
+     */
+    public Map<String, Object> uploadDatasetFile(MultipartFile file) {
+        if (file == null || file.isEmpty()) {
+            throw new CustomException("上传文件不能为空");
+        }
+
+        String originalFilename = file.getOriginalFilename();
+        if (originalFilename == null || !originalFilename.toLowerCase().endsWith(".zip")) {
+            throw new CustomException("只支持 .zip 格式文件");
+        }
+
+        try {
+            // 创建存储目录
+            File storageDir = new File(storageRoot + "/datasets");
+            if (!storageDir.exists()) {
+                storageDir.mkdirs();
+            }
+
+            // 生成唯一目录名
+            String datasetDir = storageRoot + "/datasets/" + System.currentTimeMillis();
+            File destDir = new File(datasetDir);
+            destDir.mkdirs();
+
+            // 保存 zip 文件
+            String zipPath = datasetDir + "/" + originalFilename;
+            file.transferTo(new File(zipPath));
+
+            // 解压 zip 文件
+            unzipFile(zipPath, datasetDir);
+
+            // 统计图片数量
+            int imageCount = countImageFiles(new File(datasetDir));
+
+            Map<String, Object> result = new HashMap<>();
+            result.put("localPath", datasetDir);
+            result.put("imageCount", imageCount);
+            result.put("fileName", originalFilename);
+
+            return result;
+        } catch (CustomException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new CustomException("文件上传失败：" + e.getMessage());
+        }
+    }
+
+    private void unzipFile(String zipPath, String destDir) throws Exception {
+        File zipFile = new File(zipPath);
+        try (ZipInputStream zis = new ZipInputStream(new FileInputStream(zipFile))) {
+            ZipEntry entry;
+            byte[] buffer = new byte[8192];
+            while ((entry = zis.getNextEntry()) != null) {
+                File entryFile = new File(destDir, entry.getName());
+                // 防止路径穿越攻击
+                if (!entryFile.getCanonicalPath().startsWith(new File(destDir).getCanonicalPath())) {
+                    throw new CustomException("zip 文件包含非法路径");
+                }
+                if (entry.isDirectory()) {
+                    entryFile.mkdirs();
+                } else {
+                    entryFile.getParentFile().mkdirs();
+                    try (FileOutputStream fos = new FileOutputStream(entryFile)) {
+                        int len;
+                        while ((len = zis.read(buffer)) > 0) {
+                            fos.write(buffer, 0, len);
+                        }
+                    }
+                }
+            }
+        }
+        // 解压完成后删除 zip 文件
+        zipFile.delete();
     }
 
     /**

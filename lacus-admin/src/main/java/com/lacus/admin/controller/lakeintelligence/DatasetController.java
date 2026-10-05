@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.validation.Valid;
 import java.util.Map;
@@ -46,6 +47,13 @@ public class DatasetController {
     @PostMapping
     public ResponseDTO<DatasetDTO> createDataset(@RequestBody @Valid CreateDatasetRequest request) {
         return ResponseDTO.ok(datasetBusiness.createDataset(request));
+    }
+
+    @ApiOperation("上传数据集文件")
+    @PostMapping(value = "/upload", consumes = "multipart/form-data")
+    public ResponseDTO<Map<String, Object>> uploadFile(@RequestParam("file") MultipartFile file) {
+        Map<String, Object> result = datasetBusiness.uploadDatasetFile(file);
+        return ResponseDTO.ok(result);
     }
 
     @ApiOperation("数据源探测")
