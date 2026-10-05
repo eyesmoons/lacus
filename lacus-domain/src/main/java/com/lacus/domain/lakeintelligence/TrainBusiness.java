@@ -231,8 +231,6 @@ public class TrainBusiness {
     }
 
     private String resolveDatasetUri(Long datasetId) {
-        // TODO: 根据 datasetId 解析实际数据集 URI（从 source_config 中获取）
-        // 简化实现：返回本地路径
         if (datasetId == null) {
             throw new CustomException("数据集ID不能为空");
         }
@@ -240,10 +238,24 @@ public class TrainBusiness {
         if (dataset == null) {
             throw new CustomException("数据集[" + datasetId + "]不存在");
         }
-        if (dataset.getLocalPath() == null || dataset.getLocalPath().isEmpty()) {
-            throw new CustomException("数据集[" + datasetId + "]本地路径不存在");
+        String localPath = dataset.getLocalPath();
+        // 如果 local_path 为空，尝试从 source_config JSON 中获取
+        if (localPath == null || localPath.isEmpty()) {
+            String sourceConfig = dataset.getSourceConfig();
+            if (sourceConfig != null && !sourceConfig.isEmpty()) {
+                try {
+                    com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                    java.util.Map<?, ?> config = mapper.readValue(sourceConfig, java.util.Map.class);
+                    localPath = (String) config.get("localPath");
+                } catch (Exception e) {
+                    // 解析失败，继续抛出原始错误
+                }
+            }
         }
-        return dataset.getLocalPath();
+        if (localPath == null || localPath.isEmpty()) {
+            throw new CustomException("数据集[" + datasetId + "]本地路径不存在，请先上传数据集文件或解析数据集");
+        }
+        return localPath;
     }
 
     private TaskDTO toDTO(LakeTaskEntity entity) {
