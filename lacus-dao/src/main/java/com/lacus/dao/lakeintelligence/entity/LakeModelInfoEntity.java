@@ -28,6 +28,12 @@ public class LakeModelInfoEntity {
     private String modelName;
 
     /**
+     * 模型描述
+     */
+    @TableField("description")
+    private String description;
+
+    /**
      * 关联训练任务ID
      */
     @TableField("task_id")

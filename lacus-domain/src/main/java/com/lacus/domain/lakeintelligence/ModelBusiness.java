@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,35 @@ public class ModelBusiness {
 
     @Autowired
     private FileStorageConfig fileStorageConfig;
+
+    /**
+     * 创建模型（仅基本信息）
+     */
+    public ModelInfoDTO createModel(String modelName, String description) {
+        LakeModelInfoEntity entity = new LakeModelInfoEntity();
+        entity.setModelName(modelName);
+        entity.setDescription(description);
+        entity.setStatus("CREATED");
+        entity.setCreatorId("current-user");
+        entity.setCreateTime(new Date());
+        lakeModelInfoService.save(entity);
+        return toDTO(entity);
+    }
+
+    /**
+     * 更新模型基本信息
+     */
+    public ModelInfoDTO updateModel(Long modelId, String modelName, String description) {
+        LakeModelInfoEntity entity = lakeModelInfoService.getById(modelId);
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new CustomException("模型[" + modelId + "]不存在");
+        }
+        entity.setModelName(modelName);
+        entity.setDescription(description);
+        entity.setUpdaterId("current-user");
+        lakeModelInfoService.updateById(entity);
+        return toDTO(entity);
+    }
 
     /**
      * 分页查询模型列表
