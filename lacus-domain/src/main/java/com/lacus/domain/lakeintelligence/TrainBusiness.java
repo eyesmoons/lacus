@@ -67,9 +67,19 @@ public class TrainBusiness {
      * 启动训练任务
      */
     public TaskDTO startTraining(TrainRequest request) {
-        if (lakeTaskService.isTaskNameDuplicated(null, request.getTaskName())) {
-            throw new CustomException("任务名称[" + request.getTaskName() + "]已存在");
+        // 任务名称追加时间戳，允许多次训练同名模型
+        String originalName = request.getTaskName();
+        String taskName = originalName;
+        int suffix = 1;
+        while (lakeTaskService.isTaskNameDuplicated(null, taskName)) {
+            taskName = originalName + "_" + System.currentTimeMillis();
+            suffix++;
+            if (suffix > 10) {
+                taskName = originalName + "_" + java.util.UUID.randomUUID().toString().substring(0, 8);
+                break;
+            }
         }
+        request.setTaskName(taskName);
         // 构建 ML 服务请求
         Map<String, Object> mlRequest = new HashMap<>();
         mlRequest.put("trainer_type", request.getTrainerType());
