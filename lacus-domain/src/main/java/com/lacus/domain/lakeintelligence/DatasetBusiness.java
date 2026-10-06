@@ -351,8 +351,8 @@ public class DatasetBusiness {
                     if (count >= 50000) break;
                 }
             } else if (file.isDirectory()) {
-                // 递归统计子目录（可选，根据需要开启）
-                // count += countImageFiles(file);
+                count += countImageFiles(file);
+                if (count >= 50000) break;
             }
         }
         return count;
