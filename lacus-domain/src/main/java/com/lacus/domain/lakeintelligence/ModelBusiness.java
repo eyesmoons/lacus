@@ -42,6 +42,9 @@ public class ModelBusiness {
     @Autowired
     private TrainBusiness trainBusiness;
 
+    @Autowired
+    private com.lacus.service.lakeintelligence.ILakeTaskService lakeTaskService;
+
     /**
      * 创建模型（仅基本信息）
      */
@@ -146,6 +149,11 @@ public class ModelBusiness {
         if (ObjectUtils.isEmpty(entity)) {
             throw new CustomException("模型[" + modelId + "]不存在");
         }
+        // 删除关联的训练任务
+        com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<com.lacus.dao.lakeintelligence.entity.LakeTaskEntity> taskWrapper =
+                new com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper<>();
+        taskWrapper.eq(com.lacus.dao.lakeintelligence.entity.LakeTaskEntity::getModelId, modelId);
+        lakeTaskService.remove(taskWrapper);
         // 删除模型文件
         if (entity.getModelPath() != null && !entity.getModelPath().isEmpty()) {
             File file = new File(entity.getModelPath());
