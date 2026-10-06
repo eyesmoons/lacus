@@ -386,13 +386,23 @@ public class TrainBusiness {
             model.setTrainingEpochs(((Number) epochs).intValue());
         }
 
+        // 尝试获取文件大小，支持相对路径和绝对路径
         try {
             java.io.File modelFile = new java.io.File(model.getModelPath());
+            if (!modelFile.exists()) {
+                // 尝试相对路径
+                modelFile = new java.io.File("./ml_service", model.getModelPath());
+            }
+            if (!modelFile.exists()) {
+                // 尝试 model_weights 目录
+                modelFile = new java.io.File("./ml_service/model_weights", new java.io.File(model.getModelPath()).getName());
+            }
             if (modelFile.exists()) {
                 model.setModelSizeBytes(modelFile.length());
+                log.info("[train] 模型文件大小: taskId={}, modelId={}, size={}", task.getTaskId(), model.getModelId(), modelFile.length());
             }
         } catch (Exception e) {
-            // 忽略文件大小获取失败
+            log.warn("[train] 获取模型文件大小失败: taskId={}, error={}", task.getTaskId(), e.getMessage());
         }
 
         model.setUpdateTime(new Date());

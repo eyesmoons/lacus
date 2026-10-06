@@ -90,8 +90,9 @@ class BaseTrainer:
 
     def save_checkpoint(self, model: torch.nn.Module, epoch: int, model_dir: str = "./model_weights") -> str:
         """保存模型检查点"""
-        os.makedirs(model_dir, exist_ok=True)
-        path = os.path.join(model_dir, f"{self.task_id}_epoch_{epoch}.pt")
+        abs_dir = os.path.abspath(model_dir)
+        os.makedirs(abs_dir, exist_ok=True)
+        path = os.path.join(abs_dir, f"{self.task_id}_epoch_{epoch}.pt")
         torch.save(model.state_dict(), path)
         # 更新 task_store 中的 model_path
         if self.task_id in self.task_store:
