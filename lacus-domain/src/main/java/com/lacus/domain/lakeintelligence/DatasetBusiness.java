@@ -75,7 +75,7 @@ public class DatasetBusiness {
         entity.setStatus(request.getStatus() != null && !request.getStatus().isEmpty()
                 ? request.getStatus()
                 : DatasetStatus.PROCESSING.getCode());
-        entity.setCreatorId(request.getCreatorId());
+        entity.setCreatorId(request.getCreatorId() != null ? request.getCreatorId() : String.valueOf(com.lacus.core.security.AuthenticationUtils.getUserId()));
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());
         entity.setDeleted(0);

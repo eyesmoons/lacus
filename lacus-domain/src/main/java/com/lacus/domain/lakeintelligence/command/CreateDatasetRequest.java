@@ -33,7 +33,6 @@ public class CreateDatasetRequest {
     @ApiModelProperty(value = "初始状态: PROCESSING/READY (上传解析后可直接设为 READY)")
     private String status;
 
-    @ApiModelProperty(value = "创建者ID", required = true)
-    @NotBlank(message = "创建者ID不能为空")
+    @ApiModelProperty(value = "创建者ID")
     private String creatorId;
 }
