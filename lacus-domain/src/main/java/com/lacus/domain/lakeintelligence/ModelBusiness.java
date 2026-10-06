@@ -138,6 +138,13 @@ public class ModelBusiness {
         } catch (IOException e) {
             throw new CustomException("模型文件路径校验失败：" + e.getMessage());
         }
+        // 更新文件大小为实际值
+        long actualSize = file.length();
+        if (entity.getModelSizeBytes() == null || entity.getModelSizeBytes() != actualSize) {
+            entity.setModelSizeBytes(actualSize);
+            entity.setUpdateTime(new Date());
+            lakeModelInfoService.updateById(entity);
+        }
         return file;
     }
 
