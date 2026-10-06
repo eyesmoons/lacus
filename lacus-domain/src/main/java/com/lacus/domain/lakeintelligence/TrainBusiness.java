@@ -160,8 +160,8 @@ public class TrainBusiness {
         response.setProgress(entity.getTrainingProgress());
         response.setMessage(entity.getErrorMessage());
 
-        // 训练完成时，返回关联模型的最终结果
-        if ("COMPLETED".equals(entity.getStatus()) && entity.getModelId() != null) {
+        // 训练中或已完成时，返回关联模型的信息
+        if (entity.getModelId() != null) {
             LakeModelInfoEntity model = lakeModelInfoService.getById(entity.getModelId());
             if (model != null) {
                 response.setModelId(model.getModelId());
@@ -170,7 +170,14 @@ public class TrainBusiness {
                 response.setFinalLoss(model.getFinalLoss());
                 response.setTrainingEpochs(model.getTrainingEpochs());
                 response.setModelSizeBytes(model.getModelSizeBytes());
-                response.setTrainLoss(model.getFinalLoss() != null ? model.getFinalLoss().doubleValue() : null);
+            }
+        }
+
+        // 训练完成时，返回最终损失
+        if ("COMPLETED".equals(entity.getStatus()) && entity.getModelId() != null) {
+            LakeModelInfoEntity model = lakeModelInfoService.getById(entity.getModelId());
+            if (model != null && model.getFinalLoss() != null) {
+                response.setTrainLoss(model.getFinalLoss().doubleValue());
             }
         }
 
