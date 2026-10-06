@@ -44,4 +44,7 @@ public class TrainRequest {
 
     @ApiModelProperty(value = "创建者ID")
     private String creatorId;
+
+    @ApiModelProperty(value = "CSV 标签文件路径")
+    private String labelFilePath;
 }
