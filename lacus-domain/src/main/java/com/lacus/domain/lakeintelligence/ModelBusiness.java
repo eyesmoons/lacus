@@ -52,6 +52,7 @@ public class ModelBusiness {
         entity.setDatasetId(request.getDatasetId());
         entity.setStatus("PENDING");
         entity.setModelPath("");
+        entity.setLabelFilePath(request.getLabelFilePath());
         entity.setCreatorId(String.valueOf(AuthenticationUtils.getUserId()));
         entity.setCreateTime(new Date());
         entity.setUpdateTime(new Date());

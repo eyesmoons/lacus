@@ -23,4 +23,7 @@ public class CreateModelRequest {
 
     @ApiModelProperty(value = "任务类型: SIMILARITY/CLASSIFICATION")
     private String taskType = "SIMILARITY";
+
+    @ApiModelProperty(value = "CSV 标签文件路径（分类任务）")
+    private String labelFilePath;
 }

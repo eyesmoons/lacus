@@ -58,6 +58,12 @@ public class LakeModelInfoEntity {
     private String modelPath;
 
     /**
+     * CSV 标签文件路径（分类任务）
+     */
+    @TableField("label_file_path")
+    private String labelFilePath;
+
+    /**
      * 模型文件大小(字节)
      */
     @TableField("model_size_bytes")
