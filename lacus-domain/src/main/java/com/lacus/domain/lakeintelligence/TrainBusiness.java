@@ -301,6 +301,7 @@ public class TrainBusiness {
             // 使用默认路径
             modelPath = "/data/lake-intelligence/models/" + task.getTaskId() + "/model.pt";
         }
+        log.info("[train] 模型路径: taskId={}, modelPath={}", task.getTaskId(), modelPath);
 
         // 获取模型架构
         String modelArch = (String) response.get("model_arch");
@@ -356,6 +357,7 @@ public class TrainBusiness {
         if (modelPath != null && !modelPath.isEmpty()) {
             model.setModelPath(modelPath);
         }
+        log.info("[train] 更新模型路径: taskId={}, modelId={}, modelPath={}", task.getTaskId(), model.getModelId(), model.getModelPath());
 
         String modelArch = (String) response.get("model_arch");
         if (modelArch != null && !modelArch.isEmpty()) {

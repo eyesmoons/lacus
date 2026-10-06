@@ -21,6 +21,7 @@ class TrainingProgress:
     val_loss: float = 0.0
     status: str = "idle"  # idle | training | completed | cancelled | failed
     message: str = ""
+    model_path: str = ""
 
 
 # 进度回调类型
@@ -92,6 +93,9 @@ class BaseTrainer:
         os.makedirs(model_dir, exist_ok=True)
         path = os.path.join(model_dir, f"{self.task_id}_epoch_{epoch}.pt")
         torch.save(model.state_dict(), path)
+        # 更新 task_store 中的 model_path
+        if self.task_id in self.task_store:
+            self.task_store[self.task_id].model_path = path
         return path
 
     def _run_training(self) -> None:

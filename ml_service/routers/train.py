@@ -145,6 +145,7 @@ async def get_train_status(task_id: str):
         "val_loss": progress.val_loss,
         "status": progress.status,
         "message": progress.message,
+        "model_path": progress.model_path,
     }
 
 

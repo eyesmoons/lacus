@@ -68,9 +68,6 @@ public class ModelBusiness {
         if (ObjectUtils.isEmpty(entity)) {
             throw new CustomException("模型[" + modelId + "]不存在");
         }
-        if (!"PENDING".equals(entity.getStatus())) {
-            throw new CustomException("模型[" + modelId + "]当前状态为[" + entity.getStatus() + "]，无法启动训练");
-        }
         request.setModelId(modelId);
         request.setCreatorId(String.valueOf(AuthenticationUtils.getUserId()));
         return trainBusiness.startTraining(request);
