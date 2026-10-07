@@ -256,11 +256,19 @@ public class TrainBusiness {
                 } else {
                     // 训练中，更新进度
                     updateModelStatus(task.getTaskId(), "TRAINING");
-                    Object epoch = response.get("epoch");
-                    Object totalEpochs = response.get("total_epochs");
-                    if (epoch instanceof Number && totalEpochs instanceof Number && ((Number) totalEpochs).intValue() > 0) {
-                        int progress = (int) (((Number) epoch).doubleValue() / ((Number) totalEpochs).doubleValue() * 100);
-                        task.setTrainingProgress(Math.min(progress, 100));
+                    try {
+                        Object epoch = response.get("epoch");
+                        Object totalEpochs = response.get("total_epochs");
+                        if (epoch != null && totalEpochs != null) {
+                            int ep = Integer.parseInt(epoch.toString());
+                            int total = Integer.parseInt(totalEpochs.toString());
+                            if (total > 0) {
+                                int progress = (int) ((double) ep / total * 100);
+                                task.setTrainingProgress(Math.min(progress, 100));
+                            }
+                        }
+                    } catch (Exception e) {
+                        log.warn("解析训练进度失败: {}", e.getMessage());
                     }
                 }
                 task.setUpdateTime(new Date());
