@@ -1,8 +1,10 @@
 package com.lacus.domain.lakeintelligence;
 
 import com.lacus.common.exception.CustomException;
+import com.lacus.dao.lakeintelligence.entity.LakeTaskEntity;
 import com.lacus.domain.lakeintelligence.dto.ClassifyResponse;
 import com.lacus.domain.lakeintelligence.feign.MlServiceFeign;
+import com.lacus.service.lakeintelligence.ILakeTaskService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,18 +25,29 @@ public class ClassifyBusiness {
     @Autowired
     private MlServiceFeign mlServiceFeign;
 
+    @Autowired
+    private ILakeTaskService lakeTaskService;
+
     /**
      * 图像分类推理
      *
-     * @param image   待分类图片
-     * @param modelId 模型标识符
+     * @param image  待分类图片
+     * @param taskId 训练任务ID（选中某次训练产出的模型）
      * @return 分类结果
      */
-    public ClassifyResponse classify(MultipartFile image, String modelId) {
-        Map<String, String> params = new HashMap<>();
-        if (modelId != null && !modelId.isEmpty()) {
-            params.put("model_id", modelId);
+    public ClassifyResponse classify(MultipartFile image, Long taskId) {
+        if (taskId == null) {
+            throw new CustomException("请选择模型");
         }
+        LakeTaskEntity task = lakeTaskService.getById(taskId);
+        if (task == null) {
+            throw new CustomException("训练任务[" + taskId + "]不存在");
+        }
+        if (task.getModelPath() == null || task.getModelPath().isEmpty()) {
+            throw new CustomException("该训练任务没有可用的模型文件");
+        }
+        Map<String, String> params = new HashMap<>();
+        params.put("model_path", task.getModelPath());
 
         Map<String, Object> response;
         try {
@@ -59,10 +72,10 @@ public class ClassifyBusiness {
         return classifyResponse;
     }
 
-    public List<ClassifyResponse> batchClassify(List<MultipartFile> images, String modelId) {
+    public List<ClassifyResponse> batchClassify(List<MultipartFile> images, Long taskId) {
         List<ClassifyResponse> results = new ArrayList<>();
         for (MultipartFile image : images) {
-            results.add(classify(image, modelId));
+            results.add(classify(image, taskId));
         }
         return results;
     }

@@ -8,7 +8,9 @@ IMG_H = 64
 IMG_W = 64
 
 # 随机性相关配置
-SEED = 42
+# 固定种子（保证训练可复现）。默认 27 是在"小猫数据集"上实测不塌缩的值；
+# 换数据集需重新挑选（自编码器对相似图片容易塌缩，种子决定成败）。
+SEED = int(os.environ.get("RANDOM_SEED", "27"))
 TRAIN_RATIO = 0.7
 VAL_RATIO = 0.15
 TEST_RATIO = 0.15
@@ -19,6 +21,10 @@ TRAIN_BATCH_SIZE = 32
 VAL_BATCH_SIZE = 32
 TEST_BATCH_SIZE = 32
 EPOCHS = 30
+
+# 对比损失（在重建损失基础上，拉开不同图片的 embedding，缓解塌缩）
+CONTRASTIVE_WEIGHT = float(os.environ.get("CONTRASTIVE_WEIGHT", "5.0"))
+CONTRASTIVE_TEMPERATURE = float(os.environ.get("CONTRASTIVE_TEMPERATURE", "0.1"))
 
 # 模型配置
 EMBEDDING_DIM = 512
@@ -46,6 +52,8 @@ class AppConfig:
     val_batch_size: int = VAL_BATCH_SIZE
     test_batch_size: int = TEST_BATCH_SIZE
     epochs: int = EPOCHS
+    contrastive_weight: float = CONTRASTIVE_WEIGHT
+    contrastive_temperature: float = CONTRASTIVE_TEMPERATURE
     embedding_dim: int = EMBEDDING_DIM
     chroma_backend_path: str = CHROMA_BACKEND_PATH
     image_collection_name: str = IMAGE_COLLECTION_NAME

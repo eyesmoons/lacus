@@ -4,13 +4,16 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.lacus.common.config.FileStorageConfig;
 import com.lacus.common.core.page.PageDTO;
 import com.lacus.common.exception.CustomException;
+import com.lacus.dao.lakeintelligence.entity.LakeDatasetEntity;
 import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
+import com.lacus.dao.lakeintelligence.entity.LakeTaskEntity;
 import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
 import com.lacus.domain.lakeintelligence.command.TrainRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
 import com.lacus.domain.lakeintelligence.dto.TaskDTO;
 import com.lacus.domain.lakeintelligence.query.ModelPageQuery;
 import com.lacus.core.security.AuthenticationUtils;
+import com.lacus.service.lakeintelligence.ILakeDatasetService;
 import com.lacus.service.lakeintelligence.ILakeModelInfoService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
@@ -35,6 +38,9 @@ public class ModelBusiness {
 
     @Autowired
     private ILakeModelInfoService lakeModelInfoService;
+
+    @Autowired
+    private ILakeDatasetService lakeDatasetService;
 
     @Autowired
     private FileStorageConfig fileStorageConfig;
@@ -96,7 +102,11 @@ public class ModelBusiness {
      * 分页查询模型列表
      */
     public PageDTO pageList(ModelPageQuery query) {
-        return new PageDTO(lakeModelInfoService.page(query.toPage(), query.toQueryWrapper()));
+        com.baomidou.mybatisplus.core.metadata.IPage<LakeModelInfoEntity> page =
+                lakeModelInfoService.page(query.toPage(), query.toQueryWrapper());
+        List<ModelInfoDTO> rows = page.getRecords().stream().map(this::toDTO)
+                .collect(java.util.stream.Collectors.toList());
+        return new PageDTO(rows, page.getTotal());
     }
 
     /**
@@ -120,15 +130,18 @@ public class ModelBusiness {
         if (ObjectUtils.isEmpty(entity)) {
             throw new CustomException("模型[" + modelId + "]不存在");
         }
+        if (!"TRAINING_COMPLETED".equals(entity.getStatus())) {
+            throw new CustomException("模型尚未训练完成，无法下载");
+        }
         if (entity.getModelPath() == null || entity.getModelPath().isEmpty()) {
             throw new CustomException("模型文件路径不存在");
         }
         File file = new File(entity.getModelPath());
-        if (!file.exists()) {
+        if (!file.isFile()) {
             throw new CustomException("模型文件不存在：" + entity.getModelPath());
         }
-        // 路径穿越防护：验证文件规范路径位于预期的模型存储目录内
-        String modelsRoot = fileStorageConfig.getRoot() + File.separator + "models";
+        // 路径穿越防护：验证文件规范路径位于模型存储目录内
+        String modelsRoot = fileStorageConfig.getModelDir();
         try {
             String expectedPrefix = new File(modelsRoot).getCanonicalPath();
             String actualPath = file.getCanonicalPath();
@@ -175,10 +188,56 @@ public class ModelBusiness {
         log.info("模型[{}]已删除", modelId);
     }
 
+    /**
+     * 模型→任务 级联数据：{modelId, modelName, tasks:[{taskId, taskName, status, modelPath}]}
+     * taskType 非空时按数据集的类型过滤模型
+     */
+    public List<Map<String, Object>> modelTree(String taskType) {
+        LambdaQueryWrapper<LakeModelInfoEntity> mw = new LambdaQueryWrapper<>();
+        if (taskType != null && !taskType.isEmpty()) {
+            LambdaQueryWrapper<LakeDatasetEntity> dw = new LambdaQueryWrapper<>();
+            dw.eq(LakeDatasetEntity::getTaskType, taskType);
+            List<Long> datasetIds = lakeDatasetService.list(dw).stream()
+                    .map(LakeDatasetEntity::getDatasetId).collect(java.util.stream.Collectors.toList());
+            if (datasetIds.isEmpty()) {
+                return new ArrayList<>();
+            }
+            mw.in(LakeModelInfoEntity::getDatasetId, datasetIds);
+        }
+        mw.orderByDesc(LakeModelInfoEntity::getModelId);
+        List<Map<String, Object>> tree = new ArrayList<>();
+        for (LakeModelInfoEntity model : lakeModelInfoService.list(mw)) {
+            Map<String, Object> node = new HashMap<>();
+            node.put("modelId", model.getModelId());
+            node.put("modelName", model.getModelName());
+            LambdaQueryWrapper<LakeTaskEntity> tw = new LambdaQueryWrapper<>();
+            tw.eq(LakeTaskEntity::getModelId, model.getModelId());
+            tw.orderByDesc(LakeTaskEntity::getTaskId);
+            List<Map<String, Object>> tasks = new ArrayList<>();
+            for (LakeTaskEntity task : lakeTaskService.list(tw)) {
+                Map<String, Object> tn = new HashMap<>();
+                tn.put("taskId", task.getTaskId());
+                tn.put("taskName", task.getTaskName());
+                tn.put("status", task.getStatus());
+                tn.put("modelPath", task.getModelPath());
+                tasks.add(tn);
+            }
+            node.put("tasks", tasks);
+            tree.add(node);
+        }
+        return tree;
+    }
+
     private ModelInfoDTO toDTO(LakeModelInfoEntity entity) {
         ModelInfoDTO dto = new ModelInfoDTO();
         BeanUtils.copyProperties(entity, dto);
         dto.setStatus(entity.getStatus());
+        if (entity.getDatasetId() != null) {
+            LakeDatasetEntity dataset = lakeDatasetService.getById(entity.getDatasetId());
+            if (dataset != null) {
+                dto.setDatasetName(dataset.getDatasetName());
+            }
+        }
         return dto;
     }
 

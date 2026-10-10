@@ -18,6 +18,11 @@ public class FileStorageConfig {
     private String root = "/data/lake-intelligence";
 
     /**
+     * 模型权重目录（需与 ML 服务的 MODEL_DIR 保持一致，用于下载防护）
+     */
+    private String modelDir = "/data/lake-intelligence/models";
+
+    /**
      * 数据集最大文件数
      */
     private int maxDatasetSize = 50000;

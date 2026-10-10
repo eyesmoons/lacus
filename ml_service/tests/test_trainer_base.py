@@ -15,18 +15,23 @@ class TestTrainingProgress:
         assert progress.total_epochs == 0
         assert progress.train_loss == 0.0
         assert progress.val_loss == 0.0
+        assert progress.recon_loss == 0.0
+        assert progress.contrastive_loss == 0.0
         assert progress.status == "idle"
         assert progress.message == ""
 
     def test_custom_values(self):
         progress = TrainingProgress(
             epoch=5, total_epochs=10, train_loss=0.1, val_loss=0.2,
+            recon_loss=0.05, contrastive_loss=0.01,
             status="training", message="进行中"
         )
         assert progress.epoch == 5
         assert progress.total_epochs == 10
         assert progress.train_loss == 0.1
         assert progress.val_loss == 0.2
+        assert progress.recon_loss == 0.05
+        assert progress.contrastive_loss == 0.01
         assert progress.status == "training"
         assert progress.message == "进行中"
 
@@ -104,8 +109,8 @@ class TestBaseTrainer:
         with pytest.raises(InterruptedError, match="已取消"):
             trainer._check_cancelled()
 
-    def test_save_checkpoint(self):
-        """测试检查点保存"""
+    def test_save_model(self):
+        """测试模型保存（每次训练只产生一个文件）"""
         task_store = {}
         trainer = BaseTrainer(task_id="test-007", task_store=task_store)
 
@@ -113,8 +118,10 @@ class TestBaseTrainer:
         mock_model.state_dict.return_value = {"weight": 1.0}
 
         with patch("torch.save") as mock_save:
-            trainer.save_checkpoint(mock_model, epoch=5)
+            path = trainer.save_model(mock_model)
             mock_save.assert_called_once()
+            assert path.endswith(".pt")
+            assert "test-007" in path
 
     def test_get_progress(self):
         """测试获取当前进度"""

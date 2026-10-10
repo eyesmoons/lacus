@@ -4,7 +4,7 @@
 """
 import threading
 import uuid
-from typing import Dict
+from typing import Dict, Optional
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
@@ -22,6 +22,9 @@ class VectorBuildRequest(BaseModel):
     dataset_uri: str
     collection_name: str = "image_collection"
     batch_size: int = 32
+    dataset_id: Optional[int] = None
+    model_path: Optional[str] = None
+    distance_metric: Optional[str] = "cosine"
 
 
 class VectorBuildResponse(BaseModel):
@@ -43,6 +46,9 @@ def _start_vector_build(request: VectorBuildRequest, task_id: str) -> str:
                 collection_name=request.collection_name,
                 task_id=task_id,
                 task_store=build_task_store,
+                dataset_id=request.dataset_id,
+                model_path=request.model_path,
+                distance_metric=request.distance_metric,
             )
         except Exception as e:
             build_task_store[task_id].status = "failed"

@@ -5,6 +5,7 @@ import com.lacus.core.web.domain.login.LoginUser;
 import com.lacus.dao.lakeintelligence.entity.LakeModelInfoEntity;
 import com.lacus.domain.lakeintelligence.command.CreateModelRequest;
 import com.lacus.domain.lakeintelligence.dto.ModelInfoDTO;
+import com.lacus.service.lakeintelligence.ILakeDatasetService;
 import com.lacus.service.lakeintelligence.ILakeModelInfoService;
 import org.junit.After;
 import org.junit.Before;
@@ -21,12 +22,15 @@ public class ModelBusinessTest {
 
     private ModelBusiness modelBusiness;
     private ILakeModelInfoService lakeModelInfoService;
+    private ILakeDatasetService lakeDatasetService;
 
     @Before
     public void setUp() {
         modelBusiness = new ModelBusiness();
         lakeModelInfoService = mock(ILakeModelInfoService.class);
         ReflectionTestUtils.setField(modelBusiness, "lakeModelInfoService", lakeModelInfoService);
+        lakeDatasetService = mock(ILakeDatasetService.class);
+        ReflectionTestUtils.setField(modelBusiness, "lakeDatasetService", lakeDatasetService);
 
         LoginUser loginUser = new LoginUser();
         loginUser.setUserId(42L);

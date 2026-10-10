@@ -71,6 +71,7 @@ public class DatasetBusiness {
         entity.setDescription(request.getDescription());
         entity.setStorageSource(request.getStorageSource());
         entity.setSourceConfig(request.getSourceConfig());
+        entity.setLocalPath(extractLocalPath(request.getSourceConfig()));
         entity.setTaskType(request.getTaskType());
         entity.setStatus(request.getStatus() != null && !request.getStatus().isEmpty()
                 ? request.getStatus()
@@ -82,6 +83,24 @@ public class DatasetBusiness {
         entity.setDeleted(0);
         lakeDatasetService.save(entity);
         return toDTO(entity);
+    }
+
+    /**
+     * 从数据源配置 JSON 中解析本地路径（仅 LOCAL 来源会带 localPath）
+     */
+    private String extractLocalPath(String sourceConfig) {
+        if (sourceConfig == null || sourceConfig.isEmpty()) {
+            return null;
+        }
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            Map<?, ?> config = mapper.readValue(sourceConfig, Map.class);
+            Object localPath = config.get("localPath");
+            return localPath != null ? localPath.toString() : null;
+        } catch (Exception e) {
+            log.warn("解析数据源配置中的 localPath 失败：{}", e.getMessage());
+            return null;
+        }
     }
 
     /**
@@ -335,6 +354,35 @@ public class DatasetBusiness {
 
         log.info("数据集[{}]解析完成，图片数量：{}", datasetId, imageCount);
         return toDTO(entity);
+    }
+
+    /**
+     * 解析数据集内的图片文件（相对路径），含路径穿越防护
+     */
+    public File resolveImage(Long datasetId, String relativePath) {
+        LakeDatasetEntity entity = lakeDatasetService.getById(datasetId);
+        if (ObjectUtils.isEmpty(entity)) {
+            throw new CustomException("数据集[" + datasetId + "]不存在");
+        }
+        String localPath = entity.getLocalPath();
+        if (localPath == null || localPath.isEmpty()) {
+            throw new CustomException("数据集[" + datasetId + "]本地路径不存在");
+        }
+        File root = new File(localPath);
+        File file = new File(root, relativePath);
+        try {
+            String rootCanonical = root.getCanonicalPath();
+            String fileCanonical = file.getCanonicalPath();
+            if (!fileCanonical.startsWith(rootCanonical + File.separator)) {
+                throw new CustomException("图片路径非法");
+            }
+        } catch (java.io.IOException e) {
+            throw new CustomException("图片路径校验失败：" + e.getMessage());
+        }
+        if (!file.isFile()) {
+            throw new CustomException("图片不存在：" + relativePath);
+        }
+        return file;
     }
 
     private int countImageFiles(File dir) {

@@ -4,6 +4,11 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import feign.Retryer;
 import feign.Logger;
+import feign.codec.Encoder;
+import feign.form.spring.SpringFormEncoder;
+import org.springframework.beans.factory.ObjectFactory;
+import org.springframework.boot.autoconfigure.http.HttpMessageConverters;
+import org.springframework.cloud.openfeign.support.SpringEncoder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -27,8 +32,18 @@ public class MlServiceFeignConfiguration implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate template) {
-        template.header("Content-Type", "application/json");
+        // 不设置 Content-Type：由 Feign 编码器按请求类型自动决定
+        // （JSON 请求为 application/json，multipart 上传为 multipart/form-data）
         template.header("Accept", "application/json");
+    }
+
+    /**
+     * multipart 编码器：Spring Cloud OpenFeign 不会自动装配 multipart 支持，
+     * 需显式注册 SpringFormEncoder，否则 @RequestPart MultipartFile 不会被编码发送。
+     */
+    @Bean
+    public Encoder feignFormEncoder(ObjectFactory<HttpMessageConverters> messageConverters) {
+        return new SpringFormEncoder(new SpringEncoder(messageConverters));
     }
 
     @Bean

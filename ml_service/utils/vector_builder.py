@@ -27,10 +27,12 @@ class ImageDataset:
         self.image_dir = image_dir
         self.transform = transform or self._default_transform()
         self.return_name = return_name
-        self.image_names = sorted([
-            f for f in os.listdir(image_dir)
-            if f.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif'))
-        ])
+        self.image_names = sorted(
+            os.path.relpath(os.path.join(root, name), image_dir)
+            for root, _, files in os.walk(image_dir)
+            for name in files
+            if name.lower().endswith(('.png', '.jpg', '.jpeg', '.bmp', '.gif'))
+        )
 
     @staticmethod
     def _default_transform():
@@ -58,6 +60,9 @@ def do_build_vectors(
     task_id: str,
     task_store: Dict[str, TrainingProgress],
     batch_size: int = 32,
+    dataset_id: int = None,
+    model_path: str = None,
+    distance_metric: str = "cosine",
 ) -> str:
     """执行向量构建
 
@@ -94,14 +99,23 @@ def do_build_vectors(
 
         dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=False)
 
-        # 3. 获取模型
+        # 3. 获取模型（加载训练好的权重，保证与检索端一致）
         cache = ModelCache()
-        model = cache.get_model("similarity_autoencoder")
+        model = cache.get_model("similarity_autoencoder", weights_path=model_path)
         model.eval()
 
-        # 4. 获取 ChromaDB 集合
+        # 4. 获取 ChromaDB 集合（重建前先清空同名集合，避免旧 id 残留）
         client = chromadb.PersistentClient(path=default_config.chroma_backend_path)
-        collection = client.get_or_create_collection(name=collection_name)
+        try:
+            client.delete_collection(name=collection_name)
+        except Exception:
+            pass
+        # ChromaDB 距离度量：默认是 l2（距离无界），须按配置显式指定
+        space = "l2" if (distance_metric or "").lower() in ("euclidean", "l2") else "cosine"
+        collection = client.get_or_create_collection(
+            name=collection_name,
+            metadata={"model_path": model_path or "", "hnsw:space": space},
+        )
 
         # 5. 批量提取 embedding 并写入
         total = len(dataset)
@@ -111,8 +125,10 @@ def do_build_vectors(
             for batch_images, batch_names in tqdm(dataloader, desc="构建向量"):
                 embeddings = model.encode(batch_images).numpy()
 
+                # id 带上 datasetId 前缀，供前端/后端定位图片（如 "1/13/5.png"）
+                ids = [f"{dataset_id}/{name}" for name in batch_names] if dataset_id is not None else list(batch_names)
                 collection.upsert(
-                    ids=list(batch_names),
+                    ids=ids,
                     embeddings=embeddings.tolist(),
                 )
 

@@ -83,6 +83,8 @@ public class SecurityConfig {
             .authorizeRequests()
             // 对于登录login 注册register 验证码captchaImage 以及公共Api的请求允许匿名访问
             .antMatchers("/login", "/register", "/captchaImage","/api/**").anonymous()
+            // 数据集图片需能被 <img> 直接访问（不带 token），放行
+            .antMatchers("/lake-intelligence/image/**").permitAll()
             .antMatchers(
                 HttpMethod.GET,
                 "/",

@@ -55,6 +55,7 @@ public class TrainController {
         return ResponseDTO.ok(trainBusiness.getProgress(id));
     }
 
+
     @ApiOperation("取消训练")
     @PostMapping("/{id}/cancel")
     public ResponseDTO<?> cancelTraining(@PathVariable("id") Long id) {

@@ -20,12 +20,9 @@ public class BuildVectorRequest {
     @NotNull(message = "图片库ID不能为空")
     private Long datasetId;
 
-    @ApiModelProperty(value = "关联模型ID", required = true)
-    @NotNull(message = "模型ID不能为空")
-    private Long modelId;
-
-    @ApiModelProperty(value = "向量库集合名称")
-    private String collectionName = "image_collection";
+    @ApiModelProperty(value = "训练任务ID（选择某次训练产出的模型）", required = true)
+    @NotNull(message = "训练任务不能为空")
+    private Long taskId;
 
     @ApiModelProperty(value = "批次大小")
     private Integer batchSize = 32;

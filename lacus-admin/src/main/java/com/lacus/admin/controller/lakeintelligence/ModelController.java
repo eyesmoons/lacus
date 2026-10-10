@@ -51,6 +51,12 @@ public class ModelController {
         return ResponseDTO.ok(modelBusiness.pageList(query));
     }
 
+    @ApiOperation("模型→任务 级联数据")
+    @GetMapping("/tree")
+    public ResponseDTO<List<Map<String, Object>>> modelTree(@RequestParam(value = "taskType", required = false) String taskType) {
+        return ResponseDTO.ok(modelBusiness.modelTree(taskType));
+    }
+
     @ApiOperation("创建模型")
     @PostMapping
     public ResponseDTO<ModelInfoDTO> createModel(@RequestBody @Valid CreateModelRequest request) {

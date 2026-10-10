@@ -36,6 +36,7 @@ ml:
 
 storage:
   root: /Users/casey/Downloads/20260930/lake-intelligence
+  model-dir: /Users/casey/workspace/lacus/ml_service/model_weights
   max-dataset-size: 50000
   max-upload-size: 500
   max-image-size: 10

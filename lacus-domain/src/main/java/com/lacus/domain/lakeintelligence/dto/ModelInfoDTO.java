@@ -27,6 +27,9 @@ public class ModelInfoDTO {
     @ApiModelProperty("关联图片库ID")
     private Long datasetId;
 
+    @ApiModelProperty("关联图片库名称")
+    private String datasetName;
+
     @ApiModelProperty("模型架构")
     private String modelArch;
 

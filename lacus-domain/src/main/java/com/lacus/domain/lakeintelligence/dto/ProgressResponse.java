@@ -4,6 +4,8 @@ import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;
 
 import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
 
 /**
  * 训练/构建进度响应 DTO
@@ -29,6 +31,12 @@ public class ProgressResponse {
     @ApiModelProperty("验证损失")
     private Double valLoss;
 
+    @ApiModelProperty("训练损失中的重建项")
+    private Double reconLoss;
+
+    @ApiModelProperty("训练损失中的对比项")
+    private Double contrastiveLoss;
+
     @ApiModelProperty("消息")
     private String message;
 
@@ -49,4 +57,7 @@ public class ProgressResponse {
 
     @ApiModelProperty("模型文件大小(字节)")
     private Long modelSizeBytes;
+
+    @ApiModelProperty("损失曲线 [{epoch,trainLoss,valLoss,reconLoss,contrastiveLoss}]")
+    private List<Map<String, Object>> lossHistory;
 }

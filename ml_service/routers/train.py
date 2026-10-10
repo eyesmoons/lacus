@@ -11,6 +11,7 @@ from urllib.parse import urlparse
 
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
+import torch
 from torch.utils.data import DataLoader, random_split
 
 from core.task_registry import TaskRegistry
@@ -75,9 +76,12 @@ def _create_and_start_training(request: TrainRequest, task_id: str) -> str:
             n = len(dataset)
             train_end = int(n * default_config.train_ratio)
             val_end = int(n * (default_config.train_ratio + default_config.val_ratio))
+            # 固定生成器，使 train/val 划分也可复现
+            split_generator = torch.Generator().manual_seed(default_config.seed)
             train_set, val_set, _ = random_split(
                 dataset,
                 [train_end, val_end - train_end, n - val_end],
+                generator=split_generator,
             )
             train_loader = DataLoader(train_set, batch_size=request.batch_size, shuffle=True)
             val_loader = DataLoader(val_set, batch_size=request.batch_size, shuffle=False)
@@ -143,6 +147,8 @@ async def get_train_status(task_id: str):
         "total_epochs": progress.total_epochs,
         "train_loss": progress.train_loss,
         "val_loss": progress.val_loss,
+        "recon_loss": progress.recon_loss,
+        "contrastive_loss": progress.contrastive_loss,
         "status": progress.status,
         "message": progress.message,
         "model_path": progress.model_path,

@@ -36,7 +36,7 @@ public class TrainRequest {
     @ApiModelProperty(value = "学习率")
     private Double learningRate = 1e-3;
 
-    @ApiModelProperty(value = "计算设备（cpu/cuda）")
+    @ApiModelProperty(value = "计算设备（cpu/cuda/mps）")
     private String device = "cpu";
 
     @ApiModelProperty(value = "关联模型ID")

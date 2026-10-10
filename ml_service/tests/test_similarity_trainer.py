@@ -1,18 +1,30 @@
 """SimilarityTrainer 测试"""
 import pytest
 import torch
-from torch.utils.data import DataLoader, TensorDataset
+from torch.utils.data import DataLoader, Dataset
 from unittest.mock import MagicMock, patch
 
 from core.trainer_base import BaseTrainer
 from tasks.similarity_trainer import SimilarityTrainer
 
 
+class _ImageOnlyDataset(Dataset):
+    """模拟生产 ImageDataset：每个样本返回单个图像张量（无 target）"""
+
+    def __init__(self, images: torch.Tensor):
+        self.images = images
+
+    def __len__(self) -> int:
+        return len(self.images)
+
+    def __getitem__(self, idx: int) -> torch.Tensor:
+        return self.images[idx]
+
+
 def _create_dummy_loader(batch_size: int = 4, num_samples: int = 16) -> DataLoader:
-    """创建模拟数据加载器"""
+    """创建模拟数据加载器（与生产 ImageDataset 契约一致：仅返回图像张量）"""
     images = torch.randn(num_samples, 3, 64, 64)
-    dataset = TensorDataset(images, images)
-    return DataLoader(dataset, batch_size=batch_size)
+    return DataLoader(_ImageOnlyDataset(images), batch_size=batch_size)
 
 
 class TestSimilarityTrainer:
@@ -123,3 +135,38 @@ class TestSimilarityTrainer:
         progress = task_store["sim-007"]
         assert progress.epoch == 5
         assert progress.total_epochs == 5
+
+    def test_train_one_epoch_returns_split_loss(self):
+        """_train_one_epoch 返回 (总损失, 重建损失, 对比损失)"""
+        trainer = SimilarityTrainer(
+            task_id="sim-008",
+            task_store={},
+            train_loader=_create_dummy_loader(),
+            val_loader=_create_dummy_loader(),
+        )
+        result = trainer._train_one_epoch()
+        assert len(result) == 3
+        total_loss, recon_loss, contrastive_loss = result
+        assert recon_loss > 0
+        assert contrastive_loss > 0
+        # 总损失 = 重建 + 权重 * 对比
+        expected = recon_loss + trainer.contrastive_weight * contrastive_loss
+        assert total_loss == pytest.approx(expected, rel=1e-5)
+
+    def test_progress_reports_split_loss(self):
+        """训练进度分别上报重建损失与对比损失"""
+        task_store = {}
+        trainer = SimilarityTrainer(
+            task_id="sim-009",
+            task_store=task_store,
+            train_loader=_create_dummy_loader(),
+            val_loader=_create_dummy_loader(),
+            epochs=1,
+        )
+        trainer.train()
+
+        progress = task_store["sim-009"]
+        assert progress.recon_loss > 0
+        assert progress.contrastive_loss > 0
+        expected = progress.recon_loss + trainer.contrastive_weight * progress.contrastive_loss
+        assert progress.train_loss == pytest.approx(expected, rel=1e-5)

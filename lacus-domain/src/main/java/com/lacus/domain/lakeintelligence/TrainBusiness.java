@@ -13,6 +13,7 @@ import com.lacus.domain.lakeintelligence.feign.MlServiceFeign;
 import com.lacus.domain.lakeintelligence.query.TaskPageQuery;
 import com.lacus.enums.TaskStatus;
 import com.lacus.enums.TaskType;
+import com.lacus.utils.time.DateUtils;
 import com.lacus.service.lakeintelligence.ILakeDatasetService;
 import com.lacus.service.lakeintelligence.ILakeModelInfoService;
 import com.lacus.service.lakeintelligence.ILakeTaskService;
@@ -57,6 +58,12 @@ public class TrainBusiness {
     private long pollIntervalMs;
 
     /**
+     * 存储根目录，用于拼接默认模型路径
+     */
+    @Value("${storage.root:/data/lake-intelligence}")
+    private String storageRoot;
+
+    /**
      * 分页查询训练任务列表
      */
     public PageDTO pageList(TaskPageQuery query) {
@@ -67,18 +74,8 @@ public class TrainBusiness {
      * 启动训练任务
      */
     public TaskDTO startTraining(TrainRequest request) {
-        // 任务名称追加时间戳，允许多次训练同名模型
-        String originalName = request.getTaskName();
-        String taskName = originalName;
-        int suffix = 1;
-        while (lakeTaskService.isTaskNameDuplicated(null, taskName)) {
-            taskName = originalName + "_" + System.currentTimeMillis();
-            suffix++;
-            if (suffix > 10) {
-                taskName = originalName + "_" + java.util.UUID.randomUUID().toString().substring(0, 8);
-                break;
-            }
-        }
+        // 任务名称始终追加毫秒级时间戳，允许多次训练同名模型
+        String taskName = request.getTaskName() + "_" + DateUtils.dateTimeNow(DateUtils.YYYYMMDDHHMMSSSSS);
         request.setTaskName(taskName);
         // 构建 ML 服务请求
         Map<String, Object> mlRequest = new HashMap<>();
@@ -157,7 +154,6 @@ public class TrainBusiness {
         ProgressResponse response = new ProgressResponse();
         response.setTaskId(String.valueOf(taskId));
         response.setStatus(entity.getStatus());
-        response.setProgress(entity.getTrainingProgress());
         response.setMessage(entity.getErrorMessage());
 
         // 训练中或已完成时，返回关联模型的信息
@@ -173,8 +169,44 @@ public class TrainBusiness {
             }
         }
 
-        // 训练完成时，返回最终损失
-        if ("COMPLETED".equals(entity.getStatus()) && entity.getModelId() != null) {
+        // 当前轮次 / 总轮次
+        int totalEpochs = resolveTotalEpochs(entity);
+        Map<String, Object> latestLoss = parseLatestLoss(entity.getLossHistory());
+        Integer currentEpoch = null;
+        if (latestLoss != null && latestLoss.get("epoch") instanceof Number) {
+            currentEpoch = ((Number) latestLoss.get("epoch")).intValue();
+        }
+        if (currentEpoch == null) {
+            if ("COMPLETED".equals(entity.getStatus())) {
+                currentEpoch = totalEpochs;
+            } else if (totalEpochs > 0 && entity.getTrainingProgress() != null) {
+                currentEpoch = Math.round(totalEpochs * entity.getTrainingProgress() / 100f);
+            } else {
+                currentEpoch = 0;
+            }
+        }
+        response.setProgress(currentEpoch);
+        response.setTotal(totalEpochs);
+        response.setLossHistory(parseLossHistory(entity.getLossHistory()));
+
+        // 训练损失/验证损失：取最近一次记录的损失
+        if (latestLoss != null) {
+            if (latestLoss.get("trainLoss") instanceof Number) {
+                response.setTrainLoss(((Number) latestLoss.get("trainLoss")).doubleValue());
+            }
+            if (latestLoss.get("valLoss") instanceof Number) {
+                response.setValLoss(((Number) latestLoss.get("valLoss")).doubleValue());
+            }
+            if (latestLoss.get("reconLoss") instanceof Number) {
+                response.setReconLoss(((Number) latestLoss.get("reconLoss")).doubleValue());
+            }
+            if (latestLoss.get("contrastiveLoss") instanceof Number) {
+                response.setContrastiveLoss(((Number) latestLoss.get("contrastiveLoss")).doubleValue());
+            }
+        }
+        // 无损失记录时，已完成任务回退到模型最终损失
+        if (response.getTrainLoss() == null && "COMPLETED".equals(entity.getStatus())
+                && entity.getModelId() != null) {
             LakeModelInfoEntity model = lakeModelInfoService.getById(entity.getModelId());
             if (model != null && model.getFinalLoss() != null) {
                 response.setTrainLoss(model.getFinalLoss().doubleValue());
@@ -182,6 +214,111 @@ public class TrainBusiness {
         }
 
         return response;
+    }
+
+    /**
+     * 将本轮训练的损失追加到任务的损失曲线（同一 epoch 覆盖）
+     */
+    private void appendLossHistory(LakeTaskEntity task, Map<String, Object> response) {
+        Object epochObj = response.get("epoch");
+        Object trainLoss = response.get("train_loss");
+        if (epochObj == null || !(trainLoss instanceof Number)) {
+            return;
+        }
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            List<Map<String, Object>> points = new ArrayList<>();
+            if (task.getLossHistory() != null && !task.getLossHistory().isEmpty()) {
+                points = mapper.readValue(task.getLossHistory(),
+                        new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+            }
+            int epoch = Integer.parseInt(epochObj.toString());
+            Map<String, Object> point = new HashMap<>();
+            point.put("epoch", epoch);
+            point.put("trainLoss", ((Number) trainLoss).doubleValue());
+            if (response.get("val_loss") instanceof Number) {
+                point.put("valLoss", ((Number) response.get("val_loss")).doubleValue());
+            }
+            // 训练损失的组成部分：重建项与对比项（train_loss = recon_loss + weight * contrastive_loss）
+            if (response.get("recon_loss") instanceof Number) {
+                point.put("reconLoss", ((Number) response.get("recon_loss")).doubleValue());
+            }
+            if (response.get("contrastive_loss") instanceof Number) {
+                point.put("contrastiveLoss", ((Number) response.get("contrastive_loss")).doubleValue());
+            }
+            if (!points.isEmpty()
+                    && epoch == ((Number) points.get(points.size() - 1).get("epoch")).intValue()) {
+                points.set(points.size() - 1, point);
+            } else {
+                points.add(point);
+            }
+            task.setLossHistory(mapper.writeValueAsString(points));
+        } catch (Exception e) {
+            log.warn("记录损失曲线失败: taskId={}, error={}", task.getTaskId(), e.getMessage());
+        }
+    }
+
+    /**
+     * 解析损失曲线中最近一条记录
+     */
+    private Map<String, Object> parseLatestLoss(String lossHistory) {
+        if (lossHistory == null || lossHistory.isEmpty()) {
+            return null;
+        }
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            List<Map<String, Object>> points = mapper.readValue(lossHistory,
+                    new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+            return points.isEmpty() ? null : points.get(points.size() - 1);
+        } catch (Exception e) {
+            log.warn("解析损失曲线失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 解析完整损失曲线
+     */
+    private List<Map<String, Object>> parseLossHistory(String lossHistory) {
+        if (lossHistory == null || lossHistory.isEmpty()) {
+            return null;
+        }
+        try {
+            com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+            return mapper.readValue(lossHistory,
+                    new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>() {});
+        } catch (Exception e) {
+            log.warn("解析损失曲线失败: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 解析任务总轮次：优先取模型记录的训练轮数，其次取超参数 epochs
+     */
+    private int resolveTotalEpochs(LakeTaskEntity entity) {
+        // 优先用任务自身启动时的超参数 epochs；
+        // 模型记录的 training_epochs 是单值、会被后续训练覆盖，用它当总数会出错（曾导致"74 / 10"）
+        String hyperParams = entity.getHyperParams();
+        if (hyperParams != null && !hyperParams.isEmpty()) {
+            try {
+                com.fasterxml.jackson.databind.ObjectMapper mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+                Map<?, ?> hp = mapper.readValue(hyperParams, Map.class);
+                Object epochs = hp.get("epochs");
+                if (epochs instanceof Number) {
+                    return ((Number) epochs).intValue();
+                }
+            } catch (Exception e) {
+                log.warn("解析超参数失败: taskId={}, error={}", entity.getTaskId(), e.getMessage());
+            }
+        }
+        if (entity.getModelId() != null) {
+            LakeModelInfoEntity model = lakeModelInfoService.getById(entity.getModelId());
+            if (model != null && model.getTrainingEpochs() != null && model.getTrainingEpochs() > 0) {
+                return model.getTrainingEpochs();
+            }
+        }
+        return 0;
     }
 
     /**
@@ -199,7 +336,11 @@ public class TrainBusiness {
             throw new CustomException("任务已取消");
         }
         try {
-            mlServiceFeign.cancelTrain(String.valueOf(taskId));
+            // 需传 ML 端自己的任务 id（mlTaskId），否则 ML 返回 404
+            String mlTaskId = entity.getMlTaskId();
+            if (mlTaskId != null && !mlTaskId.isEmpty()) {
+                mlServiceFeign.cancelTrain(mlTaskId);
+            }
         } catch (Exception e) {
             log.warn("调用 ML 服务取消训练失败：{}", e.getMessage());
         }
@@ -239,11 +380,18 @@ public class TrainBusiness {
                 if (response == null) {
                     continue;
                 }
+                // 记录损失曲线
+                appendLossHistory(task, response);
                 String status = (String) response.get("status");
                 if ("completed".equalsIgnoreCase(status)) {
                     task.setStatus(TaskStatus.COMPLETED.getCode());
                     task.setTrainingProgress(100);
                     task.setCompletedAt(new Date());
+                    // 记录该任务产出的模型文件
+                    Object mlModelPath = response.get("model_path");
+                    if (mlModelPath != null && !mlModelPath.toString().isEmpty()) {
+                        task.setModelPath(mlModelPath.toString());
+                    }
                     // 创建模型记录
                     createModelFromTask(task, response);
                     updateModelStatus(task.getTaskId(), "TRAINING_COMPLETED");
@@ -324,7 +472,8 @@ public class TrainBusiness {
         String modelPath = (String) response.get("model_path");
         if (modelPath == null || modelPath.isEmpty()) {
             // 使用默认路径
-            modelPath = "/data/lake-intelligence/models/" + task.getTaskId() + "/model.pt";
+            modelPath = storageRoot + java.io.File.separator + "models" + java.io.File.separator
+                    + task.getTaskId() + java.io.File.separator + "model.pt";
         }
         log.info("[train] 模型路径: taskId={}, modelPath={}", task.getTaskId(), modelPath);
 
@@ -343,8 +492,11 @@ public class TrainBusiness {
         model.setModelPath(modelPath);
         model.setStatus("TRAINING_COMPLETED");
 
-        // 获取最终损失
+        // 获取最终损失（ML 未返回 final_loss 时回退到本轮 train_loss）
         Object finalLoss = response.get("final_loss");
+        if (!(finalLoss instanceof Number)) {
+            finalLoss = response.get("train_loss");
+        }
         if (finalLoss instanceof Number) {
             model.setFinalLoss(java.math.BigDecimal.valueOf(((Number) finalLoss).doubleValue()));
         }
@@ -358,7 +510,7 @@ public class TrainBusiness {
         // 获取模型文件大小
         try {
             java.io.File modelFile = new java.io.File(modelPath);
-            if (modelFile.exists()) {
+            if (modelFile.isFile()) {
                 model.setModelSizeBytes(modelFile.length());
             }
         } catch (Exception e) {
@@ -392,6 +544,9 @@ public class TrainBusiness {
         model.setStatus("TRAINING_COMPLETED");
 
         Object finalLoss = response.get("final_loss");
+        if (!(finalLoss instanceof Number)) {
+            finalLoss = response.get("train_loss");
+        }
         if (finalLoss instanceof Number) {
             model.setFinalLoss(java.math.BigDecimal.valueOf(((Number) finalLoss).doubleValue()));
         }
@@ -402,22 +557,25 @@ public class TrainBusiness {
         }
 
         // 尝试获取文件大小，支持相对路径和绝对路径
-        try {
-            java.io.File modelFile = new java.io.File(model.getModelPath());
-            if (!modelFile.exists()) {
-                // 尝试相对路径
-                modelFile = new java.io.File("./ml_service", model.getModelPath());
+        String currentPath = model.getModelPath();
+        if (currentPath != null && !currentPath.isEmpty()) {
+            try {
+                java.io.File modelFile = new java.io.File(currentPath);
+                if (!modelFile.isFile()) {
+                    // 尝试相对路径
+                    modelFile = new java.io.File("./ml_service", currentPath);
+                }
+                if (!modelFile.isFile()) {
+                    // 尝试 model_weights 目录
+                    modelFile = new java.io.File("./ml_service/model_weights", new java.io.File(currentPath).getName());
+                }
+                if (modelFile.isFile()) {
+                    model.setModelSizeBytes(modelFile.length());
+                    log.info("[train] 模型文件大小: taskId={}, modelId={}, size={}", task.getTaskId(), model.getModelId(), modelFile.length());
+                }
+            } catch (Exception e) {
+                log.warn("[train] 获取模型文件大小失败: taskId={}, error={}", task.getTaskId(), e.getMessage());
             }
-            if (!modelFile.exists()) {
-                // 尝试 model_weights 目录
-                modelFile = new java.io.File("./ml_service/model_weights", new java.io.File(model.getModelPath()).getName());
-            }
-            if (modelFile.exists()) {
-                model.setModelSizeBytes(modelFile.length());
-                log.info("[train] 模型文件大小: taskId={}, modelId={}, size={}", task.getTaskId(), model.getModelId(), modelFile.length());
-            }
-        } catch (Exception e) {
-            log.warn("[train] 获取模型文件大小失败: taskId={}, error={}", task.getTaskId(), e.getMessage());
         }
 
         model.setUpdateTime(new Date());

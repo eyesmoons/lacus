@@ -27,6 +27,12 @@ public class LakeVectorIndexEntity {
     private String indexName;
 
     /**
+     * ChromaDB 集合名称
+     */
+    @TableField("collection_name")
+    private String collectionName;
+
+    /**
      * 关联图片库ID
      */
     @TableField("dataset_id")
@@ -37,6 +43,12 @@ public class LakeVectorIndexEntity {
      */
     @TableField("model_id")
     private Long modelId;
+
+    /**
+     * Python ML 端的构建任务 UUID
+     */
+    @TableField("ml_task_id")
+    private String mlTaskId;
 
     /**
      * 向量索引本地路径

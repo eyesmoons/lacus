@@ -17,11 +17,20 @@ public class VectorIndexDTO {
     @ApiModelProperty("向量库名称")
     private String indexName;
 
+    @ApiModelProperty("ChromaDB 集合名称")
+    private String collectionName;
+
     @ApiModelProperty("关联图片库ID")
     private Long datasetId;
 
+    @ApiModelProperty("关联图片库名称")
+    private String datasetName;
+
     @ApiModelProperty("关联模型ID")
     private Long modelId;
+
+    @ApiModelProperty("关联模型名称")
+    private String modelName;
 
     @ApiModelProperty("向量索引本地路径")
     private String indexPath;

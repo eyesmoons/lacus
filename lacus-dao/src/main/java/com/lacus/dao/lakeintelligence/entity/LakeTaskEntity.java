@@ -51,6 +51,12 @@ public class LakeTaskEntity {
     private String mlTaskId;
 
     /**
+     * 该任务训练产出的模型文件路径
+     */
+    @TableField("model_path")
+    private String modelPath;
+
+    /**
      * 状态: PENDING/TRAINING/COMPLETED/FAILED/CANCELLED
      */
     @TableField("status")

@@ -28,15 +28,15 @@ public class ClassifyController {
     @ApiOperation("图像分类推理（支持图片上传）")
     @PostMapping(consumes = "multipart/form-data")
     public ResponseDTO<ClassifyResponse> classify(@RequestPart(value = "image", required = false) MultipartFile image,
-                                                  @RequestParam(value = "model_id", required = false) String modelId) {
-        return ResponseDTO.ok(classifyBusiness.classify(image, modelId));
+                                                  @RequestParam(value = "task_id", required = false) Long taskId) {
+        return ResponseDTO.ok(classifyBusiness.classify(image, taskId));
     }
 
     @ApiOperation("批量图像分类推理")
     @PostMapping(value = "/batch", consumes = "multipart/form-data")
     public ResponseDTO<List<ClassifyResponse>> batchClassify(@RequestPart("images") List<MultipartFile> images,
-                                                             @RequestParam(value = "model_id", required = false) String modelId) {
-        return ResponseDTO.ok(classifyBusiness.batchClassify(images, modelId));
+                                                             @RequestParam(value = "task_id", required = false) Long taskId) {
+        return ResponseDTO.ok(classifyBusiness.batchClassify(images, taskId));
     }
 
     @ApiOperation("获取分类类别列表")

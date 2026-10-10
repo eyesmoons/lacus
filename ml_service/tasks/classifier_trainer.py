@@ -7,7 +7,7 @@ import torch
 from torch import nn, optim
 from torch.utils.data import DataLoader
 
-from core.trainer_base import BaseTrainer
+from core.trainer_base import BaseTrainer, resolve_device
 from models.classifier import Classifier
 
 logger = logging.getLogger(__name__)
@@ -32,7 +32,7 @@ class ClassifierTrainer(BaseTrainer):
         self.train_loader = train_loader
         self.val_loader = val_loader
         self.epochs = epochs
-        self.device = torch.device(device)
+        self.device = resolve_device(device)
         self.config = config
 
         # 构建模型、损失函数和优化器
@@ -95,7 +95,6 @@ class ClassifierTrainer(BaseTrainer):
     def _run_training(self) -> None:
         """执行训练循环"""
         logger.info("[train] 开始训练循环: task_id=%s, epochs=%s, device=%s", self.task_id, self.epochs, self.device)
-        min_val_loss = float("inf")
 
         for epoch in range(1, self.epochs + 1):
             self._check_cancelled()
@@ -114,10 +113,7 @@ class ClassifierTrainer(BaseTrainer):
             logger.info("[train] task_id=%s, epoch=%s/%s, train_loss=%.6f, val_loss=%.6f",
                         self.task_id, epoch, self.epochs, train_loss, val_loss)
 
-            # 保存最优模型
-            if val_loss < min_val_loss:
-                min_val_loss = val_loss
-                self.save_checkpoint(self.model, epoch)
-                logger.info("[train] 保存最优模型: task_id=%s, epoch=%s, val_loss=%.6f", self.task_id, epoch, val_loss)
-
+        # 训练结束只保存一个模型文件（时间戳命名）
+        path = self.save_model(self.model)
+        logger.info("[train] 保存模型: task_id=%s, path=%s", self.task_id, path)
         logger.info("[train] 训练循环完成: task_id=%s", self.task_id)

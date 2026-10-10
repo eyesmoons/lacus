@@ -43,7 +43,7 @@ def _class_names_for(n_classes: int) -> List[str]:
 @router.post("/api/classify")
 async def classify_image(
     image: UploadFile = File(..., description="待分类的图片文件"),
-    model_id: str = Form("classifier", description="模型标识符"),
+    model_path: str = Form(None, description="分类模型文件路径"),
 ):
     """图像分类推理
 
@@ -52,9 +52,9 @@ async def classify_image(
     if not image or not image.filename:
         raise HTTPException(status_code=422, detail="请提供图片文件")
 
-    # 1. 加载模型
+    # 1. 加载模型（按路径加载训练好的权重）
     cache = ModelCache()
-    model = cache.get_model(model_id)
+    model = cache.get_model("classifier", weights_path=model_path)
     model.eval()
 
     # 2. 预处理图片
