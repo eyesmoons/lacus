@@ -6,3 +6,4 @@ target/
 docs
 AGENTS.md
 CLAUDE.md
+.claude
